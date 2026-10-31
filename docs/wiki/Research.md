@@ -1,6 +1,6 @@
 # Research
 
-Research is how your country learns. You build schools, fill their seats with young men from the same recruit pool your army draws on, and after five years they graduate as scholars whose work, counted in scholar-years, unlocks new inventions. Every country climbs one shared invention tree that reaches back before the start, through the Ancient and Medieval eras, and on to the radios and tanks of the 1930s. Not every country starts at the same place on it: some begin the game still missing the plough, the horse or iron, and have to catch up. And every seat you fill is a soldier you didn't raise.
+Research is how your country learns. You build schools, fill their seats with young men from the same recruit pool your army draws on, and after five years they graduate as scholars whose work, counted in scholar-years, unlocks new inventions. Every country climbs one shared invention tree that reaches back before the start, through the Ancient and Medieval eras, and on to the radios and tanks of the 1930s. Not every country starts at the same place on it: some begin the game still missing the plough, the horse or iron, and have to catch up. And every seat you fill costs ten soldiers you didn't raise.
 
 ## How it works
 
@@ -40,9 +40,9 @@ You study **one invention at a time**, or **two** once you have an academy-level
 
 ### Why war and research don't mix
 
-- Every school seat filled takes one man from the recruit pool the army can raise.
+- Every school seat filled takes 10 men from the recruit pool the army can raise. If the pool can't pay for a seat in full, it stays empty.
 - Schools cost gold every year, from the same treasury that pays soldiers.
-- If you call students to arms, the schools empty back into recruits at once, research stops, and those students never become scholars.
+- If you call students to arms, the schools empty back into recruits at once, but only the students themselves come back, one man per student, not the 10 each cost. Research stops, and those students never become scholars.
 - Fighting in a province with a school can sack it and scatter its scholars, who may flee to a peaceful neighbour.
 
 ### What an invention costs
@@ -383,7 +383,7 @@ Under the tabs one line gives your standing, "Abreast of the times" or "Behind b
   - **Queue the path** when you don't: it lists the missing steps in an order you can study them, then the invention, with the total scholar-years and time, before you tap. If the path would make the queue longer than 5, the sheet says so and queues none of it.
 
   A known invention has no action. Study now never drops progress; to replace a study under way, the sheet offers **Switch to this study** and says how many scholar-years you would lose.
-- **Schools.** Your students: the **−5** and **+5** buttons set how many seats to fill. Each student is a man the army can't raise: more students fill from your recruit pools at once, fewer go back to them. **In need of soldiers?** folds out **Call students to arms**, which empties every school back into recruits at once; research stops until you fill seats again, and those students never become scholars. Then each school, where it is (tap to see the province) and its students, schools being founded with the months until they open, and their upkeep a year, also shown as the **Schools** line of the Treasury. **Found a school** opens the list of your towns without a school: a temple school costs 60 gold and opens after 12 months (a madrasa, with 30 seats, if you know Madrasa networks). You need Temple and monastery schools or Madrasa networks.
+- **Schools.** Your students: the **−5** and **+5** buttons set how many seats to fill. Each student costs 10 recruits the army can't raise, and the Schools part says so: what five more cost and what your students took. More students fill from your recruit pools at once; fewer go back to them, one man each. **In need of soldiers?** folds out **Call students to arms**, which empties every school back into recruits at once; research stops until you fill seats again, and those students never become scholars. Then each school, where it is (tap to see the province) and its students, schools being founded with the months until they open, and their upkeep a year, also shown as the **Schools** line of the Treasury. **Found a school** opens the list of your towns without a school: a temple school costs 60 gold and opens after 12 months (a madrasa, with 30 seats, if you know Madrasa networks). You need Temple and monastery schools or Madrasa networks.
 
 **On a phone.** Held sideways, the realm's name gives way and Back, Fold and Close sit at the end of the section row, so the tree gets the height. Where the page is at least 560 points wide, Next shows its two columns side by side; narrower, they stack. Where it is at least 500 points wide, the sheet stands beside the tree and the branch names sit in a pinned column. On a narrower screen (Tall), the tree and the sheet stack: the branch names shrink to a coloured strip with the branch's first letter, and the sheet slides up from the bottom when you pick something and closes with its own **✕**. Everything stays inside the safe areas, every chip, node and button is at least 44 points, nothing needs hover, and the page never scrolls sideways.
 

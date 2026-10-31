@@ -386,7 +386,7 @@ Then(new RegExp(`^the country "([^"]+)" has ${NUM} recruits$`), (s, _country: st
 Given("the country {string} has {int} students", (s, country: string, n: number) => {
   const p = programme(s, country);
   addTempleSchools(p, Math.ceil(n / 20));
-  s.pool = { recruits: 1000 };
+  s.pool = { recruits: n * R.recruitsPerStudent() };
   R.fillSeats(p, s.pool, n, 1440);
   s.year = 1445;
 });
@@ -509,7 +509,7 @@ Given("the country {string} has {int} students and studies {string}", (s, countr
   const p = programme(s, country);
   p.known.add("B1").add("C2").add("W3");
   addTempleSchools(p, Math.ceil(n / 20));
-  s.pool = { recruits: 1000 };
+  s.pool = { recruits: n * R.recruitsPerStudent() };
   R.fillSeats(p, s.pool, n, 1444);
   s.recruitsBefore = s.pool.recruits;
   expect(R.setStudy(p, idOf(name), { year: 1500 })).toEqual({ ok: true });
@@ -710,7 +710,7 @@ Given("the country {string} has {int} scholars and {int} students", (s, country:
   const p = programme(s, country);
   p.scholars = scholars;
   addTempleSchools(p, Math.ceil(n / 20));
-  R.fillSeats(p, { recruits: n }, n, 1440);
+  R.fillSeats(p, { recruits: n * R.recruitsPerStudent() }, n, 1440);
 });
 
 Given("it studies {string} with {int} scholar-years of progress", (s, name: string, progress: number) => {

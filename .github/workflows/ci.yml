@@ -83,3 +83,24 @@ jobs:
           php bin/console doctrine:schema:validate
           php bin/console doctrine:migrations:migrate first --no-interaction
           php bin/console doctrine:migrations:migrate --no-interaction
+
+  # The server image for one-VPS deploys (deploy/, docs/deploy.md): build it, start it with its
+  # database, and check that the migrations ran, the API answers and the web game is served.
+  deploy-image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start the stack
+        run: |
+          printf 'DOMAIN=localhost\nSERVER_NAME=:80\nPUBLIC_URL=http://localhost\nPOSTGRES_PASSWORD=ci%s\nAPP_SECRET=%s\n' "$(openssl rand -hex 8)" "$(openssl rand -hex 32)" > deploy/.env
+          docker compose -f deploy/compose.yaml up -d --build
+      - name: The server, website and game answer
+        run: |
+          for i in $(seq 1 60); do curl -sf http://localhost/api/health && break; sleep 2; done
+          curl -sf http://localhost/api/health | grep -q '"ok"'
+          curl -sf -o /dev/null http://localhost/
+          curl -sf http://localhost/play/ | grep -q '<script'
+          docker compose -f deploy/compose.yaml exec -T app php bin/console doctrine:migrations:up-to-date
+      - if: failure()
+        run: docker compose -f deploy/compose.yaml logs

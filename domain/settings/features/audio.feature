@@ -59,7 +59,7 @@ Feature: Audio settings
     And the march is heard
 
   @SET-053
-  Scenario Outline: Ambience on by default, its volume greyed while off
+  Scenario Outline: Ambience off by default, its volume greyed while off
     Given "Ambience" is "<ambience>"
     When Audio is opened
     Then "Ambience volume" is <state>

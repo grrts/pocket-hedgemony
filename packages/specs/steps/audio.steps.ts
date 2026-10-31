@@ -54,9 +54,9 @@ Given("{string} plays", (s, id: string) => {
 Given("a fresh install", (s) => {
   s.settings = A.defaultSettings();
 });
-Then("the ambience setting is on", (s) => {
-  expect(s.settings.ambienceOn).toBe(true);
-  expect(cfg.music.defaults.ambience).toBe(true);
+Then("the ambience setting is off", (s) => {
+  expect(s.settings.ambienceOn).toBe(false);
+  expect(cfg.music.defaults.ambience).toBe(false);
 });
 Given("ambience is on", (s) => {
   s.ambienceOn = true;
@@ -1529,8 +1529,8 @@ Then(/^music volume is ([\d.]+), effects volume ([\d.]+) and ambience volume ([\
 Then(/^the variety is "own palette only"$/, () => {
   expect(cfg.music.defaults.variety).toBe("own_palette");
 });
-Then("interface sounds are on, haptics are on, ambience is on", (s) => {
-  expect([s.settings.uiSounds, s.settings.haptics, s.settings.ambienceOn]).toEqual([true, true, true]);
+Then("interface sounds are on, haptics are on, ambience is off", (s) => {
+  expect([s.settings.uiSounds, s.settings.haptics, s.settings.ambienceOn]).toEqual([true, true, false]);
 });
 Then("mono, sound captions and reduced intensity are off", (s) => {
   expect([s.settings.mono, A.captionsOn(s.settings), s.settings.reducedIntensity]).toEqual([false, false, false]);

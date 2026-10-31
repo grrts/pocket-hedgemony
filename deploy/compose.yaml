@@ -1,0 +1,62 @@
+# One server running everything (docs/deploy.md): the game's server and website with HTTPS, the web
+# game at /play, and PostgreSQL 16. Settings come from deploy/.env (copy deploy/.env.example).
+#
+#   docker compose -f deploy/compose.yaml up -d --build
+name: pocket-hegemony
+
+services:
+  database:
+    # The same database as local development (server/compose.yaml), with its password from deploy/.env.
+    extends:
+      file: ../server/compose.yaml
+      service: database
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in deploy/.env}
+    restart: unless-stopped
+
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args:
+        VITE_CLOUD_API: ${PUBLIC_URL:-https://${DOMAIN:?Set DOMAIN in deploy/.env}}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+        VITE_APPLE_SERVICES_ID: ${VITE_APPLE_SERVICES_ID:-}
+        VITE_APPLE_REDIRECT_URI: ${VITE_APPLE_REDIRECT_URI:-}
+    image: pocket-hegemony-app
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-${DOMAIN}}
+      APP_SECRET: ${APP_SECRET:?Set APP_SECRET in deploy/.env}
+      DATABASE_URL: postgresql://app:${POSTGRES_PASSWORD}@database:5432/app?serverVersion=16&charset=utf8
+      DEFAULT_URI: ${PUBLIC_URL:-https://${DOMAIN}}
+      PLAY_URL: ${PUBLIC_URL:-https://${DOMAIN}}/play/
+      # The web game here, plus the desktop and phone apps' own origins.
+      CORS_ALLOW_ORIGINS: ${PUBLIC_URL:-https://${DOMAIN}},app://game,capacitor://localhost,https://localhost
+      SIGN_IN_RETURN_URLS: pockethegemony://auth/steam,${PUBLIC_URL:-https://${DOMAIN}}/play/
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL:-}
+      # Caddy faces the internet itself: no proxy in front to trust.
+      TRUSTED_PROXIES: ""
+    env_file:
+      # Optional extras: Steam, Apple, Google, S3 (server/.env lists them all).
+      - path: ./server.env
+        required: false
+    volumes:
+      - saves:/srv/saves
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  database_data:
+  saves:
+  caddy_data:
+  caddy_config:

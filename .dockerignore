@@ -1,0 +1,10 @@
+**/node_modules
+**/dist
+**/out
+.git
+apps/desktop/release
+server/vendor
+server/var
+server/.env.local
+server/.env.*.local
+deploy/.env

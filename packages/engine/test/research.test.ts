@@ -99,18 +99,21 @@ describe("research", () => {
     w.research.forEach((p, n) => !w.nationAsleep[n] && expect(p.group).toBeDefined());
   });
 
-  it("takes students from the recruit pools and gives them back when called to arms", () => {
+  it("takes each student's cost from the recruit pools and gives back only the students when called to arms", () => {
     const { w, me, p } = setup();
     const levies = w.nationLevies[me]!;
     ok(w, { type: "setSeats", n: 20 }, me);
     expect(rs.students(p)).toBe(20);
-    expect(w.nationLevies[me]).toBeCloseTo(levies - 10, 0);
+    const k = rs.recruitsPerStudent();
+    // 10 more students at k recruits each (RSCH-020).
+    expect(w.nationLevies[me]).toBeCloseTo(levies - 10 * k, 0);
     ok(w, { type: "setSeats", n: 15 }, me);
     expect(rs.students(p)).toBe(15);
     ok(w, { type: "callStudentsToArms" }, me);
     expect(rs.students(p)).toBe(0);
     expect(p.stopped).toBe(true);
-    expect(w.nationLevies[me]!).toBeGreaterThan(levies - 1);
+    // 5 sent home and 15 called come back one man each; the rest of the cost is spent (RSCH-022).
+    expect(w.nationLevies[me]!).toBeCloseTo(levies - 10 * k + 20, 0);
     expect(refused(w, { type: "callStudentsToArms" }, me)).toMatch(/no students/);
   });
 

@@ -53,10 +53,18 @@ Feature: Schools, students and scholars
 
   @RSCH-004
   Scenario: The player sets how many seats to fill
+    # config: research.recruits_per_student (10)
     Given the country "France" has 200 empty seats and 48,000 recruits
     When the player sets 150 seats to be filled
     Then 150 recruits become students
-    And the country "France" has 47,850 recruits
+    And the country "France" has 46,500 recruits
+
+  @RSCH-020
+  Scenario: Seats the recruits can't pay for stay empty
+    Given the country "France" has 200 empty seats and 1,234 recruits
+    When the player sets 200 seats to be filled
+    Then 123 recruits become students
+    And the country "France" has 4 recruits
 
   @RSCH-005
   Scenario Outline: Students are lost

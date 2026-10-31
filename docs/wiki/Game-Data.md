@@ -12,7 +12,7 @@ Keys are written as in the config. Shares are fractions (0.25 is 25 %). A value 
 | [Province](Data-Province) | 927 | `domain/province.json` | [Provinces](Provinces) |
 | [Buildings](Data-Buildings) | 1503 | `domain/buildings.json` | [Buildings](Buildings) |
 | [Trade](Data-Trade) | 323 | `domain/trade.json` | [Trade](Trade) |
-| [Research](Data-Research) | 2138 | `domain/research.json` | [Research](Research) |
+| [Research](Data-Research) | 2139 | `domain/research.json` | [Research](Research) |
 | [Institutions](Data-Institutions) | 161 | `domain/institutions.json` | [Institutions](Institutions) |
 | [Warfare](Data-Warfare) | 1687 | `domain/warfare.json` | [Warfare](Warfare) |
 | [Recruiting](Data-Recruiting) | 266 | `domain/recruiting.json` | [Recruiting](Recruiting) |
