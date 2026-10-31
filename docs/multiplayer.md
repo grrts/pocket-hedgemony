@@ -64,8 +64,8 @@ What simultaneous costs: an order you give while planning acts at once on your o
 - Pass and play keeps no news log per player: each player sees the news from the last week played.
 - No chat, and no push notification when a game waits on you.
 - Only the Artifact's owner and its Editors can play online in the Artifact (see above); on our server anyone with an account can.
-- Every poll is preceded by a browser CORS check while the game and the server are on different addresses; serving the web game from the server's address would halve the requests.
+- Every poll is preceded by a browser CORS check while the game and the server are on different addresses; the Docker deploy serves the web game from the server's address, which avoids it.
 
 ## What is needed to go live
 
-The server work is done and tested locally, on SQLite and on PostgreSQL 16 (the migration `server/migrations/Version20261031181935.php` makes the three tables). Going live needs what accounts need (accounts-design §10, `docs/deploy.md`): a domain with HTTPS, a host for the Symfony server with Postgres, and the web game's address in `CORS_ALLOW_ORIGINS`. Then a build with `VITE_CLOUD_API` set plays online on the server.
+The server work is done and tested locally, on SQLite and on PostgreSQL 16 (the migration `server/migrations/Version20261031181935.php` makes the three tables). To try it on a test server, follow [A test server on one VPS](deploy.md#a-test-server-on-one-vps): one Docker compose with PostgreSQL 16 and HTTPS serves the server and the web game at `/play/` from one address, runs the migrations on start, and the game built there plays online with nothing else to set up. Two people sign up from the Play page's Account card, one hosts, the other joins by the code.

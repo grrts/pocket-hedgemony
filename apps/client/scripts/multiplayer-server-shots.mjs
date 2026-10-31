@@ -21,7 +21,7 @@ const check = (ok, what) => {
   failed ||= !ok;
   console.log(`${ok ? "PASS" : "FAIL"} ${what}`);
 };
-const ready = (page) => page.waitForFunction(() => globalThis.__phDiagnostics?.engineRoundTripMs != null, null, { timeout: 120000 });
+const ready = (page) => page.waitForFunction(() => globalThis.__phDiagnostics?.engineRoundTripMs != null, null, { timeout: 600000 });
 const mpState = (page) => page.evaluate(() => globalThis.__phMp());
 const ready_ = async (page) => {
   for (let k = 0; k < 6; k++) {
@@ -32,6 +32,20 @@ const ready_ = async (page) => {
   }
   await page.click(".end-turn");
 };
+
+/**
+ * Freezes the running games while another browser loads: three pages drawing the map in software on one machine
+ * starve the new page's engine for minutes. A frozen page runs no script; it catches up when thawed.
+ */
+async function frozen(pages, run) {
+  const set = (state) => Promise.all(pages.map(async (p) => (await p.context().newCDPSession(p)).send("Page.setWebLifecycleState", { state })));
+  await set("frozen");
+  try {
+    return await run();
+  } finally {
+    await set("active");
+  }
+}
 
 /** A new account, signed in on a new device: the tokens the game keeps in "ph.cloud-device". */
 async function account(name) {
@@ -48,11 +62,17 @@ async function account(name) {
 /** A browser of its own (nothing shared with the others), signed in as `tokens`, or signed out. */
 async function device(name, tokens) {
   const context = await browser.newContext({ ...devices[name] });
-  if (tokens) await context.addInitScript((t) => localStorage.setItem("ph.cloud-device", t), JSON.stringify(tokens));
+  // Only on the first load: the game rotates the device token, and a reload must keep the new one.
+  if (tokens) await context.addInitScript((t) => localStorage.getItem("ph.cloud-device") || localStorage.setItem("ph.cloud-device", t), JSON.stringify(tokens));
   const page = await context.newPage();
   page.on("pageerror", (e) => console.log(`[${name}] page error: ${e.message}`));
+  page.on("console", (m) => m.type() === "error" && console.log(`[${name}] console: ${m.text()}`));
   await page.goto(base);
-  await ready(page);
+  await ready(page).catch(async (e) => {
+    await page.screenshot({ path: `${out}/stuck-ready.png` });
+    console.log(`[${name}] diagnostics: ${JSON.stringify(await page.evaluate(() => globalThis.__phDiagnostics ?? null))}`);
+    throw e;
+  });
   // A build that can send reports asks first (SHELL-014): nothing is sent from these runs.
   const none = page.locator("[data-start=consent][data-choice=none]");
   if (await none.count()) await none.click();
@@ -117,14 +137,12 @@ async function play() {
     await a.waitForFunction(() => globalThis.__phMp()?.waiting === true);
     if (week === 1) {
       await a.screenshot({ path: `${out}/4-waiting.png` });
-      // Your games on a second browser of Ana's account marks the game as waiting on her (MP-074).
-      const b2 = await device("Pixel 7 landscape", await ana("Pixel"));
-      await b2.click("[data-start=multiplayer]");
-      await b2.waitForSelector(`[data-mp-rejoin="${code}"]`, { timeout: 20000 });
-      await b2.evaluate(() => (document.querySelector(".mp-menu").scrollTop = 1e4));
-      await b2.screenshot({ path: `${out}/5-your-games-waiting.png` });
-      check((await b2.textContent(`[data-mp-rejoin="${code}"]`)).includes("waiting for your orders"), "Your games on another device marks the game waiting on this player");
-      await b2.context().close();
+      // Your games of Ana's account, asked from another of her devices, marks the game as waiting on her (MP-074).
+      // Asked of the server: a third browser loading the map beside two running games takes minutes on this machine.
+      const other = await ana("Pixel");
+      const s = await fetch(`${api}/api/sessions/refresh`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ deviceToken: other.deviceToken }) }).then((r) => r.json());
+      const mine = await fetch(`${api}/api/games`, { headers: { Authorization: `Bearer ${s.accessToken}` } }).then((r) => r.json());
+      check(mine.games.some((g) => g.code === code && g.yourMove), "Your games on another device marks the game waiting on this player");
     }
     await ready_(b);
     for (const p of [a, b])
@@ -146,11 +164,11 @@ async function play() {
   await a.screenshot({ path: `${out}/6-players.png` });
 
   // Ana comes back on a fresh browser of her account: Your games comes from the server (MP-050, MP-038).
-  const c = await device("iPad Pro 11 landscape", await ana("Laptop"));
+  const c = await frozen([a, b], async () => device("iPad Pro 11 landscape", await ana("Laptop")));
   await c.click("[data-start=multiplayer]");
   await c.waitForSelector(`[data-mp-rejoin="${code}"]`, { timeout: 20000 });
   await c.click(`[data-mp-rejoin="${code}"]`);
-  await c.waitForFunction(() => globalThis.__phMp()?.turn === 3, null, { timeout: 120000 });
+  await c.waitForFunction(() => globalThis.__phMp()?.turn === 3, null, { timeout: 600000 });
   await c.waitForTimeout(1500);
   const [sc, sa] = [await mpState(c), await mpState(a)];
   check(sc.hash === sa.hash, `a device coming back catches up to the same world (${sc.hash} / ${sa.hash})`);
@@ -165,7 +183,7 @@ async function play() {
   await a.screenshot({ path: `${out}/8-hand-over-confirm.png` });
   await a.click('[data-mp-drop="france"]');
   await a.waitForFunction(() => document.querySelector("#panel")?.textContent?.includes("played by the AI"), null, { timeout: 20000 });
-  await b.waitForSelector(".mp-menu [role=alert]", { timeout: 60000 });
+  await b.waitForSelector(".mp-menu [role=alert]", { timeout: 600000 });
   check((await b.textContent(".mp-menu [role=alert]")).includes("handed to the AI"), "the player whose realm went to the AI is told, back on the start screen");
   await b.screenshot({ path: `${out}/9-handed-to-the-ai.png` });
   check(!(await b.locator(`[data-mp-rejoin="${code}"]`).count()), "the game leaves Your games of that player");

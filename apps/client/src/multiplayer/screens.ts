@@ -32,7 +32,6 @@ export function menuHtml(
       <input id="mp-code-input" name="code" class="paper" placeholder="CODE" value="${esc(o.typed)}" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go" required ${o.busy ? "disabled" : ""}>
       <button class="wax" type="submit" ${o.busy ? "disabled" : ""}>Join</button>
     </form>
-    ${o.message ? `<p class="mp-note mp-bad" role="alert">${esc(o.message)}</p>` : ""}
     ${
       o.mine.length
         ? `<h3>Your games</h3><div class="mp-games">${o.mine
@@ -48,6 +47,7 @@ export function menuHtml(
     <p class="mp-note">Everyone plans the same week at once; when all are ready, the orders are carried out together and the week plays.</p>
     <button class="wax" data-mp="hotseat">${icon("crown", 2)}<span><b>Pass and play</b><small>2 to 4 realms on this device</small></span></button>
     <h3>Online</h3>
+    ${o.message ? `<p class="mp-note mp-bad" role="alert">${esc(o.message)}</p>` : ""}
     ${online}
   </div>`;
 }
