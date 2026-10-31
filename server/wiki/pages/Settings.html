@@ -7,7 +7,8 @@
 <li><strong>Gameplay</strong>: Tutorial hints (with how many of the six are done) and Reset tutorial and hints; Achievement toasts; Autosave and Autosaves kept per campaign; Turn playback speed (1×, 2×, 4×: how fast the week plays out after End turn) and Battle playback speed.</li>
 <li><strong>Graphics</strong>: Battery saver (Off, Auto, On) and the knobs it moves: Frame rate cap, Sharpness and Animations. Rows it moves say &quot;Set by Battery saver&quot;. Auto follows your device&#39;s battery where the browser reports it.</li>
 <li><strong>Audio</strong>: Master, Music on or off and its volume, Effects volume and Interface sounds. The speaker button&#39;s Sound card changes the same settings.</li>
-<li><strong>Accessibility</strong>: Text size (Normal, Large, Larger) for the cards, menus and alerts.</li>
+<li><strong>Accessibility</strong>: Colour vision (Default, Red-weak, Green-weak, Blue-weak, No colour), with a sample of four neighbouring realms and a map mode&#39;s ramp in the chosen mode under it; Patterns on map modes; Text size (Normal, Large, Larger) for the cards, menus and alerts. A colour vision change redraws the map, the armies and routes and the map mode&#39;s key at once.</li>
+<li><strong>Privacy</strong> (in a build that has a server): Send crash reports and Send anonymous usage statistics. The first time the start screen opens, one card, &quot;Help us improve&quot;, asks for both: Send both, Crash reports only, or No thanks. Both stay off until you say yes.</li>
 </ul>
 <p>Other rows join the screen as the game builds what they do.</p>
 <h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
@@ -69,15 +70,16 @@
 <h3 id="campaign-rules"><a class="anchor" href="#campaign-rules" aria-label="Link to this section">#</a>Campaign rules</h3>
 <p>These are chosen on the new game screen, saved in the campaign, and shown read-only in Settings, under Campaign rules:</p>
 <ul>
-<li>difficulty;</li>
+<li>difficulty (Easy, Normal or Hard; what each changes is in <a href="/wiki/The-1378-Start#difficulty">The 1378 start</a>);</li>
 <li>AI temper;</li>
 <li>fog of war;</li>
-<li>historical or free events;</li>
+<li>historical, plausible or free events (plausible by default);</li>
 <li>ironman (achievements only count in ironman);</li>
 <li>the campaign end date (default 31 August 1939);</li>
 <li>whether music eras follow the calendar or technology.</li>
 </ul>
 <p>The map mode menu&#39;s &quot;Hide unexplored lands&quot; stays a display switch, because it only hides unknown lands visually. It would become a campaign rule only if fog ever hid information the computer uses.</p>
+<p>In this build the campaign rules are difficulty, events, fog of war, ironman and the end date, chosen on the <em>Rules of the campaign</em> card (<a href="/wiki/The-1378-Start#campaign-rules">The 1378 start</a>), and the game menu shows them read-only in one line under the date. With fog of war off, &quot;Hide unexplored lands&quot; gives way to a line saying every land is shown. While an ironman campaign is played, Settings hides Autosave and Autosaves kept.</p>
 <h3 id="graphics"><a class="anchor" href="#graphics" aria-label="Link to this section">#</a>Graphics</h3>
 <div class="table-scroll"><table>
 <thead><tr><th>Setting</th><th>Options</th><th>Default</th><th>Notes</th></tr></thead>
@@ -236,6 +238,7 @@
 <ul>
 <li><strong>Colour vision</strong> swaps nation colours to a second assignment from the same 32-colour palette, chosen so neighbours stay distinguishable for that vision type, and each map mode&#39;s colour ramp to a safe one (blue to orange instead of red to green). No colour uses greys with patterns. Every mode keeps the map&#39;s season colours (snow, spring green, autumn gold, the wet season) apart: the colour-blind modes shift them with the safe ramp and No colour uses tile patterns. Seasons cannot be switched off.</li>
 <li><strong>Patterns on map modes</strong> adds hatching, dots and stripes by band, so a map mode reads without colour.</li>
+<li>In the colour-blind modes the realms keep a colour near their own where they can, but never one their neighbours can&#39;t be told from by that kind of colour vision. Map modes that ran red to green (Food, Diplomacy, Subjects, Exploration) run orange for bad or hostile and blue for good or friendly, and the ramps (People, Wealth, Trade) run pale orange to dark blue, lighter to darker, so they also read in grey. With No colour every realm is a grey with a pattern of its own beside its neighbours.</li>
 <li><strong>High contrast borders</strong> draw nation borders in black and white ink two art pixels wide.</li>
 <li><strong>Text size</strong>: panels reflow and cards grow taller, not smaller.</li>
 <li><strong>Plain font</strong> replaces the pixel font and the blackletter titles with a clear, openly licensed sans such as Atkinson Hyperlegible.</li>
@@ -256,6 +259,9 @@
 <li><strong>Account:</strong> Sign in or Create account; when signed in, your email and Sign out. Default signed out, never a wall before playing. The Load screen&#39;s &quot;Sign in to sync&quot; opens the same flow.</li>
 <li>While signed in: <strong>Cloud saves</strong> (On by default, syncing saves and personal settings), <strong>Sync on Wi-Fi only</strong> (Off by default), the list of signed-in devices each with Sign out, and <strong>Delete account and saves</strong> with a confirmation (also reachable from Privacy).</li>
 <li><strong>Privacy:</strong> Send crash reports and Send anonymous usage statistics (asked on first launch), and, in the free mobile tier only if the ad stays, Ad consent, which reopens the consent form.</li>
+</ul>
+<p><strong>What is sent.</strong> Nothing goes anywhere unless you turned the row on, and turning it off throws away whatever was still waiting. Usage statistics are short records such as a campaign starting, a turn ending (every week of the first season, then one week in thirteen) or a tutorial step reached, with a random install number; they wait on your device while you play offline and go to our own server every few minutes. A crash report says what failed and where in the game&#39;s code (file names only), what was open, your browser&#39;s name and main version, and the game&#39;s version, and never names your account. Both go to Pocket Hegemony&#39;s own server and nowhere else; the website&#39;s Privacy page lists every field and how long each is kept.</p>
+<ul>
 <li><strong>About:</strong> version and build number, Restore purchases (which Apple requires to be reachable), Credits and licences, Reset all settings, and Copy diagnostics (the diagnostics line and your settings on the clipboard for support).</li>
 </ul>
 <h3 id="platform-notes"><a class="anchor" href="#platform-notes" aria-label="Link to this section">#</a>Platform notes</h3>

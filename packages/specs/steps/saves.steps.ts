@@ -1553,6 +1553,12 @@ function mismatched(s: Scenario, ironman: boolean): void {
   s.saveBytes = reheader(w.bytes, (h) => (h.worldHash = "00000000"));
 }
 When("the player opens it", (s) => {
+  // A shared save (SAVE-128): its copy, a new campaign of the player's own, is what opens.
+  if (s.shared) {
+    s.copy = S.sharedCopy(s.shared.bytes, ctx(s, { device: "iPhone", platform: "ios" }), s.shared.from);
+    s.opened = S.openSave(s.copy.bytes, opener(s));
+    return;
+  }
   if (s.hashMismatch) {
     s.result = S.openSave(s.saveBytes, opener(s));
     if (s.result.kind === "hash warning") s.accepted = S.openSave(s.saveBytes, { ...opener(s), acceptModified: true });
@@ -2787,4 +2793,242 @@ Then("the orders journal holds {string} on day {int}", (s, choice: string, day: 
 
 Then("the account's synced files include {string}", (_s, file: string) => {
   expect(S.syncedFiles()).toContain(file);
+});
+
+// ---------------------------------------------------------------- shared saves (SAVE-128, SAVE-129)
+
+Given("a shared save {string} by {string} with the code {string}", (s, _name: string, author: string, code: string) => {
+  s.shared = { bytes: write(s, "manual").bytes, from: { code, author } };
+});
+Given("a shared save of an ironman campaign", (s) => {
+  campaign(s, "Castile", true);
+  s.shared = { bytes: write(s, "ironman").bytes, from: { code: "K7QXM2PA", author: "Leroy" } };
+});
+Then("a new campaign with its own campaign id joins the Manual saves", (s) => {
+  expect(s.copy.header.campaignId).not.toBe(campaign(s).campaignId);
+  expect(s.copy.header.kind).toBe("manual");
+  expect(s.copy.path).toBe(S.fileName(s.copy.header));
+  expect(s.opened.kind).toBe("opened");
+});
+Then("its header says it came from {string} by {string}", (s, code: string, author: string) => {
+  expect(S.readHeader(s.copy.bytes).sharedFrom).toEqual({ code, author });
+});
+Then("every later save of that campaign says so too", (s) => {
+  const h = s.copy.header as S.SaveHeader;
+  const played: S.Campaign = { campaignId: h.campaignId, playerNation: h.playerNation, nationName: nationName(h.playerNation), ironman: h.ironman, options: h.options, modified: false, playSeconds: h.playSeconds, sharedFrom: h.sharedFrom! };
+  const later = S.writeSave(ctx(s), played, world(s), "resume");
+  expect(later.header.sharedFrom).toEqual(h.sharedFrom);
+});
+Then("the copy is not ironman", (s) => {
+  expect(S.readHeader(s.shared.bytes).ironman).toBe(true);
+  expect(s.copy.header.ironman).toBe(false);
+  expect(s.opened.kind).toBe("opened");
+  expect(s.opened.header.ironman).toBe(false);
+});
+Then("its flag ironman_unbroken is off", (s) => {
+  expect(s.copy.header.flags.ironman_unbroken).toBe(false);
+});
+
+// ================================================================ steam-desktop (SAVE-145)
+
+interface PartnerSite {
+  root: string;
+  subdirectory: string;
+  pattern: string;
+  os: string;
+  recursive: boolean;
+  overrides: { os: string; root: string; path: string; replace_path?: boolean }[];
+}
+const steamBackup = () => S.storeBackup("steam") as { partner_site: PartnerSite; product_name: string; folder: string };
+const override = (os: string) => steamBackup().partner_site.overrides.find((o) => o.os === os);
+
+Then("the Auto-Cloud root is {string} with the subdirectory {string}", (_s, root: string, sub: string) => {
+  const site = steamBackup().partner_site;
+  expect(site.root).toBe(root);
+  expect(site.subdirectory).toBe(sub);
+});
+Then(/^the Auto-Cloud pattern is "([^"]+)", recursive, for every OS$/, (_s, pattern: string) => {
+  const site = steamBackup().partner_site;
+  expect(site.pattern).toBe(pattern);
+  expect(`x${C.format.extension}`.endsWith(pattern.replace("*", ""))).toBe(true);
+  expect(site.recursive).toBe(true);
+  expect(site.os).toBe("all");
+});
+Then("on macOS the root is overridden to {string} with the same path", (_s, root: string) => {
+  expect(override("macos")).toEqual({ os: "macos", root, path: steamBackup().partner_site.subdirectory });
+});
+Then("on Linux the root is overridden to {string} with the path {string}", (_s, root: string, path: string) => {
+  expect(override("linux")).toEqual({ os: "linux", root, path, replace_path: true });
+});
+Then("the desktop app's product name is {string}", (_s, name: string) => {
+  expect(steamBackup().product_name).toBe(name);
+  expect(steamBackup().partner_site.subdirectory.startsWith(`${name}/`)).toBe(true);
+});
+
+// ================================================================ purchases (SAVE-170 … SAVE-181)
+
+const STORE_OF: Record<string, S.Store> = { Steam: "steam", "the Android phone": "google" };
+const unlocked = (s: Scenario): boolean =>
+  s.noUnlockState ? true : S.fullGameUnlocked({ store: s.store, owned: s.owned, ...(s.serverAnswer && s.serverAnswer !== "no answer" ? { server: s.serverAnswer } : {}) });
+
+Given("the account is signed in on Steam and on an Android phone", (s) => {
+  const deck = dev(s, "Steam Deck");
+  const phone = dev(s, "Pixel 8");
+  s.syncedCampaign = playOffline(s, deck, "Portugal", 1);
+  sync(s, deck);
+  sync(s, phone);
+  s.phone = phone;
+});
+Then(/^the full game is (unlocked|locked) on (Steam|the Android phone)$/, (s, state: string, where: string) => {
+  const store = STORE_OF[where]!;
+  // Each store answers for its own purchase only: the account's other stores are never asked (cross-buy per store).
+  const owned = store === "steam" ? s.purchases.steam : s.purchases.android;
+  expect(S.fullGameUnlocked({ store, owned, server: owned ? "active" : "none" })).toBe(state === "unlocked");
+});
+Then("the account's saves are on both", (s) => {
+  const id = s.syncedCampaign.campaignId;
+  expect(S.entries(s.phone.storage).some((e) => e.header.campaignId === id)).toBe(true);
+  expect(S.entries(dev(s, "Steam Deck").storage).some((e) => e.header.campaignId === id)).toBe(true);
+});
+
+Given("the game runs on the store {string}", (s, store: string) => {
+  expect(S.STORES).toContain(store);
+  s.store = store;
+});
+Given(/^the store says the full game is (owned|not owned)$/, (s, state: string) => {
+  s.owned = state === "owned";
+});
+Given("the full game is not bought on this store", (s) => {
+  s.owned = false;
+  s.serverAnswer = "none";
+});
+Given("the server's answer is {string}", (s, answer: string) => {
+  s.serverAnswer = answer;
+});
+Then(/^the full game is (unlocked|locked) on this device$/, (s, state: string) => {
+  expect(unlocked(s)).toBe(state === "unlocked");
+});
+Then("the game sends the store's proof before it decides", (s) => {
+  expect(S.proofFirst({ store: s.store, owned: s.owned, server: s.serverAnswer })).toBe(true);
+  // Once the server holds the proof its active answer decides, and a refund is never sent up again.
+  expect(S.proofFirst({ store: s.store, owned: s.owned, server: "active" })).toBe(false);
+  expect(S.proofFirst({ store: s.store, owned: s.owned, server: "refunded" })).toBe(false);
+});
+
+Given(/^the build (names|names no) a cloud server and its shell (gives|gives no) a store bridge$/, (s, server: string, bridge: string) => {
+  s.noUnlockState = !S.hasUnlockState({ cloudServer: server === "names", storeBridge: bridge === "gives" });
+});
+Then("there is no unlock state", (s) => {
+  expect(s.noUnlockState).toBe(true);
+});
+
+When("the player starts a new campaign as {string}", (s, nation: string) => {
+  s.gated = S.gate(nationId(nation), unlocked(s));
+  s.chosen = nation;
+});
+Then("the Unlock card opens with {string} still chosen", (s, nation: string) => {
+  expect(s.gated).toBe("unlock");
+  expect(s.chosen).toBe(nation);
+});
+When("the player opens a save of the nation {string}", (s, nation: string) => {
+  s.campaign = undefined;
+  campaign(s, nation);
+  s.lockedSave = write(s, "resume");
+  s.gated = S.gate(S.readHeader(s.lockedSave.bytes).tier.nation, unlocked(s));
+  s.result = S.openSave(s.lockedSave.bytes, { rules: RULES, fullGame: unlocked(s) }, nationName);
+});
+Then("the Unlock card opens with {string}", (s, msg: string) => {
+  expect(s.gated).toBe("unlock");
+  expect(s.result.kind).toBe("locked");
+  expect(s.result.message).toBe(msg);
+});
+Then("the save is kept", (s) => {
+  expect(storage(s).read(s.lockedSave.path)).toBeDefined();
+});
+Then("a new campaign as {string} starts at once", (s, nation: string) => {
+  expect(S.gate(nationId(nation), unlocked(s))).toBe("go");
+});
+
+// ================================================================ combining accounts (SAVE-189 … SAVE-193)
+
+type HeldSave = { saveId: string; campaignId: string; removed: boolean };
+const heldSaves = (s: Scenario, account: string): HeldSave[] => ((s.held ??= {})[account] ??= []);
+
+Given(/^the campaign "([^"]+)" has the saves "([^"]+)" and "([^"]+)" on the account "([^"]+)"$/, (s, campaign: string, a: string, b: string, account: string) => {
+  heldSaves(s, account).push(...[a, b].map((saveId) => ({ saveId, campaignId: campaign, removed: false })));
+});
+Given(/^the save "([^"]+)" is removed on the account "([^"]+)" only$/, (s, saveId: string, account: string) => {
+  heldSaves(s, account).find((r) => r.saveId === saveId)!.removed = true;
+});
+When(/^the two accounts are combined into "([^"]+)"$/, (s, staying: string) => {
+  s.staying = staying;
+  const other = Object.keys(s.held ?? {}).find((a) => a !== staying);
+  if (other) {
+    // Every save of both is kept; a save id on both is one file, kept once (SAVE-189).
+    const kept = new Map(heldSaves(s, staying).map((r) => [r.saveId, r]));
+    for (const r of heldSaves(s, other)) {
+      const mine = kept.get(r.saveId);
+      if (!mine || S.keptSave(mine, r) === "other") kept.set(r.saveId, r);
+    }
+    s.combined = [...kept.values()];
+  }
+  if (s.heads) {
+    const mine = s.heads[staying] as { saveId: string; savedAt: number };
+    const theirs = Object.entries(s.heads).find(([a]) => a !== staying)![1] as { saveId: string; savedAt: number };
+    s.head = S.keptIronmanHead(mine, theirs) === "other" ? theirs.saveId : mine.saveId;
+  }
+  if (s.entitlements) {
+    const mine = s.entitlements[staying] as S.HeldStatus;
+    const theirs = Object.entries(s.entitlements).find(([a]) => a !== staying)![1] as S.HeldStatus;
+    s.kept = S.keptEntitlement(mine, theirs) === "other" ? { status: theirs, from: "other" } : { status: mine, from: "staying" };
+  }
+});
+Then(/^the account "([^"]+)" holds the saves "([^"]+)", "([^"]+)" and "([^"]+)" of the campaign "([^"]+)"$/, (s, account: string, a: string, b: string, c: string, campaign: string) => {
+  expect(s.staying).toBe(account);
+  const rows = s.combined as HeldSave[];
+  expect(rows.map((r) => r.saveId).sort()).toEqual([a, b, c].sort());
+  expect(rows.every((r) => r.campaignId === campaign)).toBe(true);
+});
+Then(/^the save "([^"]+)" is held once and not removed$/, (s, saveId: string) => {
+  const rows = (s.combined as HeldSave[]).filter((r) => r.saveId === saveId);
+  expect(rows).toHaveLength(1);
+  expect(rows[0]!.removed).toBe(false);
+});
+
+Given(/^the ironman campaign "([^"]+)" has its head at the save "([^"]+)" saved in (\w+) (\d+) on the account "([^"]+)"$/, (s, campaign: string, saveId: string, month: string, year: string, account: string) => {
+  s.ironCampaign = campaign;
+  (s.heads ??= {})[account] = { saveId, savedAt: Number(year) * 12 + monthOf(month) };
+});
+Then(/^the ironman head of "([^"]+)" is the save "([^"]+)"$/, (s, campaign: string, saveId: string) => {
+  expect(s.ironCampaign).toBe(campaign);
+  expect(s.head).toBe(saveId);
+});
+Then(/^an ironman upload that follows "([^"]+)" is told to load the newer game first$/, (s, parent: string) => {
+  // SAVE-089: only a save whose parent is the head is accepted.
+  expect(s.head).not.toBe(parent);
+});
+
+Given(/^the account "([^"]+)" holds an? (active|refunded|revoked) App Store purchase$/, (s, account: string, status: string) => {
+  (s.entitlements ??= {})[account] = status;
+});
+Then(/^the account holds one App Store purchase, the (active|refunded|revoked|staying account's) one$/, (s, kept: string) => {
+  if (kept === "staying account's") expect(s.kept.from).toBe("staying");
+  else expect(s.kept.status).toBe(kept);
+});
+Then(/^the full game is (unlocked|locked) on the App Store$/, (s, state: string) => {
+  expect(S.fullGameUnlocked({ store: "apple", owned: false, server: s.kept.status })).toBe(state === "unlocked");
+});
+
+Given(/^the account holds the Steam account "\d{17}" and the email "[^"]+"$/, (s) => {
+  s.signIns = ["steam", "email"] as S.SignInKind[];
+});
+When("the player removes the email sign-in", (s) => {
+  expect(S.mayRemoveSignIn(s.signIns, "email")).toBe(true);
+  s.signIns = (s.signIns as S.SignInKind[]).filter((k) => k !== "email");
+});
+Then("the account holds the Steam sign-in only, and the device stays signed in", (s) => {
+  expect(s.signIns).toEqual(["steam"]);
+});
+Then(/^removing the Steam sign-in is refused with "last_sign_in"$/, (s) => {
+  expect(S.mayRemoveSignIn(s.signIns, "steam")).toBe(false);
 });

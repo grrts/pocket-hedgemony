@@ -46,7 +46,7 @@ Newest decision first.
    tree's Second World War events and its Decolonization, Cold War and Globalization ages are out of scope;
    item 24 (event tree fixes); item 20 (order of a turn).
 2. `screen-flow/screen-flow-design.md` §4.6, G7 (16 Oct): unanswered events block End turn; events open one
-   at a time; options include historical or free events; the end-of-campaign wrap-up.
+   at a time; options include historical, plausible or free events (D-SETUP-21); the end-of-campaign wrap-up.
 3. Sibling designs proposing additions (16 Oct): `religion/religion-design.md` §10.2–10.4, §18 and
    `religion/event-tree-additions/`; `revolutions/changes-for-other-designs.md` and
    `revolutions/generated/event_tree_patch/`; `culture/culture-design.md` §6, §11; `subjects/subjects-design.md`
@@ -262,7 +262,7 @@ Newest decision first.
 - EVT-032 If a decision offered to an AI country is left unanswered for `decision_expiry_years` (10), then
   it lapses and re-enters the pool (it is rolled as a pool event) if still eligible. A decision offered to
   the player never lapses (EVT-044). [balance.yaml; screen-flow §4.6; D-EVT-8]
-- EVT-033 The game shall fire at most `max_pool_events_per_country_year` (2) pool events per country per year.
+- EVT-033 The game shall fire at most `max_pool_events_per_country_year` (3) pool events per country per year.
   [balance.yaml]
 - EVT-034 When an event fires, the game shall boost each follow-up's weight by its `boost` during its `delay`
   window, cap any boost at `max_boost` (5.0), fade it linearly over `boost_decay_years` (10) after the window
@@ -596,6 +596,54 @@ the Horn of Africa (Barquq to Zara Yaqob). Timur in India is the South file's `s
   history*; every one has its name, summary and option labels in the localization. Grouping and overview: each
   event is one card, and the News keeps the line; the Chronicle card (plan-1378 §4.6) is the overview of the
   bridge events and comes with the history check. Phone: as EVT-076. [X-19; EVT-061, EVT-076]
+### 5.19 Bridge events of 1378 to 1444: Asia, Africa and the Americas (milestone 10, 19 October 2026)
+
+The south's turning points between the 1378 start and 1444 (plan-1378 §5, rows South Asia, East Asia, Southeast
+Asia and the Americas, and the African events of the research), in `events-bridge-south.json`. Each is conditional:
+its trigger is the reason the realms had (a weak Delhi after Firuz Shah, Timur's strength, a Ming emperor who needs
+prestige, a Hồ usurper on the Trần throne, Maxtla's usurpation), and its date only makes it likelier near its year
+(`approximate`, EVT-019). History is the reference, not the script (plan-1378 §2).
+
+- EVT-095 The game shall load the region bridge files beside the campaign's events, with their names, the realms
+  they name and the places they add. At the start, each bridge event whose history began before the start day has
+  already happened, with its historical option and its historical realms and without its effects, since the start's
+  map already shows them; so a 1444 start finds Chanka's war fought and Malacca founded, and plays on as before. No
+  bridge event is `mandatory`, and each belongs to the Age of Schism and Conquerors. [plan-1378 §2, §5; D-EVT-23]
+- EVT-096 The south's events with a 1444 floor shall open by their reason instead: the Inca expand once they have
+  beaten the Chanka, or once no Chanka stand (from 1400); the Triple Alliance's height follows its founding (from
+  1430); Majapahit's collapse follows the Paregreg war (from 1420); Songhai expands once free of Mali (from 1400);
+  the Ōnin war needs the courts of Japan reunited (from 1400); the Tumu crisis needs the Oirat (from 1424). Iwami's
+  silver, Elmina, the Cape route, Columbus, Tordesillas and the Tongan chiefdom keep 1444: their conditions name
+  realms, techs and ages that come later anyway. A bridge event with a campaign event's id replaces it.
+  [plan-1378 §5; decisions.md, Africa and the Americas 1]
+- EVT-097 Asia's bridge events shall be these (★ the turning points the history check watches):
+
+| Region | Events |
+|---|---|
+| South Asia (22) | Katehar's revolt, Vijayanagara takes Goa, the Faruqi grant of Thalner, Jayasthiti Malla, death of Firuz Shah, the Tughlaq succession war, Azam Shah in Bengal, Jaunpur's independence, the Tomars take Gwalior, the Rathores take Mandore, the Reddi kingdom splits, Sack of Delhi ★, Khandesh breaks away, Malwa's and Gujarat's independence, the Ming in Ceylon, Kotte founded, the Sayyids take Delhi ★, the Vijayanagara–Bahmani wars (recurring), Vijayanagara annexes Kondavidu, the Bahmanis take the Velama forts, Kapilendra's usurpation |
+| East Asia (26) | Kōryaku coup, Hu Weiyong purge, Yellow Registers, Ming takes Yunnan ★, Naghachu surrenders, Buir Lake ★, death of Tögüs Temür, Wihwado retreat, Goryeo raids Tsushima, Meitoku rebellion, Joseon founded ★, courts of Japan reunited ★, death of Hongwu, Ōei rebellion, Jingnan war ★, Yoshimitsu king of Japan, the Jurchen guards, treasure voyages ★, Ming conquest of Đại Việt ★, Lam Sơn uprising ★, Gelug founded, the southern line passed over, Hokuzan falls, Ōei invasion, Ming capital to Beijing, Ryukyu united ★ |
+| Southeast Asia (14) | Death of Chế Bồng Nga, death of Hayam Wuruk, Hồ dynasty, Hồ takes Amaravati, Majapahit sacks Singapura, Malacca founded ★, Paregreg war, Ayutthaya sacks Angkor ★, the Forty Years' War (recurring), Razadarit reunites Hanthawaddy, Ava takes Arakan, Arakan restored at Mrauk U, Suphannaphum takes Ayutthaya, Sukhothai absorbed |
+
+  [plan-1378 §5; research/asia.md]
+- EVT-098 Africa's and the Americas' bridge events shall be these:
+
+| Region | Events |
+|---|---|
+| Maghreb and Sahel (13) | Fez retakes Marrakesh, the Marinids against Tlemcen, the Hafsids retake Tripoli, the Hafsid–Zayyanid war, the Sayfawa flee to Bornu, Kano pays Bornu, Mali's succession crisis, Songhai breaks from Mali ★, Masina settled, the Aïr sultanate, the Tuareg take Timbuktu ★, Ewuare in Benin, the treasure fleet on the Swahili coast |
+| Central and southern Africa (4) | Kongo founded ★, Kongo's provinces joined, Mutapa formed ★, Khami rises |
+| Mesoamerica (8) | Tepanec expansion, fall of Xaltocan, a Tepanec queen for Tenochtitlan, the Tepanec war on Texcoco, death of Tezozómoc, the Tepanec war and the Triple Alliance ★, Tariácuri unites the Pátzcuaro basin, fall of Mayapan ★ |
+| Andes and North America (6) | Cusco masters its basin, the Colla–Lupaca war, the Chanka war ★, Chimor reaches south, the Great Law of Peace, the Wendat alliance |
+
+  The Horn (Ifat and Adal, Dawit, Zara Yaqob) and the Mamluk court are in the East bridge file. Where a
+  checkpoint names a turning point (`start-date/checkpoints`), the event takes its key as id, so the history check
+  finds it. [plan-1378 §5; research/africa-americas.md; decisions.md]
+
+#### How the player uses it
+- EVT-099 Nothing new is tapped: a bridge event reaches the player as every event does, on the event card over the
+  map (EVT-076), with its year in history, its summary and two to four options, the historical one marked *As in
+  history*; the News keeps its line. Grouping and overview: one card per event; what history has done so far shows
+  in the News and, with the history check, on the Chronicle card (plan-1378 §4.6). Phone: the card is the same
+  sheet in the Wide and Tall layouts, 44-point options, nothing that needs hover. [X-19; EVT-076]
 
 ### 5.20 Realms' historical goals (milestone 10, 19 October 2026)
 
@@ -696,33 +744,52 @@ drawn from what the game already holds (officials, lords and their loyalty, the 
 from `packages/rules/data/domain/events-everyday.json`, and stand beside the event tree: they are not tree events
 and do not count toward its pool (EVT-033). Every number is a placeholder for balance (D-EVT-22).
 
-- EVT-115 Each realm shall draw one everyday event every `months_between` months (3 to 6, rolled after each
+- EVT-115 Each realm shall draw one everyday event every `months_between` months (2 to 4, rolled after each
   draw), its first within `first_within_months` (4) of the start, so realms do not all draw in the same month.
-  @placeholder [feedback 152; D-EVT-22]
+  @placeholder [feedback 152: "a choice every 2 to 4 months"; D-EVT-22; gaps review item 3]
 - EVT-116 When a realm draws, the game shall pick by `weight` among the everyday events the realm could have now,
   each bound to who and where it is about; a realm with nothing to bind draws nothing that month. The AI answers
   at once by the options' `ai` weights; the player's waits on the event card (EVT-044). [feedback 152]
 - EVT-117 While an event, historical or everyday, waits for the player's answer, no new everyday event shall
   come to the player; the draw waits a month at a time. A decision the player may take or leave (EVT-031) does not
   hold one back. [Leroy, 19 Oct: "not too much, so the gameplay doesn't feel too tedious"]
-- EVT-118 Everyday events shall be: an official's death (a royal post with an official), a lord's death, a lord
+- EVT-118 Everyday events drawn shall be: a lord
   slighted at court (Loyal or Wavering), a lord speaking well of you (Wavering or Disloyal), two lords quarrelling,
   a lord hurt, a child born to the ruler (a ruler of an age to have children under a law of heirs by blood, with no
   regent), the heir falling ill (an heir under the age of a child ruler), and grain lost from a province's store
   (rot, fire, rats) where it holds at least `food.min_store_months` (3) months and `food.min_store` (2) thousand
-  months of food. A lord in revolt or with no land is never drawn. [feedback 152; REALM-088, REALM-089]
+  months of food. A lord in revolt or with no land is never drawn. The death of an official or a lord is not
+  drawn: it comes from the death of people (EVT-122, EVT-123). Beside these come the events of EVT-133 to
+  EVT-135, each listed with its options in `events-everyday.json` and on the wiki's Data-Events-Everyday page.
+  [feedback 152; REALM-088, REALM-089; REALM-270]
 - EVT-119 Every everyday event shall have two or three options, each with its effects shown in words, at least one
   costing nothing. [EVT-039; feedback 152]
 - EVT-120 If an option costs more gold than the realm holds, or asks for a second lord the realm does not have,
   then the game shall not offer it. [EVT-041]
 - EVT-121 The player's everyday events shall show on the event card with the realm's own story instead of a year
   in history, marked *In your realm*. [EVT-076]
-- EVT-122 An official's death shall leave the post to a new man: the deputy, who starts at half the post's effect
+- EVT-122 When an official at a royal post of the player's dies, of any cause (REALM-270, REALM-275, which empty
+  the post), an everyday event shall ask who takes his seat: the deputy, who starts at half the post's effect
   (PROV-192); a seasoned man sent for, for gold, who keeps the post's years and so its effect; or a lord's kinsman,
-  who starts at half and makes that lord a step more loyal. [PROV-192; REALM-088 office at court]
-- EVT-123 A lord's death shall pass his lands to his son, as loyal as his father; the crown may ask a fee (gold,
-  the son a step less loyal, heavy taxes) or take the lands for the crown, making them royal land and every other
-  lord of the realm a step less loyal (land seized from another). [PROV-200, PROV-201; REALM-089]
+  who starts at half and makes that lord a step more loyal. The new man is of the dead man's type. If the post is
+  filled before the answer (by hand or by auto-fill, PROV-342), the answer leaves it as it is. A lord's man and an
+  AI realm's are replaced at once (REALM-275), with no card. [PROV-192; REALM-088 office at court; REALM-270]
+- EVT-123 When a lord of the player's dies, of any cause, and his heir takes his lands (REALM-273), an everyday
+  event shall ask the crown to confirm the heir, as loyal as his father; the crown may ask a fee (gold, the heir a
+  step less loyal, heavy taxes) or take the lands for the crown, making them royal land and every other lord of the
+  realm a step less loyal (land seized from another). A lord whose line dies out brings no card: his lands are the
+  crown's already. [PROV-200, PROV-201; REALM-089; REALM-270, REALM-273]
+- EVT-132 When a general or admiral of the player's dies, of any cause, and his army or fleet is not in a battle
+  (REALM-276), an everyday event shall tell of it while his men or ships go home without him (RECR-135 to
+  RECR-137), and his second in command (a general's) or flag captain (an admiral's), named on the card with skills
+  of 1 to 3 shown, shall ask to lead them in his place. Giving him the command costs gold; he becomes a commander of
+  the realm at their head, the march or voyage home stops where it is, and they take orders again. Letting them go
+  home costs nothing. If the men or ships have a leader again before the answer, or are in a battle, the second is
+  not offered. A dead AI commander brings no card. @placeholder [feedback 152: "a general falls", Leroy 19 Oct;
+  REALM-276; RECR-135 to RECR-137]
+- EVT-131 A death fires its card (EVT-122, EVT-123, EVT-132) only while no everyday event waits for the player; a death
+  while one waits has its News line only (REALM-270). A death's card puts the realm's next drawn event off to at
+  least `months_between`'s shortest gap (2 months) away. [EVT-117; Leroy, 19 Oct: "not too tedious"]
 - EVT-124 A child born to a ruler with no heir shall be the heir. A feast costs gold and makes the two least loyal
   lords a step more loyal; promising the child to a lord's house makes him a step more loyal (marriage into the
   ruling house). [REALM-100 to REALM-107, REALM-088]
@@ -733,7 +800,8 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
   requisitioning it from the province's lord, else another lord (a step less loyal), makes half of it good.
   [feedback 152; PROV-104]
 - EVT-127 If the player trusts the sick heir to prayer, then the heir shall die with the chance the option shows
-  (3 in 10). [feedback 152]
+  (3 in 10), by the death of people (REALM-270, REALM-272), which tells the player and leaves the ruler
+  heirless. [feedback 152]
 - EVT-128 The everyday events' state (each realm's next draw, the player's waiting events, the count and the dice)
   shall be kept in the save; a save from before them starts the draws afresh. [EVT-075]
 
@@ -743,6 +811,34 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
   or *Keep the roads open*. Plague fires it; it is never drawn and does not wait for EVT-117. @placeholder
   [feedback 152; PROV-240 to PROV-242]
 
+**More everyday events, by region and era** (gaps review item 3, Leroy 19 Oct: "Both"). Twelve events would
+repeat endlessly over a campaign of five centuries, so the pool grows to about fifty, many of them about one
+province of the realm and many limited to a part of the world or a span of years.
+
+- EVT-133 An everyday event may name the regions it comes to (`where`: regions or wider regions of
+  `exploration-regions.json`, a realm's region being the event tree's, EVT-078) and the years it comes in (`from`,
+  `to`); a realm draws only the events of its region and the current year. Besides those of EVT-118, the events are
+  about one province of the realm (any, a coastal one, or the capital, never an occupied one; the options that ask a
+  second lord ask its own lord, else the least loyal one), a landed lord and one of his provinces, or a living
+  official at a royal post: a rich harvest, hail, bandits, a fallen bridge, a town fire, a flood, a scholar seeking a
+  patron, a lord asking for a market or raising walls, an official skimming the tolls, old soldiers asking for land,
+  wolves, a tutor for the heir, a comet, silver found, pilgrims; in Europe tournaments (to 1600), quarrelling guilds,
+  a printer (1460 to 1600), witch trials (1560 to 1700), enclosure (1550 to 1850), coffee houses (1550 to 1800);
+  anywhere railways (from 1830), strikes (from 1820), cholera (1817 to 1910) and a newspaper (from 1780); in the
+  Middle East, North Africa and Central Asia raided caravans, failing water channels, locusts and endowments; in
+  Africa gold traders, cattle raids and late rains; in South and Southeast Asia a failed monsoon, temple festivals and
+  revenue surveys; in East Asia river dykes, cheating at the examinations, pirates and a tea master; spice ships,
+  the ball game, maize blight, voyagers, horse fairs, hard winters and furs where they belong. @placeholder
+  [gaps review item 3; feedback 152]
+- EVT-134 The player's realm shall not draw the same everyday event again within `rest_years` (20) of the last
+  time it came; if every event it could have is resting, it draws nothing that month. The plague card (EVT-130) and
+  the cards of a death (EVT-122, EVT-123, EVT-132) are not drawn and so do not rest. When each event last came is kept in the save. The AI's events are never seen and do not rest. @placeholder [gaps review item 3]
+- EVT-135 An event about a province may also, by the option chosen: add or take months of food in its store
+  (`food`, months of eating for its people), add or take a share of its people (`people`, every class alike) or of
+  its recruits (`recruits`, up to its ceiling), or lighten its tax for some years (`light_tax`, as a rising's light
+  tax, REB). Each shows on the card in words ("Creuse: +2 months of food in store", "Creuse: 1 in 100 of its people
+  lost", "Creuse: light tax for a year"). [EVT-119; PROV-104]
+
 #### How the player uses it: everyday events
 - EVT-129 Where: nothing new to find. An everyday event opens the same event card over the map and pauses the week
   (EVT-076): its title names who or where ("Death of Gilles de Chabannes", "Grain rots at Creuse"), *In your
@@ -751,10 +847,15 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
   Brézé: a step more loyal"). *Look at the map* folds the card into End turn and, for an event about a province,
   opens that province. Grouping: every event is one card; lords, officials, the heir and stores stay on their own
   cards, where the result shows (the lord's loyalty, the post's years, the heir on the General tab, the store on the
-  Land tab). Overview: the News keeps a line for each, with what was chosen, and the realm's Lords list and
+  Land tab). A dead commander's card opens the province where he fell; the second, once given the command, is on the
+  army's or fleet's own card like any commander, and men or ships sent home are on the Garrison or Navy tab
+  (RECR-139). Overview: the News keeps a line for each, with what was chosen, and the realm's Lords list and
   Provinces list stay the overviews of loyalty and food. Phone: the card is the sheet it already is, in the Wide
-  and Tall layouts, inside the safe areas, options in reach, nothing that needs hover. Rate: about two or three a
-  year per realm, never stacking (EVT-117). [X-19; EVT-076]
+  and Tall layouts, inside the safe areas, options in reach, nothing that needs hover. Rate: about three to five a
+  year per realm, never stacking (EVT-117), and never the same one twice in 20 years (EVT-134); a death's card takes
+  the place of the next drawn one (EVT-131). The new events are the same card, with nothing new to learn; an event
+  about a province opens that province from *Look at the map*, where its store, people and tax show on the Land tab.
+  [X-19; EVT-076]
 
 ## 6. Commands
 
@@ -814,7 +915,7 @@ before achievements and the autosave. The age and period checks run in the event
 | Key | Meaning | Value in the design | Placeholder? | Config file |
 |---|---|---|---|---|
 | selection.pool_roll_interval_months | How often pool events roll | 1 | yes | data/balance.yaml |
-| selection.max_pool_events_per_country_year | Pacing cap | 2 | yes | data/balance.yaml |
+| selection.max_pool_events_per_country_year | Pacing cap | 3 (was 2; raised with the everyday events, feedback 152) | yes | data/balance.yaml |
 | selection.decision_expiry_years | Unanswered decision lapses | 10 | yes | data/balance.yaml |
 | campaign.events_choice | New-game "Events" choice → preset | Historical, Plausible (default), Free → historical, plausible, divergent | no | events.json |
 | date_binding.approximate_peak_mult | Approximate event's chance in its history year | 2.0 | yes (provisional) | events.json |
@@ -985,8 +1086,10 @@ before achievements and the autosave. The age and period checks run in the event
   (one every 3 to 6 months, none while one waits) is set below the 2 to 4 months of the research so play stays
   light, as Leroy asked; `months_between` tunes it. Effects use only what the game already has; one new loyalty
   cause, *slighted at court*, joins the down list. Province disease is its own mechanic (province PROV-240 to
-  PROV-242) and comes in the next change. The deaths of officials and lords roll on their own for now; once the
-  shared ageing and death of people lands (the "Death across all people" work), they fire from it instead.
+  PROV-242) and comes in the next change. The deaths of officials and lords, and of the heir trusted to prayer, go
+  through the death of people (REALM-270, `personDies`); the cards for officials and lords hang on its hook
+  (`onPersonDeath`) and never roll a death of their own, so a man dies once, of his age or a battle or an event,
+  and the card asks only what follows.
 
 - **D-EVT-21** The East's bridge events (milestone 10, step 6; integrator's picks, 19 Oct): 46 new events and 7
   re-dated ones (EVT-090 to EVT-093). Realms go by tree ids, places by 1444 province ids in the file's own
@@ -1012,6 +1115,13 @@ before achievements and the autosave. The age and period checks run in the event
   Schism keeps 1449 as Basel's end. Tests run the events on today's map set back to 1378 until the 1378 map is
   joined. Provisional. Effects stay small (prestige, legitimacy, a share of the treasury) where the game cannot
   yet land the real thing.
+- **D-EVT-23** Bridge events for Asia, Africa and the Americas (milestone 10, step 6; 19 Oct 2026): the region
+  files share one shape (the campaign's events, names, entities and places as lists of map provinces) and one
+  loader, and a bridge event that has an id of the campaign replaces it, so a 1444 floor gives way to its reason.
+  At the start the events whose history began earlier count as fought as in history, which keeps a 1444 start
+  playing as before. Effects use only the tree's existing modifiers; realms the game does not know yet are named
+  in `entities` and bind once they exist. Starting statistics for 1378 are not yet set, so the stability,
+  legitimacy and army thresholds in the triggers are provisional.
 
 ## 14. Traceability
 
@@ -1041,9 +1151,17 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-085 – 089 | bridge-west.feature | A 1444 campaign already has the West's history; a 1378 campaign has none yet; France declares for Clement, then the realms choose; the tree sees a regent and the Emperor; Troyes gives Paris to England; the end of the Hundred Years' War needs the Lancastrian conquest. Engine: packages/engine/test/bridgeWest.test.ts (build checks, places and modifiers, the uncles' regency on the player's card, rebels as sparks) |
 | EVT-090 – 093 | bridge-east.feature | The East's bridge events and turning points; build checks, tree ids and places; the re-dated campaign events; the Crusade of Varna waits for a war on the Ottoman border |
 | EVT-094 | bridge-east.feature | Every East event reads on the card: name, summary, two or three options, one historical |
+| EVT-095 | bridge-south.feature | The southern events are well formed and never forced; from 1444 the earlier ones have happened as in history |
+| EVT-096 | bridge-south.feature | The Inca expand after beating the Chanka; a fled court does not; the 1444 floors give way to their reasons |
+| EVT-097 | bridge-south.feature | Malacca is founded only after Singapura falls |
+| EVT-098 | bridge-south.feature | The Triple Alliance forms after Maxtla's usurpation |
+| EVT-099 | — | Presentation: the event card, nothing new on screen |
 | EVT-100 – 108 | historical-goals.feature | A goal ends with its reason; the seed shakes the goals; a goal's pull fades after its window; a goal draws the AI's war but not past its price; an ally goal sends an envoy; the player is never steered. Engine: packages/engine/test/goals.test.ts; data: packages/rules/test/goals-1378.test.ts |
 | EVT-109 – 111 | chronicle.feature | A turning point happened as in history; late; bent when its goals are gone; gone when invalidated. Engine: packages/engine/test/goals.test.ts |
 | EVT-112 – 114 | — | Presentation: apps/client/src/ui/chronicle.ts, the History tab and the Aims fold; apps/client/scripts/chronicle-shots.mjs |
 | EVT-115 – 128 | everyday.feature | A choice every few months; none while one waits; an official's death; an option the realm cannot pay; spoiled grain; a lord's death; a child born heirless. Engine: packages/engine/test/everyday.test.ts |
 | EVT-129 | — | Presentation: apps/client/src/ui/events.ts, the event card |
 | EVT-130 | — | Engine: packages/engine/test/everyday.test.ts (plague reaching the player's land opens one card) |
+| EVT-131 | — | Engine: packages/engine/test/everyday.test.ts (a death while one waits brings no second card) |
+| EVT-132 | everyday.feature | Engine: packages/engine/test/everyday.test.ts (a general's second keeps the men in the field; not offered once they have a leader; an admiral's flag captain keeps the fleet at sea) |
+| EVT-133 – 135 | everyday.feature | Events of the realm's region and era; never the same within 20 years. Engine: packages/engine/test/everyday.test.ts (about fifty events, each with a free option and known regions; region and era; no repeat in 20 years through a save; a rich harvest fills the store and hail lightens the tax) |

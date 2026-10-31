@@ -11,6 +11,7 @@
     "specs": "pnpm --filter @ph/specs report",
     "bench": "pnpm --filter @ph/engine bench",
     "desktop": "pnpm --filter @ph/client build && pnpm --filter @ph/desktop start",
+    "desktop:package": "pnpm --filter @ph/client build && pnpm --filter @ph/desktop package",
     "wiki": "node --experimental-strip-types tools/wiki-data.ts && node --experimental-strip-types tools/wiki-export.ts"
   },
   "devDependencies": {

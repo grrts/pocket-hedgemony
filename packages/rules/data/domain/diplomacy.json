@@ -10,7 +10,15 @@
   "envoys.days_per_crossing_unit",
   "eras.VI.pact_offensive_call_bonus",
   "ledger.wrongs.grabbed_land_near_us",
-  "ai.notoriety_restraint"
+  "ai.notoriety_restraint",
+  "arms_and_fear.fear",
+  "arms_and_fear.standing",
+  "arms_and_fear.war",
+  "arms_and_fear.borrow",
+  "arms_and_fear.allies",
+  "arms_and_fear.defences",
+  "arms_and_fear.technology",
+  "arms_and_fear.opportunity"
  ],
  "relations": {
   "layers": {
@@ -1176,6 +1184,15 @@
   "punish_years": 5,
   "tribute_by_strength_multiple": 3,
   "no_aim_wrong_to_neighbours": "threatened_us",
+  "no_aim_penalty": {
+   "$comment": "F-167 (Leroy, 20 Oct): a war declared with no aim punishes the declarer hugely, the moment it is declared. Every lord, Warlike or not, takes the aimless_war loyalty cause lord_steps times; the declarer gains notoriety (the Notorious deed wrong with every realm that knows it, DIPL-174); each of its provinces holds the Unjust war grievance while the war lasts; its peace voices count peace_share more for peace; its allies may refuse the call with no oath broken (allies_refuse); the AI declares one only when Warlike or a hegemon seeker (ai_only_if_reckless). A subject rising for its freedom pays none of it. Provisional.",
+   "lord_steps": 2,
+   "notoriety": 15,
+   "peace_share": 0.25,
+   "allies_refuse": true,
+   "ai_only_if_reckless": true,
+   "provisional": true
+  },
   "regency_allows": [
    "defensive",
    "raid"
@@ -1376,5 +1393,87 @@
  ],
  "campaign_end": "1939-08-31",
  "oaths_broken_years": 30,
- "lands_taken_years": 20
+ "lands_taken_years": 20,
+ "arms_and_fear": {
+  "$comment": "Leroy, 19 Oct (DIPL-231 to DIPL-237, F-165): every AI realm keeps a standing army sized against its neighbours, calls men across the whole realm at war and borrows for it, and feels Wary or Threatened beside a much stronger neighbour. There is no rivalry: fear is measured from the armies each month and leaves no lasting tie. Every number is provisional, for the balance model to tune.",
+  "fear": {
+   "$comment": "A neighbour's strength (WAR strength: men under arms, levies it can call and its lords' men) over the realm's own side's: its own strength plus ally_weight of each ally's, its overlord's and its subjects'.",
+   "wary_ratio": 1.5,
+   "threatened_ratio": 2.5,
+   "ally_weight": 0.5
+  },
+  "standing": {
+   "$comment": "The men an AI realm keeps under arms at peace (its troop cap's count: armies, men gathering and hired companies): the larger of share_of_cap of its troop cap and match_neighbour of the largest force under arms of a neighbour it does not count as a friend, times its fear's multiplier; at most max_share_of_cap of its cap and what pay_share_of_income of its income pays at a levy's pay. It calls at most raise_per_month thousands a month and sends levies home only past the target by more than slack men.",
+   "share_of_cap": 0.25,
+   "match_neighbour": 0.5,
+   "multiplier": {
+    "calm": 1,
+    "wary": 1.5,
+    "threatened": 2
+   },
+   "max_share_of_cap": {
+    "calm": 0.5,
+    "wary": 0.7,
+    "threatened": 0.9
+   },
+   "pay_share_of_income": {
+    "calm": 0.4,
+    "wary": 0.5,
+    "threatened": 0.65
+   },
+   "raise_per_month": 3,
+   "slack": 1000
+  },
+  "war": {
+   "$comment": "At war an AI realm calls men in every royal province it holds, the most men to call first and at most per_province thousands in each a month, up to share_of_cap of its troop cap a month, while its whole army's pay stays within pay_share_of_income of its income.",
+   "share_of_cap": 0.25,
+   "per_province": 3,
+   "pay_share_of_income": 0.75
+  },
+  "borrow": {
+   "$comment": "At war, or Threatened, an AI realm whose gold is under months_of_pay of its army's pay borrows up to it, within its loan limit.",
+   "months_of_pay": 3
+  },
+  "allies": {
+   "$comment": "F-166 (DIPL-238, DIPL-239): two realms that fear the same realm count We fear the same realm in an alliance count, at the asked realm's own fear of it (the larger when it is Threatened). A Threatened AI realm weighs its envoys every envoy_every_months months instead of once a year, and besides its warmest neighbour weighs an alliance with up to partners realms that border the realm it is Threatened of and fear it too, the strongest first.",
+   "same_fear": {
+    "calm": 0,
+    "wary": 15,
+    "threatened": 30
+   },
+   "envoy_every_months": 3,
+   "partners": 3
+  },
+  "defences": {
+   "$comment": "F-166 (DIPL-240): an AI realm at peace that is Wary or Threatened orders walls first, in its province bordering the realm it fears most whose castle stands lowest, until those castles reach castle_step for its fear (0: none). For those walls it keeps reserve_share of its usual gold reserve.",
+   "castle_step": {
+    "calm": 0,
+    "wary": 1,
+    "threatened": 2
+   },
+   "reserve_share": {
+    "calm": 1,
+    "wary": 1,
+    "threatened": 0.5
+   }
+  },
+  "technology": {
+   "$comment": "F-166 (DIPL-241): an AI realm that is Wary or Threatened weighs the study cost of warfare inventions (ids beginning with warfare_prefix) and of the inventions that unlock a castle step (buildings data) by cost_weight for its fear when it chooses its next study; it still studies the one that costs it least after the weight.",
+   "warfare_prefix": "W",
+   "cost_weight": {
+    "calm": 1,
+    "wary": 0.8,
+    "threatened": 0.6
+   }
+  },
+  "opportunity": {
+   "$comment": "F-166 (DIPL-242, DIPL-243): an AI realm takes its chances. Against a target already at war with another realm its side needs at_war_ratio_factor of the usual strength ratio (warfare ai declare ratio), it looks for a war at at_war_chance_factor times its monthly chance when such a neighbour is there, and such a target weighs at_war_target_weight more in its pick. Each month it looks for a war, a gamble_chance roll of the world's dice lets it accept gamble_ratio_factor of the ratio. The ratio is never under min_ratio.",
+   "at_war_ratio_factor": 0.75,
+   "at_war_chance_factor": 2,
+   "at_war_target_weight": 3,
+   "gamble_chance": 0.1,
+   "gamble_ratio_factor": 0.8,
+   "min_ratio": 1.2
+  }
+ }
 }

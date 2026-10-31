@@ -1518,8 +1518,8 @@ Given("its commander {string}", (s, name: string) => {
   s.commander = name;
 });
 
-When(re("he leads (a fleet|an army)"), (s, post: string) => {
-  s.ranked = rankedName(nameRules, s.realm, s.commander, post === "a fleet" ? "admiral" : "general");
+When(re("he leads (a fleet|a fleet as commodore|a fleet as viceroy|an army)"), (s, post: string) => {
+  s.ranked = rankedName(nameRules, s.realm, s.commander, post === "an army" ? "general" : post === "a fleet" ? "admiral" : post === "a fleet as commodore" ? "commodore" : "viceroy");
 });
 
 Then("he is called {string}", (s, ranked: string) => {
@@ -1858,8 +1858,8 @@ Then("the army has no commander until the player commissions an official or one 
   expect(generalsOf(w, n)).toBe(s.commanders + 1);
 });
 Then("no commander is attached to an army by default", (s) => {
-  const { w } = gameFrance(s);
-  for (let i = s.armies; i < w.armies.count; i++) if (w.armies.alive[i]) expect(w.armies.commander[i]).toBe(-1);
+  const { w, n } = gameFrance(s);
+  for (let i = s.armies; i < w.armies.count; i++) if (w.armies.alive[i] && w.armies.owner[i] === n) expect(w.armies.commander[i]).toBe(-1);
 });
 Given('the country "France" has 60 gold', (s) => {
   const { w, n } = gameFrance(s);

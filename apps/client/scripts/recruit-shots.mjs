@@ -19,6 +19,7 @@ const shot = (name) => page.screenshot({ path: `${out}/${name}.png` });
 await page.goto("http://localhost:4176/");
 await page.waitForSelector(".map-layer", { timeout: 30000 });
 await page.click("[data-nation=castile]");
+await page.click("[data-begin]");
 await page.waitForTimeout(500);
 // A province next to the capital: its Garrison tab.
 await page.evaluate(() => window.__phSelect("p1594"));

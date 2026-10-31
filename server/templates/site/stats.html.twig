@@ -1,0 +1,113 @@
+{% extends 'site/layout.html.twig' %}
+
+{% block title %}Stats · Pocket Hegemony{% endblock %}
+{% block meta %}<meta name="robots" content="noindex">{% endblock %}
+{% block stylesheets %}<link rel="stylesheet" href="/site/stats.css">{% endblock %}
+
+{% block content %}
+<article class="framed sheet stats">
+<div class="prose">
+    <h1>Stats</h1>
+    <p class="muted">Usage statistics and crash reports from {{ since|date('j M Y', 'UTC') }} to today (UTC). Only moderators see this page.</p>
+    <nav class="stats-windows" aria-label="Window">
+        {% for window in windows %}
+        <a class="btn {{ window == days ? 'wax' : 'paper' }}" href="{{ path('stats', {days: window}) }}"{% if window == days %} aria-current="page"{% endif %}>{{ window }} days</a>
+        {% endfor %}
+    </nav>
+
+    <h2 id="daily">Players per day</h2>
+    <p>{{ new_total }} new {{ new_total == 1 ? 'install' : 'installs' }} in these {{ days }} days. An install is new on the day of its first <code>session_started</code>.</p>
+    <div class="table-scroll"><table>
+        <thead><tr><th>Day</th><th class="num">Active installs</th><th class="num">New installs</th></tr></thead>
+        <tbody>
+        {% for row in daily %}
+        <tr><td>{{ row.day|date('D j M', 'UTC') }}</td><td class="num">{{ row.active }}</td><td class="num">{{ row.new }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+
+    <h2 id="stop">Where players stop</h2>
+    <p>Each install's highest turn in its <code>turn_ended</code> events.</p>
+    {% set turn_total = turns|reduce((sum, n) => sum + n, 0) %}
+    <div class="table-scroll"><table>
+        <thead><tr><th>Highest turn</th><th class="num">Installs</th><th class="num">Share</th></tr></thead>
+        <tbody>
+        {% for bucket, installs in turns %}
+        <tr><td>{{ bucket }}</td><td class="num">{{ installs }}</td><td class="num">{{ turn_total ? (installs * 100 / turn_total)|round ~ ' %' : '–' }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+
+    <h2 id="tutorial">Tutorial</h2>
+    {% if tutorial is empty %}
+    <p class="empty">No <code>tutorial_step</code> events in this window.</p>
+    {% else %}
+    <p>Installs that reached each step.</p>
+    <div class="table-scroll"><table>
+        <thead><tr><th>Chapter</th><th>Step</th><th class="num">Installs</th></tr></thead>
+        <tbody>
+        {% for row in tutorial %}
+        <tr><td>{{ row.chapter }}</td><td>{{ row.step }}</td><td class="num">{{ row.installs }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+    {% endif %}
+
+    <h2 id="runtimes">Platforms</h2>
+    {% if runtimes is empty %}
+    <p class="empty">No events in this window.</p>
+    {% else %}
+    <div class="table-scroll"><table>
+        <thead><tr><th>Runtime</th><th class="num">Installs</th><th class="num">Events</th></tr></thead>
+        <tbody>
+        {% for row in runtimes %}
+        <tr><td>{{ row.runtime }}</td><td class="num">{{ row.installs }}</td><td class="num">{{ row.events }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+    {% endif %}
+
+    <h2 id="events">Events</h2>
+    {% if events is empty %}
+    <p class="empty">No events in this window.</p>
+    {% else %}
+    <div class="table-scroll"><table>
+        <thead><tr><th>Event</th><th class="num">Count</th><th class="num">Installs</th></tr></thead>
+        <tbody>
+        {% for row in events %}
+        <tr><td><code>{{ row.name }}</code></td><td class="num">{{ row.events }}</td><td class="num">{{ row.installs }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+    {% endif %}
+
+    <h2 id="crashes">Crashes</h2>
+    {% if crashes is empty %}
+    <p class="empty">No crash reports in this window.</p>
+    {% else %}
+    <p>The {{ crashes|length }} most frequent, grouped by kind, message (digits ignored) and first stack frame. The sample is the latest report.</p>
+    <div class="table-scroll"><table class="crash-table">
+        <thead><tr><th class="num">Crashes</th><th class="num">Installs</th><th>Last seen</th><th>Version</th><th>Crash</th></tr></thead>
+        <tbody>
+        {% for crash in crashes %}
+        {% set latest = crash.latest %}
+        <tr>
+            <td class="num">{{ crash.crashes }}</td>
+            <td class="num">{{ crash.installs }}</td>
+            <td>{{ crash.lastSeen|date('j M H:i') }}</td>
+            <td>{{ latest.version }}</td>
+            <td class="crash">
+                <details>
+                    <summary><strong>{{ latest.kind }}</strong>{% if latest.where %} in {{ latest.where }}{% endif %}: {{ latest.message }}</summary>
+                    <p class="muted">{{ latest.runtime }}{% if latest.browser %} · {{ latest.browser }}{% endif %} · <code>{{ crash.fingerprint|slice(0, 10) }}</code></p>
+                    {% if latest.stack %}<pre>{{ latest.stack }}</pre>{% else %}<p class="muted">No stack.</p>{% endif %}
+                </details>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+    {% endif %}
+</div>
+</article>
+{% endblock %}

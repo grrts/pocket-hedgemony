@@ -1,5 +1,4 @@
 import { isHuman } from "./humans.ts";
-import { plagueReached } from "./everyday.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { Rng } from "./rng.ts";
@@ -130,6 +129,13 @@ function addSick(world: World, p: number): void {
   list.splice(i, 0, p);
 }
 
+const reachedListeners: ((world: World, p: number) => void)[] = [];
+
+/** Hangs a reaction on plague reaching a province of the player's (the everyday event's card, EVT-130). */
+export function onPlagueReached(fn: (world: World, p: number) => void): void {
+  reachedListeners.push(fn);
+}
+
 /**
  * Plague takes hold in p at its first step, rumour. `from` is the province it
  * came from (-1 when it broke out there), `how` the way it came. The player
@@ -143,8 +149,9 @@ function catchPlague(world: World, p: number, news: News[], from: number, how: "
   const owner = world.provinceOwner[p]!;
   if (owner >= 0 && isHuman(world, owner)) {
     const way = how === "here" ? "has broken out in its crowded streets" : how === "army" ? "has come with an army" : how === "sea" ? `has come by ship from ${nameOf(world, from)}` : `has come ${how === "river" ? "down the river" : "along the road"} from ${nameOf(world, from)}`;
-    news.push({ kind: "plague", text: `Plague in ${nameOf(world, p)}: the sickness ${way}. Its townsfolk die first. You can close the province to slow it, at a cost to its trade and tax.`, nations: [owner], province: p });    // A card asks what to do about it (EVT-130).
-    plagueReached(world, p);
+    news.push({ kind: "plague", text: `Plague in ${nameOf(world, p)}: the sickness ${way}. Its townsfolk die first. You can close the province to slow it, at a cost to its trade and tax.`, nations: [owner], province: p });
+    // A card asks what to do about it (EVT-130).
+    for (const fn of reachedListeners) fn(world, p);
   }
 }
 

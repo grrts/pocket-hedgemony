@@ -28,6 +28,7 @@ for (const [tag, device] of [["pixel", devices["Pixel 7 landscape"]], ["se", dev
   await page.goto("http://localhost:4179/");
   await page.waitForSelector(".map-layer", { timeout: 30000 });
   await page.click("[data-nation=france]");
+  await page.click("[data-begin]");
   await page.waitForTimeout(500);
   await page.click("text=Stop hints").catch(() => {});
   await garrison("p1063");

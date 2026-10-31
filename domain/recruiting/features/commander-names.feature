@@ -24,12 +24,15 @@ Feature: Commanders named and ranked in their realm's language
     Then he is called "<ranked>"
 
     Examples:
-      | country  | name                | post    | ranked                          |
-      | portugal | Fernão Coutinho     | a fleet | Almirante Fernão Coutinho       |
-      | portugal | Fernão Coutinho     | an army | Marechal Fernão Coutinho        |
-      | japan    | Hosokawa Katsumoto  | an army | Hosokawa Katsumoto Taishō       |
-      | hungary  | Hunyadi János       | an army | Hunyadi János főkapitány        |
-      | ottomans | Mehmed Pasha        | a fleet | Kapudan Mehmed Pasha            |
+      | country  | name               | post                 | ranked                      |
+      | portugal | Fernão Coutinho    | a fleet              | Almirante Fernão Coutinho   |
+      | portugal | Fernão Coutinho    | an army              | Marechal Fernão Coutinho    |
+      | japan    | Hosokawa Katsumoto | an army              | Hosokawa Katsumoto Taishō   |
+      | hungary  | Hunyadi János      | an army              | Hunyadi János főkapitány    |
+      | ottomans | Mehmed Pasha       | a fleet              | Kapudan Mehmed Pasha        |
+      | portugal | Fernão Coutinho    | a fleet as commodore | Capitão-mor Fernão Coutinho |
+      | portugal | Fernão Coutinho    | a fleet as viceroy   | Vice-Rei Fernão Coutinho    |
+      | japan    | Hosokawa Katsumoto | a fleet as viceroy   | Hosokawa Katsumoto Tandai   |
 
   @RECR-123
   Scenario: A mercenary company's captain

@@ -32,6 +32,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForTimeout(600);
   if (await page.locator("#reopen:visible").count()) await page.click("#reopen");
   await page.locator("button.play[data-nation=lithuania]").click();
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   const stopHints = page.locator(".hint-note button", { hasText: "Stop hints" });

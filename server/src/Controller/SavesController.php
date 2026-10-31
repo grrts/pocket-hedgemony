@@ -56,6 +56,13 @@ final class SavesController
     public function changes(#[CurrentUser] Account $account, Request $request): JsonResponse
     {
         $cursor = max(0, $request->query->getInt('since'));
+        // A device that came over from a combined account starts the change log over (SAVE-192).
+        $device = $request->attributes->get('_device');
+        $reset = $device instanceof Device && $device->takeMoved();
+        if ($reset) {
+            $cursor = 0;
+            $this->em->flush();
+        }
         $page = $this->changes->since($account, $cursor, self::CHANGES_PER_PAGE);
         $saves = $tombstones = [];
         foreach ($page as $change) {
@@ -75,7 +82,7 @@ final class SavesController
             'cursor' => $cursor,
             'more' => \count($page) === self::CHANGES_PER_PAGE,
             'usage' => $this->usageJson($account),
-        ]);
+        ] + ($reset ? ['reset' => true] : []));
     }
 
     /** Uploads one save; write-once, checked, within the quota (SAVE-063, SAVE-068, SAVE-069). */

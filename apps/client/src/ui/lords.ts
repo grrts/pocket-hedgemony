@@ -1,6 +1,7 @@
 import type { Ruleset } from "@ph/rules";
 import { portrait } from "../art/portraits.ts";
 import type { Titles } from "@ph/engine";
+import { fold } from "./fold.ts";
 import { lookOf } from "./people.ts";
 import { DEFAULT_TITLES, an, cap } from "./titles.ts";
 
@@ -284,10 +285,8 @@ export function lordsMenSection(
   const why = !o.atWar ? `${cap(t.lords)} are called only at war.` : !callable ? `No ${t.lord} can be called now: each is out already, has no men or refuses.` : "";
   const byLord = new Map(lords.map((l) => [l.k, l]));
   const sorted = [...rows].sort((a, b) => LOYALTY_ORDER.indexOf(byLord.get(b.lord)!.loyalty) - LOYALTY_ORDER.indexOf(byLord.get(a.lord)!.loyalty) || b.wouldBring - a.wouldBring);
-  return `<h3 class="sub">${esc(cap(t.lords))}' men</h3>
-    <p class="retinue-sum">${parts.length ? parts.join(" · ") : `No ${esc(t.lord)} has men to send.`}</p>
-    <button class="wax wide" data-call-lords ${o.atWar && callable ? "" : "disabled"}>Call the ${esc(t.lords)}</button>
-    ${why ? `<p class="hint">${esc(why)}</p>` : `<p class="hint">Each comes by his loyalty: a loyal ${esc(t.lord)} brings all his men and stays to the end, a wavering one brings half, later, and leaves after some months, a disloyal one stays home. They cost you nothing and lead only their own men.</p>`}
+  // The summary and Call stay on the page; the lords one by one, and how they answer, sit in a fold (SHELL-185).
+  const list = `<p class="hint">Each comes by his loyalty: a loyal ${esc(t.lord)} brings all his men and stays to the end, a wavering one brings half, later, and leaves after some months, a disloyal one stays home. They cost you nothing and lead only their own men.</p>
     <div class="lord-list">${sorted
       .map((r) => {
         const l = byLord.get(r.lord)!;
@@ -297,6 +296,12 @@ export function lordsMenSection(
           <span class="army-buttons">${button}</span></div>`;
       })
       .join("")}</div>`;
+  const sumLine = parts.length ? parts.join(" · ") : `No ${t.lord} has men to send.`;
+  return `<h3 class="sub">${esc(cap(t.lords))}' men</h3>
+    <p class="retinue-sum">${esc(sumLine)}</p>
+    <button class="wax wide" data-call-lords ${o.atWar && callable ? "" : "disabled"}>Call the ${esc(t.lords)}</button>
+    ${why ? `<p class="hint">${esc(why)}</p>` : ""}
+    ${fold("lords-men", `${esc(cap(t.lords))} one by one`, `${rows.length} ${rows.length === 1 ? esc(t.lord) : esc(t.lords)}, most loyal first`, list)}`;
 }
 
 /** The Retinue block on a lord's own screen (WAR-259, WAR-260): his men, and Call him, Command or Send him home. */

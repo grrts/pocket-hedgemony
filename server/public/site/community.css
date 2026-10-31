@@ -711,6 +711,91 @@
   }
 }
 
+/* ---- A shared save's card, above the post it came with (domain/saves SAVE-134, SAVE-136) ---- */
+
+.save-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin: 8px 14px 4px;
+  padding: 10px 12px;
+  border: 3px solid var(--wood);
+  background: var(--paper-light);
+}
+
+.save-card.is-removed {
+  opacity: 0.75;
+}
+
+.save-crop {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 192px;
+  height: 128px;
+  border: 2px solid var(--outline);
+  background: var(--paper);
+}
+
+.save-crop img {
+  width: 192px;
+  height: 128px;
+  image-rendering: pixelated;
+}
+
+.save-about {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.save-about p {
+  margin: 4px 0;
+}
+
+.save-title {
+  margin: 0;
+  font-size: 26px;
+  overflow-wrap: anywhere;
+}
+
+.save-facts,
+.save-code {
+  font-size: 19px;
+  color: var(--ink-soft);
+}
+
+.save-code strong {
+  color: var(--ink);
+  letter-spacing: 1px;
+}
+
+.save-marks .badge {
+  margin: 0 8px 0 0;
+}
+
+.save-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shared-remove summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.shared-remove summary::-webkit-details-marker {
+  display: none;
+}
+
+.shared-remove form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 0;
+}
+
 /* ---- Phones ---- */
 
 @media (max-width: 500px) {
@@ -753,6 +838,18 @@
 
   .form-buttons > * {
     flex: 1;
+  }
+
+  .save-card {
+    margin: 6px 6px 2px;
+  }
+
+  .save-crop {
+    width: 100%;
+  }
+
+  .save-actions > .btn {
+    flex: 1 1 100%;
   }
 }
 

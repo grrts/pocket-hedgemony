@@ -118,6 +118,23 @@ class CloudSave
         return self::objectKey($this->account, $this->campaignId, $this->saveId);
     }
 
+    /** The save moves to the account another was combined into (SAVE-187); its bytes move to the new key(). */
+    public function moveTo(Account $account): void
+    {
+        $this->account = $account;
+    }
+
+    public function isPurged(): bool
+    {
+        return $this->purged;
+    }
+
+    /** Milliseconds since 1970, as the header gives it. */
+    public function getSavedAt(): int
+    {
+        return (int) $this->savedAt;
+    }
+
     public function getSaveId(): string
     {
         return $this->saveId;

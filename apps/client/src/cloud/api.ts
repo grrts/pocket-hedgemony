@@ -54,9 +54,9 @@ export interface DeviceTokens {
 }
 
 /**
- * Where the device token lives (SAVE-057): the web keeps it in localStorage;
- * desktop `safeStorage`, the iOS Keychain and the Android Keystore come later
- * behind the same two calls.
+ * Where the device token lives (SAVE-057): the web keeps it in localStorage,
+ * the desktop in `safeStorage` (`desktopTokenStore`); the iOS Keychain and the
+ * Android Keystore come later behind the same two calls.
  */
 export interface TokenStore {
   load(): DeviceTokens | undefined;
@@ -78,6 +78,39 @@ export function webTokenStore(kv: KeyValue = webKeyValue(), key = "ph.cloud-devi
   };
 }
 
+/** The desktop's safeStorage behind preload.cjs (SAVE-143); `set` answers false where it cannot encrypt. */
+export interface SecretStore {
+  get(): string | undefined;
+  set(value: string | undefined): boolean;
+}
+
+/**
+ * The device token on the desktop (SAVE-143): encrypted with safeStorage; where
+ * that cannot encrypt, in web storage as on the web. A token web storage kept
+ * before moves into safeStorage once it can.
+ */
+export function desktopTokenStore(secret: SecretStore, fallback: TokenStore = webTokenStore()): TokenStore {
+  return {
+    load: () => {
+      const text = secret.get();
+      if (text) {
+        try {
+          return JSON.parse(text) as DeviceTokens;
+        } catch {
+          return undefined;
+        }
+      }
+      const old = fallback.load();
+      if (old && secret.set(JSON.stringify(old))) fallback.save(undefined);
+      return old;
+    },
+    save: (t) => {
+      if (secret.set(t ? JSON.stringify(t) : undefined)) fallback.save(undefined);
+      else fallback.save(t);
+    },
+  };
+}
+
 export interface DeviceRow {
   id: string;
   name: string;
@@ -86,9 +119,40 @@ export interface DeviceRow {
   current: boolean;
 }
 
+/**
+ * What a store sign-in sends the server (SAVE-149 … SAVE-151): Apple's identity token or Google's
+ * ID token with the nonce whose SHA-256 the store signed into it, or the one-time code Steam in the
+ * browser came back with.
+ */
+export type StoreProof = { appleIdentityToken: string; nonce: string; appleAuthorizationCode?: string } | { googleIdToken: string; nonce: string } | { steamOpenIdCode: string };
+
 export interface AccountCard extends AccountInfo {
   signIns: { provider: string; label: string }[];
   devices: DeviceRow[];
+}
+
+/**
+ * The offer that comes with a sign-in of another account (SAVE-186): what that account holds, the
+ * sign-in both accounts hold when that blocks combining (SAVE-188), and otherwise the token.
+ */
+export interface CombineOffer {
+  signIn: string;
+  account: { displayName: string; saves: number; sharedSaves: number; purchases: string[]; storageFull: boolean; sharedFull: boolean };
+  blockedBy: string | null;
+  token?: string;
+  message?: string;
+}
+
+/** The offer a refused Add carries, if it carries one. */
+export function combineOffer(e: unknown): CombineOffer | undefined {
+  if (!(e instanceof CloudError) || e.code !== "linked_to_another_account") return undefined;
+  const offer = e.body?.combine as CombineOffer | undefined;
+  return offer && typeof offer === "object" && offer.account ? offer : undefined;
+}
+
+/** What `POST /api/account/merge` answers: the account card, and what came over (SAVE-187). */
+export interface Combined extends AccountCard {
+  combined: { displayName: string; signIns: number; devices: number; saves: number; sharedSaves: number; purchases: number };
 }
 
 /** One save's header as the server's Save table keeps it (SAVE-061). */
@@ -116,12 +180,50 @@ export interface Usage {
   quotaBytes: number;
 }
 
+/** What a shared save is for: the board its topic goes to, or a reply in the topic it came from (SAVE-125, SAVE-130). */
+export type SharePurpose = "show" | "help" | "broke" | "reply";
+
+/** A shared save's card, as the server gives it (SAVE-127). */
+export interface SharedCard {
+  code: string;
+  title: string;
+  author: string;
+  nation: string;
+  realm: string;
+  date: { y: number; m: number };
+  turn: number;
+  playSeconds: number;
+  gameVersion: string;
+  ironman: boolean;
+  modified: boolean;
+  thumbnail: string;
+  plays: number;
+  topicUrl?: string;
+}
+
+/** What the server answers a share with. */
+export interface Shared {
+  code: string;
+  shownCode: string;
+  link: string;
+  topicUrl: string;
+}
+
+/** The bytes as base64, in pieces so a 2 MB save does not overflow the call stack. */
+export function base64(bytes: Uint8Array): string {
+  let text = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) text += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(text);
+}
+
 export interface Changes {
   saves: RemoteSave[];
   tombstones: { saveId: string; deletedAt: number }[];
   cursor: string;
   more: boolean;
   usage: Usage | undefined;
+  /** The device came over from an account combined into this one: the list starts over (SAVE-192). */
+  reset: boolean;
 }
 
 /** An online game as the server gives it (server/src/Controller/GamesController.php). */
@@ -149,10 +251,13 @@ export interface MyGameRow {
 export class CloudError extends Error {
   readonly status: number;
   readonly code: string;
-  constructor(status: number, code: string, message?: string) {
+  /** The server's whole answer, for refusals that carry more than a word (the offer to combine, SAVE-186). */
+  readonly body: Record<string, unknown> | undefined;
+  constructor(status: number, code: string, message?: string, body?: Record<string, unknown>) {
     super(message ?? code);
     this.status = status;
     this.code = code;
+    this.body = body;
   }
   get offline(): boolean {
     return this.status === 0;
@@ -172,6 +277,59 @@ export function errorText(e: unknown): string {
       return "An account with this email already exists. Sign in instead.";
     case "invalid_input":
       return e.message !== "invalid_input" ? e.message : "Check the fields and try again.";
+    // Steam sign-in (SAVE-118, SAVE-141): the server's own words.
+    case "steam_unavailable":
+      return e.message !== e.code ? e.message : "Steam sign-in is not available.";
+    case "steam_refused":
+      return e.message !== e.code ? e.message : "Steam did not accept the sign-in.";
+    case "steam_ticket":
+      return "Steam could not sign you in just now. Check that Steam is online and try again.";
+    // Apple, Google and Steam in the browser (SAVE-149 … SAVE-156): the server's own words where it gives them.
+    case "apple_unavailable":
+      return e.message !== e.code ? e.message : "Sign in with Apple is not available.";
+    case "apple_refused":
+      return e.message !== e.code ? e.message : "Apple did not accept the sign-in.";
+    case "google_unavailable":
+      return e.message !== e.code ? e.message : "Google sign-in is not available.";
+    case "google_refused":
+      return e.message !== e.code ? e.message : "Google did not accept the sign-in.";
+    case "sign_in_expired":
+      return e.message !== e.code ? e.message : "The sign-in took too long or was used already. Try again.";
+    case "sign_in_cancelled":
+      return "The sign-in was cancelled.";
+    case "sign_in_sheet":
+      return "The sign-in could not open. Try again.";
+    case "return_not_allowed":
+      return "This build of the game cannot sign in with Steam in the browser.";
+    case "linked_to_another_account":
+      return "This sign-in already belongs to another Pocket Hegemony account.";
+    case "already_has_steam":
+      return "This account already has a Steam sign-in.";
+    case "already_has_apple":
+      return "This account already has a Sign in with Apple.";
+    case "already_has_google":
+      return "This account already has a Google sign-in.";
+    // Combining accounts and removing a sign-in (SAVE-186 … SAVE-193): the server's own words.
+    case "combine_expired":
+      return e.message !== e.code ? e.message : "The offer to combine ran out. Add the sign-in again.";
+    case "nothing_to_combine":
+      return e.message !== e.code ? e.message : "That account is already combined or gone.";
+    case "both_have_steam":
+    case "both_have_apple":
+    case "both_have_google":
+    case "both_have_email":
+      return e.message !== e.code ? e.message : "Both accounts have a sign-in of the same kind. Remove one of them, then add this sign-in again.";
+    case "last_sign_in":
+      return "An account keeps at least one sign-in.";
+    // Shared saves (SAVE-125 … SAVE-131): the server's own words.
+    case "no_shared_save":
+    case "too_many_shared":
+    case "topic_locked":
+    case "no_topic":
+    case "rate_limited":
+    case "damaged":
+    case "too_big":
+      return e.message !== e.code ? e.message : "Something went wrong. Try again.";
     default:
       return "Something went wrong. Try again.";
   }
@@ -227,6 +385,56 @@ export class CloudApi {
     return r.account;
   }
 
+  /**
+   * `POST /api/sessions` with a Steam Web API ticket (hex) and the Steam name,
+   * which names the account when this Steam account has none yet (SAVE-113).
+   */
+  async signInWithSteam(steamTicket: string, displayName: string, device: { name: string; platform: string }): Promise<AccountInfo> {
+    const r = await this.json<{ accessToken: string; accessTokenExpiresIn: number; deviceToken: string; deviceId: string; account: AccountInfo }>(
+      "POST",
+      "/api/sessions",
+      { steamTicket, ...(displayName ? { displayName } : {}), device },
+      false,
+    );
+    this.keep(r);
+    return r.account;
+  }
+
+  /**
+   * `POST /api/sessions` with a store's proof (SAVE-149 … SAVE-151); `displayName` names the account
+   * when the store has none yet and gives no name itself (Apple's name comes only the first time).
+   */
+  async signInWithStore(proof: StoreProof, displayName: string | undefined, device: { name: string; platform: string }): Promise<AccountInfo> {
+    const r = await this.json<{ accessToken: string; accessTokenExpiresIn: number; deviceToken: string; deviceId: string; account: AccountInfo }>(
+      "POST",
+      "/api/sessions",
+      { ...proof, ...(displayName ? { displayName } : {}), device },
+      false,
+    );
+    this.keep(r);
+    return r.account;
+  }
+
+  /** `POST /api/account/sign-ins` with a store's proof: adds that sign-in to this account (SAVE-153). */
+  async addSignIn(proof: StoreProof): Promise<AccountCard["signIns"]> {
+    return (await this.json<{ signIns: AccountCard["signIns"] }>("POST", "/api/account/sign-ins", proof)).signIns;
+  }
+
+  /** `POST /api/account/merge`: combines the account the offer named into this one (SAVE-187). */
+  combineAccounts(combineToken: string): Promise<Combined> {
+    return this.json<Combined>("POST", "/api/account/merge", { combineToken });
+  }
+
+  /** `DELETE /api/account/sign-ins/{provider}`: removes a sign-in while another remains (SAVE-193). */
+  async removeSignIn(provider: string): Promise<AccountCard["signIns"]> {
+    return (await this.json<{ signIns: AccountCard["signIns"] }>("DELETE", `/api/account/sign-ins/${encodeURIComponent(provider)}`)).signIns;
+  }
+
+  /** `POST /api/sessions/steam-openid`: Steam's sign-in address, coming back to `returnUrl` (SAVE-151, SAVE-152). */
+  async steamOpenIdUrl(returnUrl: string): Promise<string> {
+    return (await this.json<{ url: string }>("POST", "/api/sessions/steam-openid", { return: returnUrl }, false)).url;
+  }
+
   /** `POST /api/accounts`, then signs the new account in on this device. */
   async register(email: string, displayName: string, password: string, device: { name: string; platform: string }): Promise<AccountInfo> {
     await this.json("POST", "/api/accounts", { email, displayName, password }, false);
@@ -236,6 +444,16 @@ export class CloudApi {
   /** `GET /api/account`: sign-ins and devices for the account card. */
   getAccount(): Promise<AccountCard> {
     return this.json<AccountCard>("GET", "/api/account");
+  }
+
+  /**
+   * `DELETE /api/account` (SAVE-198): deletes the account with its cloud and
+   * shared saves, signing every device out; this one forgets its tokens and
+   * its cloud lines, and keeps the saves on the device (SAVE-206).
+   */
+  async deleteAccount(): Promise<void> {
+    await this.call("DELETE", "/api/account");
+    this.forget();
   }
 
   /** `DELETE /api/devices/{id}`; signing this device out forgets its tokens even when the server can't be reached. */
@@ -255,7 +473,7 @@ export class CloudApi {
 
   /** `GET /api/saves?since=<cursor>`. */
   async changes(since: string | undefined): Promise<Changes> {
-    const r = await this.json<{ saves?: Record<string, unknown>[]; tombstones?: { saveId: string; deletedAt: unknown }[]; cursor: string | number; more?: boolean; usage?: Usage }>(
+    const r = await this.json<{ saves?: Record<string, unknown>[]; tombstones?: { saveId: string; deletedAt: unknown }[]; cursor: string | number; more?: boolean; usage?: Usage; reset?: boolean }>(
       "GET",
       `/api/saves${since ? `?since=${encodeURIComponent(since)}` : ""}`,
     );
@@ -265,6 +483,7 @@ export class CloudApi {
       cursor: String(r.cursor),
       more: !!r.more,
       usage: r.usage,
+      reset: !!r.reset,
     };
   }
 
@@ -324,6 +543,45 @@ export class CloudApi {
   /** `PUT /api/games/{code}/weeks/{week}`: a realm's orders for one week. */
   async sendWeek(code: string, week: number, body: { realm: string; orders: unknown; hash: string }): Promise<void> {
     await this.json("PUT", `/api/games/${encodeURIComponent(code)}/weeks/${week}`, body);
+  }
+
+  // ---------------------------------------------------------------- shared saves (SAVE-124 … SAVE-131)
+
+  /** `POST /api/shared-saves`: posts one save to the community as the player. */
+  shareSave(input: { bytes: Uint8Array; title: string; note: string; realm: string; purpose: SharePurpose }): Promise<Shared> {
+    return this.json<Shared>("POST", "/api/shared-saves", { file: base64(input.bytes), title: input.title, note: input.note, realm: input.realm, purpose: input.purpose });
+  }
+
+  /** `GET /api/shared-saves/{code}`: anyone may read a card. */
+  async sharedCard(code: string): Promise<SharedCard> {
+    return (await this.json<{ save: SharedCard }>("GET", `/api/shared-saves/${encodeURIComponent(code)}`, undefined, false)).save;
+  }
+
+  /** `GET /api/shared-saves/{code}/file`: the bytes; the server counts a play. */
+  async sharedFile(code: string): Promise<Uint8Array> {
+    const res = await this.call("GET", `/api/shared-saves/${encodeURIComponent(code)}/file`, undefined, false);
+    return new Uint8Array(await res.arrayBuffer());
+  }
+
+  /** `GET /api/shared-saves`: what this account shared, for the Shared saves row. */
+  async mySharedSaves(): Promise<SharedCard[]> {
+    return (await this.json<{ shared: SharedCard[] }>("GET", "/api/shared-saves")).shared;
+  }
+
+  async removeShared(code: string): Promise<void> {
+    await this.call("DELETE", `/api/shared-saves/${encodeURIComponent(code)}`);
+  }
+
+  // ---------------------------------------------------------------- purchases (SAVE-172 … SAVE-175)
+
+  /** `GET /api/entitlements/{store}`: is the full game unlocked on this store? (purchases.ts reads the answer). */
+  entitlement(store: string): Promise<unknown> {
+    return this.json("GET", `/api/entitlements/${encodeURIComponent(store)}`);
+  }
+
+  /** `POST /api/purchases`: the store's proof (a signed transaction, a purchase token, or nothing for Steam). */
+  submitPurchase(store: string, proof: object): Promise<unknown> {
+    return this.json("POST", "/api/purchases", { ...proof, store });
   }
 
   // ---------------------------------------------------------------- tokens
@@ -413,12 +671,14 @@ export class CloudApi {
 async function failure(res: Response): Promise<CloudError> {
   let code = `http_${res.status}`;
   let message: string | undefined;
+  let body: Record<string, unknown> | undefined;
   try {
     const j = (await res.json()) as { error?: string; message?: string; details?: { field: string; message: string }[] };
     if (j.error) code = j.error;
     message = j.message ?? j.details?.map((d) => d.message).join(" ");
+    body = j as Record<string, unknown>;
   } catch {
     // No JSON body.
   }
-  return new CloudError(res.status, code, message);
+  return new CloudError(res.status, code, message, body);
 }

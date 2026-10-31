@@ -24,11 +24,11 @@ Feature: Battle: field, roles, levels, approaches and skills
       | 3        | 3      | not trapped | the two armies fight                    |
 
   @WAR-090 @placeholder
-  Scenario: A battle day has 6 bells and a battle at most 3 days
+  Scenario: A battle day has 3 bells and a battle at most 5 days
     Given a battle in era II
     When the battle is resolved
-    Then each battle day has 6 bells
-    And if no army has broken after 3 days the attacker pulls back
+    Then each battle day has 3 bells
+    And if no army has broken after 5 days the attacker pulls back
 
   @WAR-091 @WAR-093
   Scenario: The battlefield is the province's middle tiles: Troyes 1450

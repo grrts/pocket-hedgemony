@@ -17,6 +17,7 @@ for (const [name, device] of [
   await page.goto("http://localhost:4179/");
   await page.waitForSelector(".map-layer", { timeout: 30000 });
   await page.click("[data-nation=france]");
+  await page.click("[data-begin]");
   await page.waitForFunction(() => window.__phTurn() >= 0, null, { timeout: 60000 });
   await page.waitForTimeout(2000);
   await page.click(".panel .close").catch(() => {});

@@ -39,9 +39,13 @@ In all, about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minute
 
 ### How you use it
 
-You find the tutorial on the first-launch question ("Play the tutorial"), under Tutorial in the main menu (under More once you have finished it) with its chapter list, and through Practice this on any How to play page of the Almanac. Every lesson happens on the map and on the real cards over it; the parchment note says in one line what to look at or tap, and a spotlight sits on it. The historical choices (which emperor to back, the Germiyan marriage, the Hamid towns) are ordinary event cards with their options. One chapter is one subject, one step is one thing, and one note shows at a time. The chapter list's ticks show how far you are through the ten chapters, and the note's counter how far through the chapter.
+You find the tutorial on the first-launch question ("Play the tutorial", asked the first time you press Play with no campaign to continue), as Tutorial on the start screen (under More once you have finished it), and later through Practice this on any How to play page of the Almanac. Starting it opens a new campaign as the Ottomans on 20 September 1378, with the camera on Edirne and the Grand Vizier's note at the bottom of the screen, at the step where you left off.
 
-On a phone in landscape the note runs along the bottom inside the safe areas and moves under the top bar when what it points at is low, so it never covers it, and it never takes more than a third of the screen. Skip step, Free look, event options and every button a step points at are at least 44 points; the spotlight takes no taps, a "look" step ends on a tap anywhere, and nothing needs hover. Turn the phone upright and the game asks you to turn it sideways again; the tutorial waits on its step.
+Every lesson happens on the map and on the real cards over it. The note names the chapter and counts its steps ("The map · 2 / 6"), and says in one line what to look at or do; a brass spotlight rings what to tap and the rest of the screen dims to half, one tap at a time (to open a province's card: the province on the map, then its name at the bottom left; to change the map mode: Map mode, then the mode). A "do" step moves on by itself when you do what it asks (drag the map, zoom, open the card, pick the mode); a "look" step moves on with Next or a tap anywhere. A place named in the note (Edirne, Gallipoli) is a link that turns the map to it. When what to tap is off screen, Show me brings it up. Skip step skips one step, and × leaves the tutorial and keeps your place for next time; the game menu adds Skip this chapter and Leave the tutorial. The historical choices (which emperor to back, the Germiyan marriage, the Hamid towns) are ordinary event cards with their options. One chapter is one subject, one step is one thing, and one note shows at a time: the first-campaign hints wait while the tutorial runs.
+
+**What you can play today.** The game plays chapter 0, The map, from the normal 1378 start: drag the map, look at Edirne and Bursa, zoom in on Gallipoli, open Edirne's card, then the Food and Faith map modes. The later chapters wait for their chapter saves and scripted events. At the end the vizier offers the chapter 9 choice at once: **Keep ruling the Ottomans** carries on in this campaign as your own (from then on it saves as usual, marked "began as the tutorial", and the hints pick up), or **New campaign** opens the realm list. The tutorial writes no saves of its own until you keep ruling, so Play on the start screen never drops you back into a half-done lesson. The chapter list with its ticks comes once more than one chapter can be played; until then Tutorial sits in the start screen's column until chapter 0 is done, then under More.
+
+On a phone in landscape the note runs along the bottom inside the safe areas, between the overview button and End turn, and moves beside an open card or under the top bar when it would cover the spotlight or the card, so it never covers what it points at, and it never takes more than a third of the screen. In a narrow upright window it spans the width above End turn. Next, Skip step, Show me, × and every button a step points at are at least 44 points, and a place link's tap area is too; the spotlight and the dimming take no taps, so the control under them works as ever, and nothing needs hover. Turn a phone upright and the game asks you to turn it sideways again; the tutorial waits on its step.
 
 ### Pacing tools
 
@@ -134,7 +138,7 @@ The list folds into a single icon with a count and never covers the map. Each go
 
 ### First-campaign hints
 
-Until the Murad's Frontier chapters are playable, the first-campaign hints are the tutorial you meet. In your first campaign a small parchment note says what to tap next, and a brass ring pulses around the exact button, card or spot on the map it means, one tap at a time. There are thirteen, one after another, and together they walk you through the main systems:
+The first-campaign hints carry on where the tutorial's playable chapters stop. In your first campaign a small parchment note says what to tap next, and a brass ring pulses around the exact button, card or spot on the map it means, one tap at a time. There are thirteen, one after another, and together they walk you through the main systems:
 
 | # | Hint | What you tap |
 |---|---|---|
@@ -146,7 +150,7 @@ Until the Murad's Frontier chapters are playable, the first-campaign hints are t
 | 6 | End the turn | End turn |
 | 7 | Read the news | The scroll in the top bar |
 | 8 | Choose a study | Your banner, Research, Can study, then Study now |
-| 9 | Recruit | Your capital's card, the Garrison tab, then Recruit |
+| 9 | Recruit | Your capital's card, the Troops tab, then Recruit |
 | 10 | Build | The Build tab, then Build |
 | 11 | Meet your lords | Your banner, Lands, then your lords' page |
 | 12 | See your gold | The gold in the top bar |
@@ -154,7 +158,7 @@ Until the Murad's Frontier chapters are playable, the first-campaign hints are t
 
 Doing the thing ticks its hint off, in any order, and the next one appears; an order the game refuses ticks nothing, and a hint you have already done (a study already chosen) is skipped. When what to tap is not on screen, Show me opens the card that holds it or turns the map to it. The × dismisses one hint, and Stop hints turns them all off.
 
-The note sits between the overview button and End turn. When that would cover the ring or an open card, it moves beside the card, or under the top bar, so it never covers what it points at; a button half hidden at the bottom of a card is scrolled into view first. The ring takes no taps, so the button under it works as ever. The counter ("3 / 13") shows how far you are. Hints wait while an event card, the game menu or the loading screen is up, or a week plays. Which hints are done stays with you, not with the save: a second campaign picks up where the first left off, and once all thirteen are done they never come back. In Settings (the cog in the side tools, or the game menu), Gameplay holds the Tutorial hints switch with "n of 13 done" and "Reset tutorial and hints", which brings them all back. Tutorial on the start screen does the same and starts you at the realm list.
+The note sits between the overview button and End turn. When that would cover the ring or an open card, it moves beside the card, or under the top bar, so it never covers what it points at; a button half hidden at the bottom of a card is scrolled into view first. The ring takes no taps, so the button under it works as ever. The counter ("3 / 13") shows how far you are. Hints wait while the tutorial runs, an event card, the game menu or the loading screen is up, or a week plays; what you do in the tutorial still ticks them off. Which hints are done stays with you, not with the save: a second campaign picks up where the first left off, and once all thirteen are done they never come back. In Settings (the cog in the side tools, or the game menu), Gameplay holds the Tutorial hints switch with "n of 13 done" and "Reset tutorial and hints", which brings them all back and starts the tutorial over. Guided campaign on the first-launch question turns the hints on; I know the way turns them off.
 
 ### Needs attention
 
@@ -221,7 +225,7 @@ The game tracks the last input you touched and swaps every prompt live, even mid
 
 ### Starting, skipping and returning
 
-The first time you tap to start, the game asks "New to Pocket Hegemony?" with Play the tutorial (recommended), Guided campaign and I know the way. The main menu has a chapter list with a tick on each chapter done, and any chapter can be played at any time. Tutorial progress (chapters done, the current step, mutes, first-time entries seen) is kept in the save. The chapter saves that ship with the game are read-only.
+The first time you press Play with no campaign to continue, the game asks "New to Pocket Hegemony?" with Play the tutorial (recommended), Guided campaign and I know the way; it asks once. Once the chapter saves exist, the main menu has a chapter list with a tick on each chapter done, and any chapter can be played at any time. Tutorial progress (chapters done, the current step, mutes, first-time entries seen) belongs to you, not to a campaign save: closing the game mid-chapter brings you back to the same step. The chapter saves that ship with the game are read-only.
 
 At the end of chapter 9, "Keep ruling the Ottomans" turns the tutorial save into a normal campaign: the quiet world lifts, scripted events stop, the vizier's notes give way to the Needs attention list, and the save is marked "began as the tutorial", so it is not ironman. The tutorial earns no achievements.
 
@@ -292,6 +296,6 @@ Nothing. Every question about the tutorial and the help layers has been decided.
 
 ## For developers
 
-- Spec: [`domain/onboarding/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/onboarding/spec.md), requirement code **TUT** (TUT-001 to TUT-134).
+- Spec: [`domain/onboarding/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/onboarding/spec.md), requirement code **TUT** (TUT-001 to TUT-140).
 - Features: `domain/onboarding/features/` (first-launch-and-layers, tutorial-chapters, byzantine-civil-war, janissaries, pacing-tools, off-script, step-script, guided-first-turns, needs-attention, tooltips-and-why, almanac, inputs, skipping-and-returning, accessibility, measuring).
-- Code: `packages/engine/src/domain/onboarding/` (tutorial, attention, almanac); data in `packages/rules/data/domain/onboarding.json`; steps in `packages/specs/steps/onboarding.steps.ts`.
+- Code: `packages/engine/src/domain/onboarding/` (tutorial, attention, almanac); data in `packages/rules/data/domain/onboarding.json`; steps in `packages/specs/steps/onboarding.steps.ts`. On screen: `apps/client/src/ui/tutorial.ts` (the note and spotlight), checked on a phone by `apps/client/scripts/tutorial-shots.mjs`.

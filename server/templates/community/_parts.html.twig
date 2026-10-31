@@ -56,3 +56,27 @@
     <a class="btn paper" href="{{ path('community_signin', {next: next}) }}">Sign in</a>
 </p>
 {% endmacro %}
+
+{# A shared save's card, above the post it came with (domain/saves SAVE-134). #}
+{% macro save_card(save) %}
+<section class="save-card{% if not save.playable %} is-removed{% endif %}" aria-label="Shared save: {{ save.title }}">
+    <span class="save-crop">{% if save.thumbnail %}<img src="data:image/png;base64,{{ save.thumbnail }}" width="96" height="64" alt="The map around {{ save.realm }}">{% else %}{{ _self.icon('map', 4) }}{% endif %}</span>
+    <div class="save-about">
+        <h2 class="save-title">{{ save.title }}</h2>
+        <p class="save-facts">{{ save.realm }} · {{ save.dateText }} · week {{ save.turn + 1 }} · {{ save.playTimeText }} played · version {{ save.gameVersion }}{% if save.plays %} · played {{ save.plays }} {{ save.plays == 1 ? 'time' : 'times' }}{% endif %}</p>
+        {% if save.ironman or save.modified %}<p class="save-marks">
+            {%- if save.ironman %}<span class="badge">Was ironman: opens as a normal campaign</span>{% endif -%}
+            {%- if save.modified %} <span class="badge">Modified</span>{% endif -%}
+        </p>{% endif %}
+        {% if save.playable %}
+        <p class="save-code">Code <strong>{{ save.shownCode }}</strong>: type it in the game under Load, Open a shared save.</p>
+        <p class="save-actions">
+            {% if play_url %}<a class="btn wax" href="{{ play_url }}{{ '?' in play_url ? '&' : '?' }}shared={{ save.code }}">{{ _self.icon('swords') }}Play this save</a>{% endif %}
+            <a class="btn paper" href="{{ path('shared_save_download', {code: save.code}) }}" download>Download</a>
+        </p>
+        {% else %}
+        <p class="save-code">The player who shared this save removed it.</p>
+        {% endif %}
+    </div>
+</section>
+{% endmacro %}

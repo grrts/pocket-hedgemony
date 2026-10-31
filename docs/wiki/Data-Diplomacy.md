@@ -607,6 +607,19 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `no_aim_wrong_to_neighbours` | threatened\_us |
 | `regency_allows` | defensive, raid |
 
+### No aim penalty
+
+> F-167 (Leroy, 20 Oct): a war declared with no aim punishes the declarer hugely, the moment it is declared. Every lord, Warlike or not, takes the aimless\_war loyalty cause lord\_steps times; the declarer gains notoriety (the Notorious deed wrong with every realm that knows it, DIPL-174); each of its provinces holds the Unjust war grievance while the war lasts; its peace voices count peace\_share more for peace; its allies may refuse the call with no oath broken (allies\_refuse); the AI declares one only when Warlike or a hegemon seeker (ai\_only\_if\_reckless). A subject rising for its freedom pays none of it. Provisional.
+
+| Key | Value |
+|---|---|
+| `lord_steps` | 2 |
+| `notoriety` | 15 |
+| `peace_share` | 0.25 |
+| `allies_refuse` | yes |
+| `ai_only_if_reckless` | yes |
+| `provisional` | yes |
+
 ## Truce
 
 | Key | Value |
@@ -766,3 +779,18 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | 5 | V | 1800 |
 | 6 | VI | 1870 |
 | 7 | VII | 1914 |
+
+## Arms and fear
+
+> Leroy, 19 Oct (DIPL-231 to DIPL-237, F-165): every AI realm keeps a standing army sized against its neighbours, calls men across the whole realm at war and borrows for it, and feels Wary or Threatened beside a much stronger neighbour. There is no rivalry: fear is measured from the armies each month and leaves no lasting tie. Every number is provisional, for the balance model to tune.
+
+| Name | wary ratio | threatened ratio | ally weight | share of cap | match neighbour | multiplier | max share of cap | pay share of income | raise per month | more |
+|---|---|---|---|---|---|---|---|---|---|---|
+| fear (provisional) | 1.5 | 2.5 | 0.5 |  |  |  |  |  |  |  |
+| standing (provisional) |  |  |  | 0.25 | 0.5 | calm: 1; wary: 1.5; threatened: 2 | calm: 0.5; wary: 0.7; threatened: 0.9 | calm: 0.4; wary: 0.5; threatened: 0.65 | 3 | slack: 1000 |
+| war (provisional) |  |  |  | 0.25 |  |  |  | 0.75 |  | per province: 3 |
+| borrow (provisional) |  |  |  |  |  |  |  |  |  | months of pay: 3 |
+| allies (provisional) |  |  |  |  |  |  |  |  |  | same fear: (calm: 0; wary: 15; threatened: 30); envoy every months: 3; partners: 3 |
+| defences (provisional) |  |  |  |  |  |  |  |  |  | castle step: (calm: 0; wary: 1; threatened: 2); reserve share: (calm: 1; wary: 1; threatened: 0.5) |
+| technology (provisional) |  |  |  |  |  |  |  |  |  | warfare prefix: W; cost weight: (calm: 1; wary: 0.8; threatened: 0.6) |
+| opportunity (provisional) |  |  |  |  |  |  |  |  |  | at war ratio factor: 0.75; at war chance factor: 2; at war target weight: 3; gamble chance: 0.1; gamble ratio factor: 0.8; min ratio: 1.2 |

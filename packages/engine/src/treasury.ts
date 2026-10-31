@@ -22,6 +22,8 @@ import { governorWages } from "./colonies.ts";
 import { W as WARFARE } from "./domain/warfare/index.ts";
 import { empireDues, empireTax } from "./institutions.ts";
 import { fursOf } from "./tribes.ts";
+import { incomePaidIn } from "./difficulty.ts";
+import * as dip from "./domain/diplomacy/index.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -193,7 +195,8 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
     sumLedger(world, n);
   }
   if (!pay) return;
-  for (let n = 0; n < world.nationCount; n++) world.nationTreasury[n] = world.nationTreasury[n]! + world.nationMonthlyIncome[n]!;
+  // An AI realm's income pays in by the campaign's difficulty (SETUP-102).
+  for (let n = 0; n < world.nationCount; n++) world.nationTreasury[n] = world.nationTreasury[n]! + incomePaidIn(world, n, world.nationMonthlyIncome[n]!);
 }
 
 /** Debt a loan of this much gold adds: the gold plus its interest, all at once (REALM-188). */
@@ -291,18 +294,23 @@ export function repayLoan(world: World, n: number, gold: number): string | null 
 
 /**
  * The AI's monthly treasury (REALM-171): normal tax at peace and heavy at war,
- * a loan only when its gold is below zero, and repaying once it holds a
- * year's upkeep.
+ * a loan when its gold is below zero, or at war or Threatened below a few
+ * months of its army's pay (DIPL-234), and repaying once it holds a year's
+ * upkeep.
  */
 export function aiTreasury(world: World, news: News[]): void {
   const ai = realmConfig.ai;
   for (let n = 0; n < world.nationCount; n++) {
     if (isHuman(world, n) || world.nationGone[n]) continue;
-    const rate = TAX_RATES.indexOf((inAnyWar(world, n) ? ai.tax_at_war : ai.tax_at_peace) as TaxRateName);
+    const war = inAnyWar(world, n);
+    const rate = TAX_RATES.indexOf((war ? ai.tax_at_war : ai.tax_at_peace) as TaxRateName);
     if (rate !== world.nationTaxDefault[n]) applyRate(world, n, -1, rate, news);
     const gold = world.nationTreasury[n]!;
-    if (gold < ai.loan_when_gold_below) {
-      const want = Math.min(canBorrow(world, n), -gold + 1);
+    // At war or Threatened a realm keeps its army's pay for a few months in hand (DIPL-234).
+    const pressed = war || dip.fearLevel(dip.country(world.diplomacy, world.nationIds[n]!).fears) === "threatened";
+    const floor = pressed ? -world.nationLedger[n * LEDGER_LINES + PAY]! * dip.AF.borrow.months_of_pay : 0;
+    if (gold < ai.loan_when_gold_below || gold < floor) {
+      const want = Math.min(canBorrow(world, n), Math.max(-gold + 1, floor - gold));
       if (want > 0) takeLoan(world, n, want, news);
     } else if (world.nationDebt[n]! > 0) {
       const upkeep = -12 * (world.nationLedger[n * LEDGER_LINES + PAY]! + world.nationLedger[n * LEDGER_LINES + WAGES]!) * ai.repay_when_gold_above_years_upkeep;

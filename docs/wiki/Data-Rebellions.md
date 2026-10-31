@@ -91,6 +91,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `Grasping officials` | Tax |
 | `Banned language` | Homeland |
 | `Newly taken` | Homeland |
+| `Unjust war` | Tax |
 
 ## Join share
 

@@ -59,7 +59,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 |---|---|
 | `steps` | Loyal, Wavering, Disloyal, In revolt |
 | `up` | want\_granted, gift\_of\_gold, office\_at\_court, marriage\_into\_ruling\_house, victory\_taken\_part, long\_secure\_reign, fed\_in\_famine, shared\_faith\_and\_tongue, war\_against\_rival |
-| `down` | heavy\_taxes, land\_seized\_from\_him, land\_seized\_from\_another, war\_lost, battle\_lost, child\_ruler, disputed\_heir, new\_ruler, grain\_requisitioned, foreign\_bribes, crown\_borrowed, crown\_defaulted, massacre, faith\_not\_shared, censured\_by\_head, slighted\_at\_court, lord\_assassinated, assassin\_caught |
+| `down` | heavy\_taxes, land\_seized\_from\_him, land\_seized\_from\_another, war\_lost, battle\_lost, child\_ruler, disputed\_heir, new\_ruler, grain\_requisitioned, foreign\_bribes, crown\_borrowed, crown\_defaulted, massacre, faith\_not\_shared, censured\_by\_head, slighted\_at\_court, lord\_assassinated, assassin\_caught, aimless\_war |
 
 ## Food
 

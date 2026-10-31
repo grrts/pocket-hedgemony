@@ -29,7 +29,7 @@ The menu has two groups:
 | Column | **Play** (large, wax-red, focused first) | Always | With a campaign in progress it shows the realm's banner, name and date ("France · May 1503") and loads the newest save; otherwise New campaign |
 | Column | New campaign | While a campaign is in progress | New campaign |
 | Column | Load | While any save exists | Load |
-| Column | Tutorial | Until the tutorial is finished, then under More | The tutorial's chapter list |
+| Column | Tutorial | Until every chapter you can play is done, then under More | Murad's Frontier at the step you left off (its chapter list once more than one chapter can be played) |
 | Icon row | Settings | Always | Settings, over the start screen |
 | Icon row | Achievements | Always | Achievements |
 | Icon row | Wiki | Always | This wiki, in your browser; the game stays where it was |
@@ -40,7 +40,7 @@ The version number sits small in the lower right corner. Back on the start scree
 
 On a phone in landscape the logo sits top left, the column and icon row fill the left third on a parchment band, and the map pans across the rest; on a tablet held upright the map fills the top half and the menu sits below it. Play is at least 56 points tall, everything else at least 44, and each icon has its name under it.
 
-**New to Pocket Hegemony?** The very first time you press Play, with no campaign yet, the game asks once: Play the tutorial (focused), Guided campaign, or I know the way. The tutorial starts at its first chapter; Guided campaign opens New campaign with the goals list for your first year switched on; I know the way opens New campaign without it. See [Tutorial and help](Tutorial-and-Help).
+**New to Pocket Hegemony?** The very first time you press Play, with no campaign yet, the game asks once: Play the tutorial (focused), Guided campaign, or I know the way. The tutorial starts at its first chapter, as the Ottomans in 1378; Guided campaign opens New campaign with the first-campaign hints switched on (they stand in for the goals list for now); I know the way opens New campaign with them off. While the tutorial runs, the game menu adds Skip this chapter and Leave the tutorial under Return to the map. See [Tutorial and help](Tutorial-and-Help).
 
 **The free tier.** The free mobile download and the Steam demo let you play the Ottomans and France, with nothing else held back. They show a small "Full game" ribbon beside the logo on the start screen that leads to Unlock, never as a pop-up. No version of the game shows ads. The Unlock screen offers one purchase, the full game, which unlocks every realm; it shows the store's price and a Buy button, and on phones also Restore purchases.
 
@@ -49,8 +49,10 @@ On a phone in landscape the logo sits top left, the column and icon row fill the
 One screen in three steps, with a strip at the top ("Realm · Options · Begin"). Back moves one step back, and from step 1 returns to the start screen without asking. The nation select music plays, its lead voice changing with the highlighted realm.
 
 1. **Realm.** Choose a realm on the map at world zoom, with filters (region, difficulty, free or locked) and a short list of suggested realms. Choosing a region frames it on the map and lists every realm there by name, one row each. Tapping a realm shows its card with its strengths at a glance and one line, Ways to grow ([The 1378 start](The-1378-Start)). A locked realm shows a padlock and a button to Unlock; coming back from a purchase returns you to step 1 with that realm still chosen. Quick start skips straight to Begin with the last options used and the realm you last tapped (or the first suggested one).
-2. **Options.** Difficulty, AI aggression, fog, historical or free events, ironman, and the end date, with presets that fill the whole step. The end date is 31 August of any year from 1494 to 1939; 31 August 1939 is the default.
+2. **Options.** Difficulty, AI aggression, fog, historical, plausible or free events, ironman, and the end date, with presets that fill the whole step. Difficulty is a row of Easy, Normal (chosen) and Hard, each with one line on what it changes ([The 1378 start](The-1378-Start#difficulty)). The end date is 31 August of any year from 1494 to 1939; 31 August 1939 is the default.
 3. **Begin.** A summary card (banner, ruler, capital, start date, options) and one big Begin button.
+
+**In this build** steps 2 and 3 are one card, *Rules of the campaign*, opened by tapping a suggested realm or Rule on a realm's card: the realm's banner and start day, one row of buttons per rule (Difficulty Easy, Normal or Hard; Events Historical, Plausible or Free (Plausible by default); Fog of war On or Off; Ironman Off or On), the end year, a few lines on what the chosen rules mean, and **Begin as …**. It starts from your last new game's choices. AI aggression, presets and Quick start are not in yet. What each rule does is in [The 1378 start](The-1378-Start#campaign-rules).
 
 ### Load and loading
 
@@ -91,7 +93,17 @@ How a card sits depends on the shape:
 | Tall | A bottom sheet at 55 % height, dragged up to full height or down to a peek strip |
 | Large | A side sheet 380 px wide at UI scale 1 |
 
-A **country card** has the tabs General, Diplomacy, Trade and Army, and opens on General. A **province card** has a **Garrison** tab for the troops there without a commander.
+Another realm's **country card** has three tabs, General, Diplomacy and Army, and opens on General. Its trade (wealth, richest lands, Show wealth on the map) is a **Trade** fold on General, and its Heritage line opens its heritage as a page with **Back to General**. Before a campaign the picker's card has no tabs at all.
+
+One of your **province cards** has three tabs too, one per question:
+
+| Tab | Pages | What it answers |
+|---|---|---|
+| Overview | | What is this province like? The owner, then folds for **Governed by** (the lord or royal land and the official; it opens by itself while a royal post is empty), **Food** (harvest, what the land feeds, the castle store; open by itself while the land is short), **People** by class, **Tax** and its rates, and a castle's own **Castle food** |
+| Troops | Garrison, Port (in a port) | What can I raise here? Levies, the troops without a commander, sailors and ships |
+| Build | Buildings, Land | What can I change here? Works, and the land's tiles |
+
+Each fold's line says what it holds ("Normal · 3.66 gold a month", "694,000 · 18 % in town"), so most of the time you read the Overview without opening anything. Troops and Build show an hourglass while men gather, hulls build or a site is open.
 
 ### The Realm book
 
@@ -108,7 +120,9 @@ Your own realm's card is the Realm book. Tap your banner or a plaque in the top 
 
 **The Overview** (Realm's first page) is the whole realm on one screen: your capital, then one tile for each other section with its key line (gold and gold a month, provinces and people, armies and men, war or peace, what you study), then your ruler and heir, the score and Stability's four pillars. A tile with a red edge says what waits on you ("2 provinces hungry", "1 new land to fill", "An answer waits", "Choose what to study"), and tapping it opens the page that holds it. What the old General tab repeated from other pages (government form, faiths and languages, lands by ground, heritage, the fallen, neighbours) now lives only on its own page.
 
-The six sections are one row of icons with their names under the card's title, in every shape; a section with several pages shows them in a second, lower row. Tapping a section opens the page you last looked at there. A red seal on Diplomacy means an offer or an envoy waits for your answer. Turn reports and battle replays live in the News (the scroll button in the top bar), which took the place of the old Chronicle. Another realm's card keeps its own tabs: General, Diplomacy, Trade, Army and Heritage. Show on map (on a screen that points at an army or province) closes the book, moves the camera and opens that card; Back returns to the book on the same tab and scroll position. A book screen opened from a card (Levy from a province card) stacks on the card, and Back returns to the card.
+Each page keeps what you act on most at the top. Settings and long lists you open now and then sit in folds whose line says what they hold: Food's settings and castles, Trade's Found a trader and Busiest cities, and the officials in post. The Provinces page lists the first eight provinces, and every one that needs you (held by rebels, rioting or plotting, hungry, or royal with no official), with **All provinces** for the rest. The Army page opens on your troops against the cap and **Call the lords**; the lords one by one and your commanders sit in folds.
+
+The six sections are one row of icons with their names under the card's title, in every shape; a section with several pages shows them in a second, lower row. Tapping a section opens the page you last looked at there. A red seal on Diplomacy means an offer or an envoy waits for your answer. Turn reports and battle replays live in the News (the scroll button in the top bar), which took the place of the old Chronicle. Show on map (on a screen that points at an army or province) closes the book, moves the camera and opens that card; Back returns to the book on the same tab and scroll position. A book screen opened from a card (Levy from a province card) stacks on the card, and Back returns to the card.
 
 ### The game menu
 

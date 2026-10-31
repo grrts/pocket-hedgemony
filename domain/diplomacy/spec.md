@@ -756,6 +756,60 @@ The answer to an ask comes as a letter a month after the envoy reaches the court
 #### How the player uses it: a hint before asking
 - DIPL-230 Where: nothing new to find. On another realm's Diplomacy tab, each mission tile and *Demand tribute* starts its one line with the word in bold (*Likely* in green, *Unsure* in brown, *Unlikely* in red, the word itself saying it so colour is never needed), and each province demand button ends with it ("Demand Navarra · Unlikely"). The *Send an envoy* line says what the word means and that much can change before the envoy arrives. A mission that cannot be sent shows why, not a word. Grouping and overview: the word sits on the button it is about; the letter with its *Why?* stays the full answer, and your own Diplomacy tab the overview of envoys and answers. Phone: no new buttons; the tiles keep their 44-point buttons in the Wide and Tall layouts, the word is part of the line under the button, nothing needs hover. [X-19, DIPL-202, DIPL-208, DIPL-227]
 
+### 5.33 Arms and fear (F-165, Leroy 19 Oct)
+Leroy, 19 October: realms should always try to keep standing armies and compare them with their neighbours; when a
+neighbour's military strength is too high a realm should feel threatened and act on it. There is no rivalry system:
+fear is measured from the armies each month and leaves no lasting relation, wrong or stance. This replaces the AI's
+old peace rule (levies sent home before their pay begins), its capital-only call of at most 10,000 men at war, and
+REALM-171's loan only below zero gold. Every number is `diplomacy.arms_and_fear.*`, provisional, for the balance
+model to tune.
+
+- DIPL-231 Each month, before the AI builds, borrows, declares and calls men, the diplomacy context shall measure for every realm, against each neighbouring realm that is not its ally, overlord or subject, the neighbour's strength (WAR strength: men under arms, levies it can call and its lords' men) over its own side's (its own strength plus `fear.ally_weight`, a half, of each ally's, its overlord's and its subjects'). At `fear.wary_ratio` (1.5) or more it is *Wary* of that neighbour, at `fear.threatened_ratio` (2.5) *Threatened*. A realm's fear is its worst. Fears are kept with the realm until the next month's measure and saved with the game. [F-165]
+- DIPL-232 While at peace, an AI realm shall keep a standing army under arms (its troop cap's count: armies, men gathering and hired companies): the larger of `standing.share_of_cap` (a quarter) of its troop cap and `standing.match_neighbour` (a half) of the largest force under arms of a neighbour it does not count as a friend, times its fear's `standing.multiplier` (calm 1, Wary 1.5, Threatened 2); at most `standing.max_share_of_cap` of its cap (calm a half, Wary 0.7, Threatened 0.9) and what `standing.pay_share_of_income` of its income before army pay pays at a levy's pay (calm 0.4, Wary a half, Threatened 0.65). Under the target by more than `standing.slack` (1,000 men) it calls up to `standing.raise_per_month` (3) thousands a month in its royal provinces, first where its garrisons already stand (so the standing army stays a few armies), then those with the most men to call; over it by more than the slack, levies whose free months are over go home, smallest first, never taking it under the target. At peace men without a commander stand as the province's garrison (RECR-107). [F-165; replaces the AI's levies going home before their pay begins]
+- DIPL-233 While at war, an AI realm with a commander free or the gold to commission one (feedback 28) shall call men in every royal province it holds, the most men to call first and at most `war.per_province` (3) thousands in each a month, up to `war.share_of_cap` (a quarter) of its troop cap a month, while its whole army stays within what `war.pay_share_of_income` (0.75) of its income before army pay pays at a levy's pay. The price of war (WAR-228) counts the same men in the pay the AI weighs before it declares. [F-165; replaces the call of at most 10,000 men from the capital and the land around it]
+- DIPL-234 While at war, or Threatened, an AI realm whose gold is under `borrow.months_of_pay` (3) months of its army's pay shall borrow up to that, within its loan limit (REALM-171 otherwise unchanged). What lenders would give it counts toward the war chest WAR-228 asks for before it declares. [F-165; WAR-228]
+
+#### How the player uses it: who fears whom
+- DIPL-235 Where and grouping: another realm's Diplomacy tab says under *What they think of you* whether they are Wary or Threatened of you ("Threatened of you: your strength is 3.2 times their side's. They keep more men under arms against you and borrow to pay them"), and names the other neighbours they fear, each a link to that realm's card. Fear sits with standing because both say how a court sees you; nothing about fear sits elsewhere. [F-165; X-19]
+- DIPL-236 Overview: your own Diplomacy tab's *Your name abroad* card (DIPL-225) has a *Neighbours who fear you* row, after any league and before notoriety: how many fear you and how many are Threatened, opening on a tap to each of them with Wary or Threatened and how many times their side you are, and the ratios at which a neighbour becomes Wary and Threatened. The row is marked red with its "!" when any is Threatened. When a neighbour comes to be Threatened by you, a news line says so, once. [F-165; X-19]
+- DIPL-237 Phone: in landscape the fear lines and the row are inside the card's single column within the safe area, the row and each realm link are at least 44 points tall and open on a tap, the ratio is text so colour is never the only sign, and nothing needs hover. [F-165; X-19]
+
+### 5.34 Acting on fear (F-166, Leroy 19 Oct)
+Leroy, 19 October: a realm that finds a neighbour's military strength too high should feel threatened and act
+accordingly: make alliances, keep a bigger defence force (DIPL-232), build a technological advantage and invest in
+defences that help it defend. Realms should take the opportunities they get, and sometimes gamble a little. There is
+still no rivalry system: everything here reads the month's fears (DIPL-231), which are measured afresh each month and
+leave no lasting tie. Every number is `diplomacy.arms_and_fear.*`, provisional, for the balance model to tune.
+
+- DIPL-238 When a realm counts an alliance asked of it, and both it and the asker fear one realm (DIPL-231), the count shall hold *We fear the same realm (that realm)* at `allies.same_fear` for the asked realm's own fear of it: +15 when Wary, +30 when Threatened. When they fear several realms in common, the one that gives most is counted, once. The AI and the player's asks are counted alike (DIPL-081). [F-166; DIPL-090]
+- DIPL-239 While Threatened, an AI realm shall weigh its envoys every `allies.envoy_every_months` (3) months instead of once a year, and besides its warmest neighbour (DIPL-178) shall weigh an alliance with up to `allies.partners` (3) realms that border the realm it is Threatened of most and fear it too, the strongest first, whether or not they border it; its allies, overlord and subjects are not counted. It sends the best ask that would be a yes, as DIPL-178 and DIPL-179 say. [F-166; DIPL-178]
+- DIPL-240 While at peace and Wary or Threatened, an AI realm shall order walls before its other works (but after a first shipyard): a castle, or its next step, in the province bordering the realm it fears most whose castle stands lowest (counting one on order), the most people first, until those castles reach `defences.castle_step` for its fear (Wary 1, earthworks; Threatened 2, stone). It needs the invention each step asks (BLD rules unchanged) and keeps `defences.reserve_share` of its usual reserve for these walls (Wary all of it, Threatened a half). A calm realm builds as before. [F-166; BLD AI]
+- DIPL-241 While Wary or Threatened, an AI realm choosing its next study shall weigh the study cost of warfare inventions (ids starting `technology.warfare_prefix`, W) and of the inventions that unlock a castle step (buildings data: B4, B1, B5, B6, B13) by `technology.cost_weight` (Wary 0.8, Threatened 0.6), and study the invention that costs least after the weight (RSCH-078 otherwise unchanged). [F-166; RSCH-078]
+- DIPL-242 An AI realm shall take its chances against a neighbour already at war with another realm: it looks for a war at `opportunity.at_war_chance_factor` (2) times its monthly chance when such a neighbour is there, needs `opportunity.at_war_ratio_factor` (0.75) of the usual strength ratio over that target's side (WAR-228), and picks such a target `opportunity.at_war_target_weight` (3) times as likely. [F-166; WAR-228]
+- DIPL-243 Each month an AI realm looks for a war (DIPL-242, WAR-228), a roll of the world's dice under `opportunity.gamble_chance` (0.1) lets it gamble that month: it needs `opportunity.gamble_ratio_factor` (0.8) of the strength ratio. The ratio an AI needs is never under `opportunity.min_ratio` (1.2) nor over the usual ratio. The roll is the seeded world's, so a campaign stays deterministic. The war chest, peace voices, notoriety and censure checks of WAR-228 are unchanged. [F-166; WAR-228; X-15]
+
+#### How the player uses it: realms acting on fear
+- DIPL-244 Where and grouping: *We fear the same realm (name)* shows as a row of the Why? of every answer letter on the Diplomacy tab, yours and another realm's, like every other reason (DIPL-081), with the feared realm named. When two realms that both fear you ally and one of them borders you, the news says so once: "Savoy and Provence ally out of fear of your strength: they will answer each other's call against you." The walls, studies and declarations show where they already do: the province's castle and site, the realm's research on its card, and the war news. Nothing new sits elsewhere. [F-166; X-19]
+- DIPL-245 Overview: the *Neighbours who fear you* row of *Your name abroad* (DIPL-236) stays the one place that shows who fears you and so who may ally, wall and arm against you; another realm's Diplomacy tab keeps its fear lines (DIPL-235). [F-166; X-19]
+- DIPL-246 Phone: the reasons row is text in the Why? list inside the card's single column, opening on a tap of at least 44 points, with no hover; the news line is a Dispatches line like any other. [F-166; X-19]
+
+### 5.35 A war with no aim costs dearly (F-167, Leroy 20 Oct)
+
+*Leroy, 20 Oct:* "No aim wars should punish you giganticly. Loyalty of lords should decline instantly. You can think of more penalties." A war with no aim stays allowed (DIPL-146), but on top of *Threatened us* (DIPL-151) and the wavering when land is taken (WAR-222) the declarer now pays at once. The numbers are `diplomacy.war_aims.no_aim_penalty`, provisional.
+
+- DIPL-247 When a realm declares war with the aim *No aim*, the game shall have every one of its lords, Warlike or not, take the loyalty cause `aimless_war` `no_aim_penalty.lord_steps` times (2) that same day, falling no lower than Disloyal (REALM-088); the player gets one news line saying how many turned. [F-167]
+- DIPL-248 When a realm declares war with the aim *No aim*, the game shall add `no_aim_penalty.notoriety` (15) notoriety as a notorious deed (DIPL-174): the wrong *Notorious deed* with every realm that knows it, fading over 30 years, counted in its notoriety for leagues and asks (DIPL-221, DIPL-223). [F-167]
+- DIPL-249 While a realm fights a war it declared with the aim *No aim*, every province it owns shall hold the grievance *Unjust war* (rebels' cause Tax), from the day of the declaration until the war ends. [F-167; PROV-230]
+- DIPL-250 While a realm fights a war it declared with the aim *No aim*, its peace voices in that war shall count `no_aim_penalty.peace_share` (25 in 100) more for peace, up to all of them (WAR-221). [F-167]
+- DIPL-251 When `no_aim_penalty.allies_refuse` holds, an AI ally called to the declarer's side of a war with the aim *No aim* shall refuse the call; the refusal of an offensive call breaks nothing (D-DIPL-2), so no oath is broken and the alliance stands. The declare sheet counts such allies out of *Your side*. [F-167; D-DIPL-9]
+- DIPL-252 When `no_aim_penalty.ai_only_if_reckless` holds, an AI realm shall not declare a war with the aim *No aim* unless its ruler is Warlike or it seeks hegemony (WAR-228); it tries a demand first as before (DIPL-180), and a refused demand gives it an aim. A subject rising for its freedom (SUBJ-077) declares with no aim but pays none of DIPL-247 to DIPL-250. [F-167; WAR-228]
+
+How the player uses it:
+
+- DIPL-253 Where: *Declare war* on another realm's Diplomacy tab opens the declare sheet (WAR-229). When the player holds no aim, a red-framed block *A war with no aim* heads the *Price of war*, before anything else, with one row per cost: *Your lords* (how many lose how many steps at once), *Your name abroad* (the notoriety gained), *Your people* (*Unjust war* in how many provinces), *Peace voices* (how many in 100 more say peace), *Your allies* (who stays out, when any), and *Neighbours alarmed*. Each row opens its reason on a tap. The block ends with the way out: make a demand first, and a refusal gives an aim. The Terms' *Aim* row says *No aim* in red, and Confirm reads *Declare war with no aim*. [F-167; X-19]
+- DIPL-254 Grouping and overview: every cost sits on the one declare sheet, beside the rest of the price, so the player weighs it once before Confirm. After the declaration it shows where each thing already lives: the lords on the Lords tab and the stability plaque, the notoriety on *Your name abroad* (DIPL-225), *Unjust war* in each province's mood line with what ends it, the peace voices on the war plaque and war card (WAR-230, WAR-231), and one news line. [F-167; X-19]
+- DIPL-255 Phone: the block is text rows inside the sheet's columns in the Wide layout and its single scrolling column in the Tall one, each row at least 44 points tall and opening on a tap with no hover; the red frame and the "!" mark each row, so colour is never the only sign; Confirm stays pinned inside the safe area. [F-167; X-19; WAR-232]
+
 ## 6. Commands
 
 All commands are data, the same for player and AI.
@@ -923,6 +977,15 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | `subject_kinds`, `autonomy_levels` | Eight kinds, five levels | section 4 | rule | relation-rules.json |
 | diplomacy.wrongs.grabbed_land_near_us | Wrong for land taken near a country (DIPL-222) | −5 per province, fades over 20 years | yes | diplomacy |
 | diplomacy.ai.notoriety_restraint | Notoriety above which an AI that isn't Warlike or a hegemon seeker declares no war (WAR-228) | 50 | yes | diplomacy |
+| diplomacy.arms_and_fear.fear | Strength ratios for Wary and Threatened, and the weight of friends' strength (DIPL-231) | 1.5, 2.5; a half | yes | diplomacy |
+| diplomacy.arms_and_fear.standing | The AI's standing army at peace: share of the cap, share of the largest unfriendly neighbour's force, fear multipliers, caps by fear, pay share by fear, thousands a month, slack (DIPL-232) | a quarter; a half; 1, 1.5, 2; 0.5, 0.7, 0.9; 0.4, 0.5, 0.65; 3; 1,000 | yes | diplomacy |
+| diplomacy.arms_and_fear.war | The AI's call at war: share of the cap a month, thousands a province, pay share (DIPL-233) | a quarter; 3; 0.75 | yes | diplomacy |
+| diplomacy.arms_and_fear.borrow | Months of army pay a realm at war or Threatened keeps in hand by borrowing (DIPL-234) | 3 | yes | diplomacy |
+| diplomacy.arms_and_fear.allies | We fear the same realm by the asked's fear; months between a Threatened realm's envoys; partners weighed (DIPL-238, DIPL-239) | Wary +15, Threatened +30; 3; 3 | yes | diplomacy |
+| diplomacy.arms_and_fear.defences | Castle step wanted on the border with the most feared realm, and the share of the reserve kept, by fear (DIPL-240) | Wary 1, Threatened 2; Wary 1, Threatened a half | yes | diplomacy |
+| diplomacy.arms_and_fear.technology | Warfare id prefix and the study cost weight of warfare and fortification inventions by fear (DIPL-241) | W; Wary 0.8, Threatened 0.6 | yes | diplomacy |
+| diplomacy.war_aims.no_aim_penalty | A war with no aim: loyalty steps for every lord, notoriety gained, peace voices added, whether AI allies refuse, whether only a reckless AI declares one (DIPL-247 to DIPL-252) | 2; 15; 0.25; yes; yes | yes | diplomacy |
+| diplomacy.arms_and_fear.opportunity | Against a target at war elsewhere: ratio factor, chance factor, pick weight; the gamble's chance and ratio factor; the floor ratio (DIPL-242, DIPL-243) | 0.75, 2, 3; 0.1, 0.8; 1.2 | yes | diplomacy |
 
 ## 11. Seams
 
@@ -963,6 +1026,15 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
   Balancers join leagues against the strong; Client seekers seek a protector; Hegemon seekers make demands and
   offer pledges and overlordship to small neighbours (section 4 Posture rows).
 - Relation-level AI weights in relation-rules are retired (D-DIPL-34); only the forced peace after 60 months stays.
+- Arms and fear (F-165): each month every realm measures its neighbours against its own side and is Wary or
+  Threatened of a much stronger one; an AI realm keeps a standing army sized against its neighbours and its fear,
+  calls men across the realm at war and borrows for war or when Threatened (DIPL-231 to DIPL-234). No rivalry.
+- Acting on fear (F-166): realms that fear the same realm count *We fear the same realm* in an alliance; a
+  Threatened realm weighs its envoys every 3 months and looks for partners beside the realm it fears; a Wary or
+  Threatened realm walls its border with the realm it fears most and studies warfare and fortification sooner
+  (DIPL-238 to DIPL-241).
+- Opportunities and gambles (F-166): a neighbour at war elsewhere draws the AI's eye, needs a smaller edge and is
+  likelier picked; now and then, by chance, an AI gambles on a smaller edge (DIPL-242, DIPL-243).
 
 ## 13. Decisions and open questions
 
@@ -1303,3 +1375,8 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | DIPL-227 | — | Presentation: apps/client/src/ui/statecraft.ts, apps/client/src/style.css (`.missions`, `.diplomacy-tab`); apps/client/scripts/diplomacy-tab-shots.mjs |
 | DIPL-229 | features/reasons-count.feature | A one-word hint before asking. Engine: packages/engine/test/statecraft.test.ts (the word follows the count, none on a visit, a gift or a mission that cannot be sent) |
 | DIPL-230 | — | Presentation: apps/client/src/ui/statecraft.ts (`odds`), apps/client/src/style.css (`.odds`) |
+| DIPL-231 … DIPL-234 | features/arms-and-fear.feature | Fear of a stronger neighbour; A standing army sized against the neighbours; Calling men across the realm at war; Borrowing for war — engine: packages/engine/test/arms.test.ts |
+| DIPL-235 … DIPL-237 | features/arms-and-fear.feature | Who fears whom — presentation: apps/client/src/ui/statecraft.ts (`fearHtml`), apps/client/src/ui/priceOfWar.ts (`nameAbroadHtml`), apps/client/src/ui/priceOfWar.test.ts |
+| DIPL-238 … DIPL-243 | features/acting-on-fear.feature | We fear the same realm; Partners against a common fear; Walls on the feared border; Arms in research; Taking an opportunity; A gamble — engine: packages/engine/test/fearActs.test.ts |
+| DIPL-247 … DIPL-255 | features/no-aim-war.feature | Lords turn the day a war with no aim is declared; The name abroad darkens; An unjust war while it lasts; Peace voices lean to peace; Allies stay out; The AI keeps from wars with no aim; A rising pays nothing; The declare sheet shows the cost — engine: packages/engine/test/aimlessWar.test.ts; presentation: apps/client/src/ui/priceOfWar.ts `aimlessWarHtml` |
+| DIPL-244 … DIPL-246 | features/acting-on-fear.feature | Allies against you out of fear — presentation: the Why? list (apps/client/src/ui/statecraft.ts `reasonsHtml`), packages/engine/src/statecraft.ts (`reasonName`, `alliedAgainstYou`) |

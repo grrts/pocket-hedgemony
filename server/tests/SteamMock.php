@@ -11,8 +11,12 @@ use Symfony\Component\HttpClient\Response\MockResponse;
  */
 final class SteamMock
 {
-    public function __invoke(string $method, string $url): MockResponse
+    public function __invoke(string $method, string $url, array $options = []): MockResponse
     {
+        // The purchase checks' store calls (Steam ownership, Google Play) answer from StoresMock.
+        if (StoresMock::handles($url)) {
+            return (new StoresMock())($method, $url, $options);
+        }
         if (!str_starts_with($url, SteamWebApi::URL)) {
             throw new \LogicException("Unexpected HTTP call in a test: {$method} {$url}");
         }

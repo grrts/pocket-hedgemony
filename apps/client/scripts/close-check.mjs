@@ -68,6 +68,7 @@ try {
   await page.goto("http://localhost:4179/");
   await page.waitForSelector("[data-nation=castile]", { timeout: 60000 });
   await page.tap("[data-nation=castile]");
+  await page.tap("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(600);
 
@@ -89,10 +90,13 @@ try {
       () => page.tap("[data-declare]"),
     ),
   );
-  await check("official",then(realm("officials"), () => page.tap("[data-official]")));
-  await check("commander", then(realm("military"), () => page.tap("[data-command]")));
+  // The officials in post sit in a fold (SHELL-172): open it, then tap the first official.
+  await check("official", then(realm("officials"), () => page.evaluate(() => document.querySelector("[data-page-fold=officials-in-post]")?.setAttribute("open", "")), () => page.tap("[data-official]")));
+  // The commanders sit in a fold on the Army page (SHELL-185): open it, then tap Command.
+  const commanders = () => page.evaluate(() => document.querySelector("[data-page-fold=war-commanders]")?.setAttribute("open", ""));
+  await check("commander", then(realm("military"), commanders, () => page.tap("[data-command]")));
   await check("realm after a commander", realm(null));
-  await check("province after a commander", then(realm("military"), () => page.tap("[data-command]"), () => page.evaluate(() => window.__phSelect("p1601"))));
+  await check("province after a commander", then(realm("military"), commanders, () => page.tap("[data-command]"), () => page.evaluate(() => window.__phSelect("p1601"))));
   await page.tap(".end-turn");
   await check("realm while the week plays", realm(null));
 } finally {

@@ -28,7 +28,9 @@ function atWar(w: World, fr: number): number {
   for (const id of ["savoy", "milan", "aragon", "navarra", "brittany", "lorraine", "castile"]) {
     const b = w.nationIndex.get(id);
     if (b === undefined || relationState(w, fr, b).state !== null) continue;
-    if (!applyNow(w, { type: "declareWar", target: b, aim: "no_aim" }, fr).rejectedOrders.length) return b;
+    // On a Punish aim, so the price of a war with no aim (F-167) leaves the lords be.
+    w.diplomacy.aims.push({ holder: w.nationIds[fr]!, target: w.nationIds[b]!, aim: "punish", source: "test" });
+    if (!applyNow(w, { type: "declareWar", target: b, aim: "punish" }, fr).rejectedOrders.length) return b;
   }
   throw new Error("no foe for France");
 }

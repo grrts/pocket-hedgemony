@@ -257,7 +257,7 @@
     "difficulty",
     "AI aggression",
     "fog",
-    "historical or free events",
+    "historical, plausible or free events",
     "ironman",
     "end date"
   ],
@@ -615,7 +615,6 @@
     "countryCardTabs": [
       "General",
       "Diplomacy",
-      "Trade",
       "Army"
     ],
     "tabHolds": {
@@ -631,7 +630,11 @@
         "faith",
         "tongue",
         "in revolt",
-        "fallen"
+        "fallen",
+        "wealth",
+        "trade income",
+        "trade pacts",
+        "embargoes"
       ],
       "Diplomacy": [
         "standing",
@@ -645,12 +648,6 @@
         "the peace table",
         "peace offers"
       ],
-      "Trade": [
-        "wealth",
-        "trade income",
-        "trade pacts",
-        "embargoes"
-      ],
       "Army": [
         "soldiers",
         "recruits",
@@ -661,7 +658,7 @@
     },
     "subjects": {
       "diplomacy": "Diplomacy",
-      "trade": "Trade",
+      "trade": "General",
       "army": "Army"
     },
     "overviews": {

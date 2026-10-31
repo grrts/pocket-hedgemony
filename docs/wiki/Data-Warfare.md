@@ -86,8 +86,10 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 | Key | Value |
 |---|---|
-| `bells_per_day` | 6 |
-| `max_days` | 3 |
+| `bells_per_day` | 3 |
+| `first_bell_hour` | 8 |
+| `contact_days` | 1 |
+| `max_days` | 5 |
 | `max_sectors` | 7 |
 | `max_sectors_sea` | 3 |
 | `bell_order` | orders, shooting, charges, melee, breaking, depth and rotation |
@@ -97,17 +99,17 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 | Key | Value |
 |---|---|
-| `base` | 0.04 |
-| `era_VI` | 0.06 |
-| `era_VII` | 0.08 |
+| `base` | 0.025 |
+| `era_VI` | 0.04 |
+| `era_VII` | 0.05 |
 
 ### By invention
 
 | Name | needs | share |
 |---|---|---|
-| 1 | [W19 Machine gun](Data-Research#inventions) | 0.08 |
-| 2 | [W17 Breech-loading rifle](Data-Research#inventions) | 0.06 |
-| 3 | [W16 Rifled musket](Data-Research#inventions) | 0.05 |
+| 1 | [W19 Machine gun](Data-Research#inventions) | 0.05 |
+| 2 | [W17 Breech-loading rifle](Data-Research#inventions) | 0.04 |
+| 3 | [W16 Rifled musket](Data-Research#inventions) | 0.03 |
 
 ## Skill growth
 
@@ -328,11 +330,11 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 | Name | bell | max days | room |
 |---|---|---|---|
-| I | 2 hours | 3 | 1 |
-| II | 2 hours | 3 | 1 |
-| III | 2 hours | 3 | 1 |
-| IV | 2 hours | 3 | 1 |
-| V | 2 hours | 3 | 1 |
+| I | 4 hours | 5 | 1 |
+| II | 4 hours | 5 | 1 |
+| III | 4 hours | 5 | 1 |
+| IV | 4 hours | 5 | 1 |
+| V | 4 hours | 5 | 1 |
 | VI | half a day | 10 | 0.5 |
 | VII | a day | 30 | 0.25 |
 
@@ -611,6 +613,17 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `fever_after_months` | 3 |
 | `fever_mul` | 2 |
 | `ration` | 1 |
+
+## Castle supply
+
+> Castles starve besiegers (Leroy, 19 Oct; WAR-263 to WAR-269): a held castle gathers the land's food behind its walls, so enemy foragers find less in its province (by castle step: earthwork, stone, bastion, star, concrete) and reach\_share of that in the provinces it reaches by road; armies besieging it eat more by its step.
+
+| Key | Value |
+|---|---|
+| `provisional` | yes |
+| `forage_cut_by_step` | 0.3, 0.45, 0.6, 0.7, 0.8 |
+| `reach_share` | 0.5 |
+| `besieger_eat_by_step` | 1.15, 1.25, 1.3, 1.35, 1.4 |
 
 ## Storm
 

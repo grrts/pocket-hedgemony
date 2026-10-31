@@ -10,9 +10,27 @@ Tap the three-line button at the top left of the map (or press `Esc`) to open th
 - **Load** lists every save on this device, newest first, with its map crop, banner, date and when it was saved. Each campaign's first line is "Where you left off". Tap a line to Load or Delete it; Delete asks first. Going back to an earlier save of the campaign you are playing asks "Leave … unsaved?" when weeks have passed since your last save.
 - **Where you left off** is kept after every week and when you leave, so Exit to main menu and Continue on the start screen bring you straight back.
 - **Autosaves** are set in Settings → Gameplay.
-- **Account and cloud saves** in Settings is where you sign in with your email or make an account; "Sign in to keep your saves on every device" at the bottom of the Load card opens it too. Once you are signed in, the card shows a status line ("Up to date", "3 saves waiting to upload", "Offline, will sync when connected", "Storage full"), how much of your storage you use, and your devices, each with Sign out. The saves you made on other devices show in Load marked "from Steam Deck" and the like, and come down when you open one. Deleting a save in Load deletes it in the cloud too. You can play without an account. Steam, Apple and Google sign-in come later.
+- **Account and cloud saves** in Settings is where you sign in with your email or make an account; "Sign in to keep your saves on every device" at the bottom of the Load card opens it too. Once you are signed in, the card shows a status line ("Up to date", "3 saves waiting to upload", "Offline, will sync when connected", "Storage full"), how much of your storage you use, and your devices, each with Sign out. The saves you made on other devices show in Load marked "from Steam Deck" and the like, and come down when you open one. Deleting a save in Load deletes it in the cloud too. You can play without an account. On Steam you are signed in with your Steam account by itself, with nothing to type: the card says "Signed in with Steam" and lists your sign-ins. If you sign out, the game waits until you tap **Sign in with Steam** on the card. Apple and Google sign-in come later.
+
+- **Sign-ins** on the same card lists every way into your account (Steam, Apple, Google, email), with **Add** for the ones this device offers. If the sign-in you add already has a Pocket Hegemony account of its own (say you signed in with Steam on the PC and with Apple on the phone before linking them), the card asks once: "This Sign in with Apple has its own Pocket Hegemony account, "Bertrand", with 4 saves. Combine the two accounts?" **Combine accounts** moves everything to the account you are in: saves, shared saves, purchases, sign-ins and devices. All saves are kept, even past your storage (the card then says storage is full until you delete some), and the other account is closed. Your other devices stay signed in and show the combined saves on their next sync. Two accounts that both have a Steam sign-in (or both an email) can't be combined until you remove one. **Remove** on a sign-in takes it off while you have another; the last one stays.
+- **Delete account** sits at the very bottom of the same card, below Sign out. It asks first and says what goes: "Delete the account "Leroy"? Its 12 cloud saves and 2 shared saves are deleted, and every device is signed out." Your sign-ins and devices go too, and the topics and posts you wrote in the community stay under "Deleted player". The saves on this device stay, and so does the full game you bought: the store keeps the purchase, and **Restore purchases** unlocks it again, even on a new account. Deleting needs a connection and can't be undone.
+- **Share** sits beside Load and Delete when you open a save in Load, and **Share this campaign** is in the game menu. See Sharing saves with the community below.
+- **Open a shared save** at the bottom of the Load card takes the code of a save someone shared.
 
 On the web, saves are kept in your browser's storage on this device.
+
+## Sharing saves with the community
+
+Share a campaign so other players can play it: to show off a campaign, to ask for help with one that went wrong, or to report something that broke. It needs your account, because the save is posted to the community on the website as you.
+
+- **The Share sheet** holds the title (your save's name, which you can change), a short note if you want one, and what it is for: **Show my campaign** (posts to Strategy and campaign stories), **Help me with this** (posts to *Saves to try*, where others take over a stuck campaign) or **Something broke** (posts to Bug reports). Then **Post to the community**. The sheet then says "Shared. Your topic is on the community." with **Copy link**, **Share link** (your phone's share sheet) and **Open the topic**.
+- **On the website** the topic shows the save's card above your post: its map crop, title, realm, date, week, play time and game version, the share code, **Play this save** (opens the game in your browser) and **Download** (the `.phsave` file).
+- **Playing someone's save** starts a new campaign of your own: it never mixes with the author's saves, it joins your Manual saves, and its line in Load says "From Leroy's campaign". Type the code under Load → **Open a shared save**, or tap Play this save on the website.
+- **Sharing back.** When you share a campaign you took over this way, **Reply in the original topic** is the first choice: your save goes up as a reply with its own card, so a topic becomes a chain of saves people pass along.
+- **Fair and safe.** A shared ironman save opens as a normal campaign and earns no achievements. A locked country asks for the unlock as with any save, and a save from a newer version asks you to update the game. The server checks the file like any upload, and the shared copy drops your device name; nothing else in a save is personal. Shared saves don't count toward your cloud storage; you can keep up to 50. Deleting a save in Load leaves its shared copy; **Remove** takes it away, and moderators can hide a topic like any other.
+- **What you shared** is listed under **Shared saves** on the Account and cloud saves card, and on your page on the community, each with how many times it was played and Remove.
+
+Later: share links that open the phone and desktop apps directly, attaching an exported `.phsave` to a new topic on the website, and a note on saves that need Steam Workshop mods.
 
 ## How it works
 
@@ -121,7 +139,7 @@ Cloud saves run on Pocket Hegemony's own server, so one optional account carries
 - **No conflicts by design.** Files are named `<campaignId>/<savedAt>-<saveId>.phsave`, so two devices that played offline simply end up with both sets. The Load screen shows them all, marked with the device that made each, and Continue picks the newest. Two devices continuing the same non-ironman campaign make two lines of play, and that is not an error.
 - **What syncs.** All Manual saves, the latest Resume and Ironman save per campaign, and the newest autosave per campaign. Older autosaves, the backup Resume save and the orders journal stay on the device.
 - **Deleting** a campaign deletes it from the cloud too. A removed save gets a tombstone so other devices learn of it, and its bytes are purged 30 days later.
-- **Signing in** is with email and password. You get a short-lived access token and a long-lived device token, kept in the platform's secure storage (Keychain, Keystore, or Electron's safe storage). Each device appears in your account's device list and can be signed out from any other. Password reset by email and account deletion (which deletes every save) are offered. Sign in with Apple, Google and Steam come later; if Google is offered on iOS, Apple will be too. Sign-in is offered from a Cloud saves row in [Settings](Settings) and a "Sign in to sync" prompt on the Load screen, never as a wall before playing.
+- **Signing in** is with Steam (on the Steam version, by itself) or with email and password. You get a short-lived access token and a long-lived device token, kept in the platform's secure storage (Keychain, Keystore, or Electron's safe storage). Each device appears in your account's device list and can be signed out from any other. Password reset by email and account deletion (which deletes every save) are offered. Sign in with Apple and Google, and Steam on phones, come later; if Google is offered on iOS, Apple will be too. Sign-in is offered from a Cloud saves row in [Settings](Settings) and a "Sign in to sync" prompt on the Load screen, never as a wall before playing.
 - **When it syncs.** On launch and when you return to the app, the game fetches changes since its last position, headers first so the Load screen fills at once. A save's bytes download only when you open it, or in the background for the newest Resume save. Every written save is queued for upload; the queue survives restarts and empties oldest first when online, retrying with back-off. Backgrounding does nothing extra for the cloud, so those few seconds go to the orders journal. "Sync on Wi-Fi only" (off by default) stops syncing on a metered connection.
 - **Server checks.** Each upload is checked for size (2 MB cap), magic, CRCs, and that its header matches. Each account has a quota of 300 saves and 200 MB; at the quota the game asks you to delete old saves, and the server never drops one on its own. There is a rate limit per account and per device. Later, the server can load a save with the engine and check its world hash before trusting it, for example for a leaderboard.
 - **Saves, not purchases.** A campaign synced from one store opens on another device only if its nation is unlocked there.
@@ -141,7 +159,7 @@ The server keeps a table of the header fields the Load screen needs and stores t
 
 | Platform | Free backup |
 |---|---|
-| Steam | Steam Auto-Cloud on the save folder, one cloud folder for Windows, macOS and Linux, 500 MB and 2,000 files for the synced set only, Dynamic Cloud Sync on so a suspended Deck uploads |
+| Steam | Each save is a `.phsave` file in the save folder (`%APPDATA%\Pocket Hegemony\saves` on Windows, `~/Library/Application Support/Pocket Hegemony/saves` on macOS, `~/.config/Pocket Hegemony/saves` on Linux and Steam Deck). Steam Auto-Cloud carries every `.phsave` file there, one cloud folder for Windows, macOS and Linux, 500 MB and 2,000 files, Dynamic Cloud Sync on so a suspended Deck uploads |
 | Android | Auto Backup of the synced set (within its 25 MB limit), excluding the orders journal |
 | iOS and iPadOS | The device's own iCloud backup includes the save folder |
 | Web | Saves live in IndexedDB; the game asks for persistent storage. Signing in is the only way to keep web saves beyond the browser |
@@ -154,12 +172,14 @@ Play Games saved games and an iCloud Documents container are not used.
 
 On phones the free download and the full game are the same app, so saves carry over with nothing to do; buying the unlock removes the lock. Each header records your nation and whether it needs the full game. Loading a locked nation's save without the full game shows the unlock screen instead of failing, and never deletes the save. If a purchase is refunded or revoked, the saves stay and those nations ask to be unlocked again.
 
+**Buying the full game.** Each store sells the full game once: on Steam it is the paid game itself (the demo is a separate app), and on an iPhone, iPad or Android phone it is the one in-app purchase, `full_game`, in the free download. A purchase unlocks the full game on the store where you bought it; your account carries your saves to every device, but not the purchase. While the full game is locked, the start screen shows a small **Full game** ribbon, and More holds **Unlock**; both open the Unlock card, which also opens by itself when you choose a realm or open a save that needs the full game. The card shows what it unlocks, **Buy** with the store's own price, and on phones **Restore purchases**, and says the result right there ("The full game is unlocked on this device."). Once unlocked, the realm or save you chose is one tap away, and the ribbon is gone. The game asks your store first, so it works offline and without an account; when you are signed in, our server checks the purchase too, so a refund locks the full game again (your saves always stay) and one purchase can't be used by two accounts.
+
 With the Steam demo and the full game on the same computer, the full game finds the demo's saves on first launch and copies them into its own folder, and Steam Cloud keeps them from then on. A signed-in demo player's saves sync to the full game on any computer or phone; without an account, Export and Import do the same. Each save records which app wrote it (free, demo or full game) but no list of limits, so the full game simply opens a demo save with no limits.
 
 ### Ironman
 
-- Chosen only when a campaign starts, and it cannot be turned off.
-- No manual Save, no Load of earlier points, no console or debug tools.
+- Chosen only when a campaign starts, and it cannot be turned off: the **Ironman** row on the *Rules of the campaign* card before Begin ([The 1378 start](The-1378-Start#campaign-rules)).
+- No manual Save, no Load of earlier points, no console or debug tools. In the game today the game menu has no Save in an ironman campaign, the Load card lists the ironman campaign as one line marked *Ironman* (and not at all while you play it), and the ironman save takes the place of the Resume save after every week and when you leave.
 - Export is allowed as a backup. Importing an ironman save starts it on this device; the copy on the old device is then no longer the newest. Importing an ironman save needs a connection: offline you see "Connect to import an ironman save."
 - The server accepts an ironman upload only if the save it names as its parent is still the campaign's newest ironman save. Otherwise the second device is told to load the newer game first.
 - If two devices played the same ironman campaign offline and the line has split, the game asks once: "Keep the game from Steam Deck (June 1530) or from this phone (Feb 1528)?", recommends the one further along, and removes the other line.
@@ -182,6 +202,7 @@ Send a report, on the failure screen, attaches the Resume save and the orders jo
 - The Cloud saves row and "Sync on Wi-Fi only" in [Settings](Settings), and the autosave interval and count rows.
 - The ironman split prompt, asked once.
 - The unlock screen for a locked nation's save.
+- The Full game ribbon on the start screen and the Unlock card, with Buy and, on phones, Restore purchases.
 
 ## How it connects
 
@@ -234,6 +255,6 @@ The budgets are targets for a low-end Android phone, still to be confirmed by th
 
 ## For developers
 
-- Spec: [`domain/saves/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/saves/spec.md), requirement code **SAVE** (SAVE-001 to SAVE-104).
-- Features: `domain/saves/features/` (save-kinds-and-continue, saving-by-hand, resume-and-orders-journal, safe-writing, save-file-format, migrations, cloud-sync, backups-export-import, free-tier-saves, ironman, integrity-and-testing).
+- Spec: [`domain/saves/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/saves/spec.md), requirement code **SAVE** (SAVE-001 to SAVE-139).
+- Features: `domain/saves/features/` (save-kinds-and-continue, saving-by-hand, resume-and-orders-journal, safe-writing, save-file-format, migrations, cloud-sync, backups-export-import, free-tier-saves, ironman, integrity-and-testing, sign-in, shared-saves, combine-accounts, delete-account).
 - Code: `packages/engine/src/domain/saves/`. The engine core has `packages/engine/src/protocol.ts` (`newGame` with seed and nation only, `endTurn` with orders) and `hashWorld` in `packages/engine/src/hash.ts`; the save and load requests are still to be added. Test saves go in `packages/engine/test/saves/`.

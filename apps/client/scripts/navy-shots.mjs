@@ -31,12 +31,14 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     continue;
   }
   await page.click("[data-nation=portugal]");
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   await page.locator("[data-hint=stop]").first().click({ timeout: 3000 }).catch(() => {});
   const lisbonId = await page.evaluate(() => window.__phCapital());
   await page.evaluate((id) => window.__phSelect(id), lisbonId);
   await page.waitForTimeout(300);
+  await page.click("[data-tab=garrison]");
   await page.click("[data-tab=port]");
   await page.waitForTimeout(300);
   await shot("1-port");
@@ -63,6 +65,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   for (let t = 0; t < 5; t++) await endTurn();
   await page.evaluate((id) => window.__phSelect(id), lisbonId);
   await page.waitForTimeout(200);
+  await page.click("[data-tab=garrison]");
   await page.click("[data-tab=port]");
   await page.waitForTimeout(200);
   await shot("2b-port-building");
@@ -149,6 +152,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.goto("http://localhost:4183/");
   await page.waitForSelector("[data-nation=ottomans]", { timeout: 60000 });
   await page.click("[data-nation=ottomans]");
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.locator("[data-hint=stop]").first().click({ timeout: 3000 }).catch(() => {});
   flagship = await page.evaluate(() => window.__phNavy().mine.find((m) => m.ships.some((s) => s.type === "galley"))?.id ?? -1);

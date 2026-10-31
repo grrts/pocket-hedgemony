@@ -24,10 +24,15 @@ async function check(name, expectedMode, setup, path = "") {
     null,
     { timeout: 15000 },
   ).then((h) => h.jsonValue());
-  // Through the start screen when asked: Play with no campaign goes to the realms.
-  if (path.includes("start")) await page.click(".start-play");
+  // Through the start screen when asked: Play with no campaign asks the first-launch question
+  // once (SHELL-131), and "I know the way" goes to the realms.
+  if (path.includes("start")) {
+    await page.click(".start-play");
+    await page.click('[data-choice="I know the way"]');
+  }
   // Play one turn through the real UI too.
   await page.click("[data-nation=france]");
+  await page.click("[data-begin]");
   await page.click(".end-turn");
   await page.waitForSelector(".turn-label .day:text('27 Sep 1378')");
   const ok = d.engineError === null && d.engineMode === expectedMode;

@@ -7,6 +7,7 @@ import type { Lord } from "./domain/realm/index.ts";
 import { GRIEVANCES } from "./moods.ts";
 import { fallenEffect } from "./fallen.ts";
 import { TRAITS } from "./rulers.ts";
+import { aimless, NO_AIM } from "./aimlessWar.ts";
 
 /**
  * The price of war, peace part (X-21): each side's peace voices counted in the
@@ -237,7 +238,9 @@ function countRealm(world: World, n: number, war: dip.War, day: Day): Omit<Peace
     };
   });
   const c = wf.countVoices({ lords, royal: r.royal, capitalPeace: r.capitalPeace, warlikeRuler: world.rulers[n]?.traits.includes("Warlike") ?? false });
-  const share = Math.min(1, c.peaceShare + fallenEffect(world, n).peace);
+  // A war its realm declared with no aim: its people want peace sooner (F-167).
+  const unjust = id === war.declarer && aimless(war) ? NO_AIM.peace_share : 0;
+  const share = Math.min(1, c.peaceShare + fallenEffect(world, n).peace + unjust);
   const obligation = wf.obligation(share);
   return { nation: n, peace: c.peace, war: c.war, none: c.none, total: c.total, share, obligation, obliged: obligation !== "free" };
 }

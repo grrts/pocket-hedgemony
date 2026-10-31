@@ -1,6 +1,7 @@
 import { isChanged, label, optionsOf, resolve, rowEnabled, sectionRows, setBy, STRINGS, type Value } from "@ph/engine/domain/settings";
 import { icon } from "../art/ui.ts";
-import { env, pref, prefs, resetPref, resetPrefSection, setPref } from "../settings/prefs.ts";
+import { env, lensPatternsOn, pref, prefs, resetPref, resetPrefSection, setPref, visionPref } from "../settings/prefs.ts";
+import { bandPattern, hexRgb, lensRamp, nationColours, patternCss, rgbHex } from "../map/colourVision.ts";
 import { sound } from "../audio/sound.ts";
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -29,6 +30,8 @@ const BUILT = new Set([
   "audio.interface_sounds",
   "audio.ambience",
   "audio.ambience_volume",
+  "accessibility.colour_vision",
+  "accessibility.lens_patterns",
   "accessibility.text_size",
 ]);
 
@@ -64,6 +67,11 @@ export interface OwnSection {
 const ownSections = new Map<string, OwnSection>();
 export function setOwnSection(section: string, own: OwnSection): void {
   ownSections.set(section, own);
+}
+
+/** Rows that show only in some builds, such as the Privacy rows in a build with a server to send to (D-SET-22). */
+export function showRows(...ids: string[]): void {
+  for (const id of ids) BUILT.add(id);
 }
 
 const rowsOf = (section: string) => sectionRows(prefs, section, env).filter((id) => BUILT.has(id));
@@ -197,16 +205,40 @@ function rowHtml(id: string): string {
   if (def.type === "slider") {
     control = `<input type="range" min="${def.min}" max="${def.max}" step="${def.step ?? 5}" value="${v}" data-slide="${id}" aria-label="${esc(nameOf(id))}"${on ? "" : " disabled"}><output>${v} %</output>`;
   } else if (def.type === "toggle") {
-    control = `<button class="paper toggle${v ? " on" : ""}" data-set="${id}" data-v="${!v}" aria-pressed="${!!v}" data-sfx="${v ? "ui_toggle_off" : "ui_toggle_on"}">${v ? "On" : "Off"}</button>`;
+    // A consent row not answered yet ("ask") is off (SET-114).
+    const t = v === true;
+    control = `<button class="paper toggle${t ? " on" : ""}" data-set="${id}" data-v="${!t}" aria-pressed="${t}" data-sfx="${t ? "ui_toggle_off" : "ui_toggle_on"}">${t ? "On" : "Off"}</button>`;
   } else {
-    control = `<div class="seg" role="radiogroup" aria-label="${esc(nameOf(id))}">${optionsOf(def)
+    control = `<div class="seg${optionsOf(def).length > 4 ? " many" : ""}" role="radiogroup" aria-label="${esc(nameOf(id))}">${optionsOf(def)
       .map((o) => `<button class="paper${o === v ? " on" : ""}" role="radio" aria-checked="${o === v}" data-set="${id}" data-v='${JSON.stringify(o)}'>${esc(label(prefs.cat, id, o))}</button>`)
       .join("")}</div>`;
   }
   return `
     <div class="set-row${on ? "" : " off"}" data-row="${id}">
       <div class="set-label"><b>${esc(nameOf(id))}</b><i class="changed" title="Changed from the default"${isChanged(prefs, id) ? "" : " hidden"}></i><small>${esc(by ?? descOf(id))}</small></div>
-      <div class="set-control">${control}</div>
+      <div class="set-control${def.type !== "slider" && def.type !== "toggle" && optionsOf(def).length > 4 ? " wide" : ""}">${control}</div>
+      ${id === "accessibility.colour_vision" ? visionPreview() : ""}
+    </div>`;
+}
+
+/** Four neighbouring realms, red and green among them, and the Food lens's red to green ramp. */
+const PREVIEW_REALMS = ["#b13e53", "#38b764", "#3b5dc9", "#ef7d57"];
+const PREVIEW_RAMP = ["#a8323e", "#d08a48", "#e9d79a", "#8cb85a", "#3f7a44"].map(hexRgb);
+
+/**
+ * What Colour vision and Patterns on lenses draw, under the Colour vision
+ * row (SET-095, SET-096): the sample realms and lens ramp in the chosen
+ * mode, so the player sees the change before closing Settings.
+ */
+function visionPreview(): string {
+  const v = visionPref();
+  const near = PREVIEW_REALMS.map((_, i) => new Set(PREVIEW_REALMS.map((_, j) => j).filter((j) => j !== i)));
+  const realms = nationColours(v, { colours: PREVIEW_REALMS, neighbours: near, order: PREVIEW_REALMS.map((_, i) => i) });
+  const ramp = lensRamp(v, PREVIEW_RAMP, "diverging");
+  const sw = (c: number[], pattern: number) => `<i class="swatch" style="background-color:${rgbHex(c)};${patternCss(pattern, c)}"></i>`;
+  return `<div class="vision-preview" aria-hidden="true">
+      <span class="vision-sample"><small>Realms</small>${realms.colours.map((c, i) => sw(hexRgb(c), realms.patterns[i]!)).join("")}</span>
+      <span class="vision-sample"><small>Lens</small>${ramp.map((c, i) => sw(c, lensPatternsOn() ? bandPattern(i) : 0)).join("")}</span>
     </div>`;
 }
 

@@ -1,0 +1,40 @@
+/* The moderators' stats page (/stats): tables that scroll sideways on a phone. */
+
+.stats-windows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 8px;
+}
+
+.stats .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.stats td {
+  white-space: nowrap;
+}
+
+.stats td.crash {
+  white-space: normal;
+  min-width: 260px;
+  max-width: 640px;
+}
+
+.stats summary {
+  min-height: 44px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.stats pre {
+  margin: 8px 0 0;
+  padding: 8px;
+  max-height: 320px;
+  overflow: auto;
+  font-size: 14px;
+  line-height: 1.3;
+  white-space: pre;
+  background: rgb(0 0 0 / 0.08);
+}

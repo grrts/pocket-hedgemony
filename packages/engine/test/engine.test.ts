@@ -258,7 +258,8 @@ describe("engine host", () => {
 
   it("reports errors instead of throwing", () => {
     const handle = createEngineHost(() => rules);
-    expect(handle({ id: 1, type: "endTurn", orders: [] }).response).toEqual({ id: 1, type: "error", message: "no game in progress" });
+    // The stack comes along for crash reports (settings SET-140).
+    expect(handle({ id: 1, type: "endTurn", orders: [] }).response).toEqual({ id: 1, type: "error", message: "no game in progress", stack: expect.stringContaining("no game in progress") });
   });
 });
 

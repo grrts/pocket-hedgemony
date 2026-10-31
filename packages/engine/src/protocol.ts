@@ -27,6 +27,7 @@ import { tribesView, type TribesView } from "./tribes.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
 import { campaignView, setPlayer, type CampaignView } from "./campaignEnd.ts";
+import { setDifficulty } from "./difficulty.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { PLAGUE_STEPS, quarantineTaxShare } from "./plague.ts";
 import { CLASS_NAMES } from "./living.ts";
@@ -39,16 +40,18 @@ import { buildSheets, landSheets, slotsOf, slotsUsed, townSize, workCost, WORKS,
 import { buildingType } from "./domain/buildings/index.ts";
 import type { GameDate, GoalDef, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
-import { advance, applyNow, campaigning, HOURS_PER_STEP, mayMarchInto, processTurn, refillHere, type Order } from "./turn.ts";
+import { advance, applyNow, campaigning, forageCut, HOURS_PER_STEP, mayMarchInto, processTurn, refillHere, type Order } from "./turn.ts";
+import { supplyNotes } from "./castleSupply.ts";
 import { createWorld, tileMarch, type World } from "./world.ts";
 import { settlementsView, type SettlementView } from "./settlement.ts";
-import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
+import { armyBreak, battlePhase, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { foodMonths } from "./domain/warfare/index.ts";
 import { battleSides } from "./domain/map-presentation/index.ts";
 import { tileStepHours } from "./march.ts";
 import { tileGridFromImages, type TileGrid } from "./tiles.ts";
 import { navyView, type NavyView } from "./navy.ts";
 import { fleetOffersView, type FleetOfferView } from "./hiredFleets.ts";
+import { newGameChoices, worldOptionsOf, type NewGameChoices } from "./domain/scenario-setup/campaign.ts";
 import { openSave, writeSave, memoryStorage, type Campaign, type SaveHeader, type SaveKind, type Platform as SavePlatform } from "./domain/saves/index.ts";
 import { Rng } from "./rng.ts";
 import { explorationView, type ExplorationView } from "./colonies.ts";
@@ -81,7 +84,11 @@ const companyView = (c: FreeCompany): CompanyView => ({
 /** Messages the UI thread sends to the engine worker. */
 export type EngineRequest =
   /** `map` is the map's images as the UI decoded them, so armies march over its tiles; without it they stand still. */
-  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles; endDate?: string; chapterYears?: number; goals?: GoalDef[]; humans?: string[] }
+  /**
+   * `difficulty` is the campaign's difficulty, as the save library's options name it; normal when not given (SETUP-099).
+   * `choices` are the options step's other campaign rules (SETUP-054); without them the world plays as before (the probes, tests).
+   */
+  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles; endDate?: string; chapterYears?: number; goals?: GoalDef[]; difficulty?: string; choices?: Partial<NewGameChoices>; humans?: string[] }
   /** Plays a whole week at once (the start-up probe and the benchmarks). */
   | { id: number; type: "endTurn"; orders: Order[] }
   /** Plays the clock on by some 4-hour steps (six a day). */
@@ -124,7 +131,7 @@ export type EngineResponse =
   | { id: number; type: "saved"; path: string; header: SaveHeader; bytes: Uint8Array; removed: string[]; ironmanHead?: string }
   /** A save that did not open, and why, in the player's words; `canAccept` when opening anyway is allowed. */
   | { id: number; type: "refused"; message: string; canAccept: boolean }
-  | { id: number; type: "error"; message: string }
+  | { id: number; type: "error"; message: string; stack?: string }
   | { id: number; type: "planned"; orders: PlayerOrders };
 
 /**
@@ -192,7 +199,7 @@ export interface Snapshot {
   sieges: { province: number; by: number; days: number; months: number; progress: number; breaches: number; garrison: number; foodMonths: number | null }[];
   /** Battles being fought: where, each side's leading realm with its men now and at the start, and rounds fought of all. */
   /** Battles being fought, with each side's men and morale left after the rounds so far (WAR-207, VIEW-077). */
-  battles: { id: number; tile: number; province: number; attacker: number; defender: number; attMen: number; defMen: number; attStart: number; defStart: number; attMorale: number; defMorale: number; round: number; rounds: number; player: boolean }[];
+  battles: { id: number; tile: number; province: number; attacker: number; defender: number; attMen: number; defMen: number; attStart: number; defStart: number; attMorale: number; defMorale: number; round: number; rounds: number; phase: "contact" | "fighting" | "night"; day: number; player: boolean }[];
   /** Width of the tile grid (tile = y * width + x, in map pixels). */
   tileWidth: number;
   nationTreasury: Float64Array;
@@ -390,6 +397,8 @@ export interface Snapshot {
     /** 1 while on campaign (at war or abroad: men eat double), and the rations a month the store where it stands can give it. */
     campaigning: Uint8Array;
     refill: number[];
+    /** Why an army of the player's runs short, in words for its food line (WAR-266): enemy castles near its foragers, besieging. */
+    supplyNotes: string[][];
     /** Share of its men an army can lose before it breaks (the player's armies only; 0 for others). */
     breakPoint: number[];
     training: ({ arm: string; men: number; months: number } | null)[];
@@ -530,10 +539,13 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           defMen: men(b.defenders),
           attStart: b.attStart,
           defStart: b.defStart,
-          attMorale: att.moraleLeft,
-          defMorale: def.moraleLeft,
+          attMorale: b.attMorale ?? att.moraleLeft,
+          defMorale: b.defMorale ?? def.moraleLeft,
           round: b.round,
           rounds: b.rounds,
+          phase: battlePhase(w, b),
+          // Fighting days so far, 0 on the contact day.
+          day: b.day ?? 0,
           player: [...b.attackers, ...b.defenders].some((s) => a.owner[s] === player),
         };
       }),
@@ -705,6 +717,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         rations: live.map((slot) => armyRations(w, slot)),
         campaigning: Uint8Array.from(live, (slot) => Number(campaigning(w, slot))),
         refill: live.map((slot) => (a.owner[slot] === player ? refillHere(w, slot) : 0)),
+        supplyNotes: live.map((slot) => (a.owner[slot] === player ? supplyNotes(w, slot, forageCut(w, slot)) : [])),
         breakPoint: live.map((slot) => (a.owner[slot] === player ? armyBreak(w, slot) : 0)),
         training: live.map((slot) => (a.trainArm[slot]! >= 0 ? { arm: ARMS[a.trainArm[slot]!]!, men: a.trainMen[slot]!, months: a.trainLeft[slot]! } : null)),
       },
@@ -759,14 +772,19 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         case "newGame": {
           const rules = loadRules();
           grid = req.map ? tileGridFromImages(rules, req.map.width, req.map.height, req.map.province, req.map.terrain) : undefined;
-          world = createWorld(rules, req.seed, grid);
+          const choices = req.choices ? newGameChoices(req.choices) : null;
+          // The rules the world reads (events preset, fog); difficulty lives on world.campaign (SETUP-099).
+          world = createWorld(rules, req.seed, grid, choices ? { options: worldOptionsOf(choices) } : {});
           const idx = world.nationIndex.get(req.playerNation);
           if (idx === undefined) throw new Error(`unknown nation ${req.playerNation}`);
           player = idx;
           setPlayer(world, idx);
+          if (choices) world.campaign.endDate = choices.endDate;
           // A nearer end date (YYYY-MM-DD), for trying the end card (SHELL-164).
           if (req.endDate && /^\d{4}-\d\d-\d\d$/.test(req.endDate)) world.campaign.endDate = req.endDate;
           if (req.chapterYears && req.chapterYears > 0) world.campaign.chapterYears = Math.round(req.chapterYears);
+          // The difficulty chosen at new game, fixed for the campaign (SETUP-099).
+          setDifficulty(world, req.difficulty ?? req.choices?.difficulty);
           // Goals of the caller's own, for trying the Chronicle and the Aims fold (EVT-112, EVT-113).
           if (req.goals) {
             world.goals = createGoals(world, req.goals);
@@ -781,7 +799,10 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
             setPlayer(world, world.humans[0]!);
             world.player = idx;
             weekStarts();
-          } else startAchievements(world);
+          } else {
+            // Only an ironman campaign earns achievements (ACH-034).
+            startAchievements(world, choices ? { ironman: choices.ironman } : {});
+          }
           return snapshot(req.id, started, []);
         }
         case "endTurn": {
@@ -862,7 +883,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         }
       }
     } catch (e) {
-      return { response: { id: req.id, type: "error", message: e instanceof Error ? e.message : String(e) }, transfer: [] };
+      return { response: { id: req.id, type: "error", message: e instanceof Error ? e.message : String(e), ...(e instanceof Error && e.stack ? { stack: e.stack } : {}) }, transfer: [] };
     }
   }
 

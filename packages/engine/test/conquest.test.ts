@@ -6,7 +6,8 @@ import { declareWar, offerPeace, relationState, syncDate, type News } from "../s
 import { monthlyConquest, nameAbroadView } from "../src/conquest.ts";
 import { libraryEvents, statecraftView, syncCountries } from "../src/statecraft.ts";
 import { foldInRealm, makeSubject } from "../src/subjects.ts";
-import { maxCededProvinces, priceOfWar, whyAiWontDeclare, wouldSayPeaceAtDeclaration, aiWarPay } from "../src/priceOfWar.ts";
+import { canBorrow } from "../src/treasury.ts";
+import { atWarElsewhere, maxCededProvinces, priceOfWar, whyAiWontDeclare, wouldSayPeaceAtDeclaration, aiWarPay } from "../src/priceOfWar.ts";
 import * as dip from "../src/domain/diplomacy/index.ts";
 
 const rules = loadDefaultRuleset();
@@ -193,7 +194,7 @@ describe("the price of war (WAR-228, WAR-229)", () => {
   function scene() {
     const w = createWorld(rules, 1, tiles);
     const n = nation(w, "castile");
-    const t = dip.neighbours(w.diplomacy, "castile").map((c) => nation(w, c)).find((x) => relationState(w, n, x).state === null && !w.nationGone[x])!;
+    const t = dip.neighbours(w.diplomacy, "castile").map((c) => nation(w, c)).find((x) => relationState(w, n, x).state === null && !w.nationGone[x] && !atWarElsewhere(w, x, n))!;
     alone(w, t);
     alone(w, n);
     for (let k = 0; k < w.nationCount; k++) setStrength(w, k, 0);
@@ -230,12 +231,14 @@ describe("the price of war (WAR-228, WAR-229)", () => {
     expect(whyAiWontDeclare(w, n, t)).toBe("their side is too strong");
   });
 
-  it("does not declare holding gold for 3 months of war pay", () => {
+  it("does not declare holding gold and loans for 3 months of war pay", () => {
     const { w, n, t } = scene();
-    w.nationTreasury[n] = 3 * aiWarPay(w, n);
+    const loans = canBorrow(w, n);
+    w.nationTreasury[n] = 3 * aiWarPay(w, n) - loans;
     expect(aiWarPay(w, n)).toBeGreaterThan(0);
     expect(whyAiWontDeclare(w, n, t)).toBe("no war chest");
-    w.nationTreasury[n] = 6 * aiWarPay(w, n);
+    // What lenders would give counts toward the chest (DIPL-234).
+    w.nationTreasury[n] = 6 * aiWarPay(w, n) - loans;
     expect(whyAiWontDeclare(w, n, t)).toBeNull();
   });
 

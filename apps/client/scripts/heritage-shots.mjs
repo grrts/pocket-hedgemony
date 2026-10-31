@@ -32,13 +32,13 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForTimeout(300);
   await page.locator(".heritage-line").scrollIntoViewIfNeeded();
   await shot("picker-general");
-  await page.click("#panel [data-realm-section=Realm]").catch(() => {});
-  await page.click("[data-realm-tab=heritage]");
+  await page.click("[data-realm-open-tab=heritage]");
   await page.waitForTimeout(300);
   await shot("picker-heritage");
   await page.goto("http://localhost:4179/");
   await page.waitForSelector("[data-nation=france]", { timeout: 60000 });
   await page.click("[data-nation=france]");
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   await page.click(".hud .realm[data-realm]");

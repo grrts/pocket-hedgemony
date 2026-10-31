@@ -21,6 +21,8 @@ export const monthText = (iso: string) => {
   const [y, m] = iso.split("-").map(Number);
   return `${m ? MONTHS[m - 1] + " " : ""}${y}`;
 };
+/** A ratio as "3.2 times", "twice", "1.5 times". */
+const times = (r: number) => (r === 2 ? "twice" : `${Number.isInteger(r) ? r : r.toFixed(1)} times`);
 const plural = (n: number, one: string, many = `${one}s`) => `${fmt(n)} ${n === 1 ? one : many}`;
 const pct = (share: number) => Math.round(Math.max(0, Math.min(1, share)) * 100);
 
@@ -81,6 +83,71 @@ export interface DeclareSheetInput {
   censure: string;
 }
 
+/**
+ * What a war with no aim costs the day it is declared (F-167): a red-framed
+ * block at the head of the Price of war, one row a cost, each opening its
+ * reason on a tap. "" for a war with an aim.
+ */
+export function aimlessWarHtml(p: PriceOfWar, o: Pick<DeclareSheetInput, "name" | "titles">): string {
+  const a = p.aimless;
+  if (!a) return "";
+  const lords = esc(o.titles.lords);
+  const steps = a.lordSteps === 1 ? "a step" : `${fmt(a.lordSteps)} steps`;
+  const rows: string[] = [];
+  rows.push(
+    reasonRow(
+      `Your ${lords}`,
+      a.lords ? `${fmt(a.lords)} lose ${steps} of loyalty at once` : `none left to lose loyalty`,
+      `Every one of your ${lords}, Warlike or not, loses ${steps} of loyalty the day you declare. A Disloyal ${esc(o.titles.lord)} pays you no tax, refuses your call to arms and may go over to a neighbour; your stability falls with them. Those who still can waver again when you take land.`,
+      true,
+    ),
+  );
+  rows.push(
+    reasonRow(
+      "Your name abroad",
+      `+${fmt(a.notoriety)} notoriety`,
+      `Every realm that knows you holds the wrong <em>Notorious deed</em> toward you, fading over 30 years. Notoriety makes realms refuse your alliances and marriages and band into leagues against you.`,
+      true,
+    ),
+  );
+  rows.push(
+    reasonRow(
+      "Your people",
+      `<em>Unjust war</em> in ${plural(a.provinces, "province")}`,
+      "Every province of yours holds the grievance <em>Unjust war</em> until the war ends: a step nearer to riots and risings everywhere.",
+      true,
+    ),
+  );
+  rows.push(
+    reasonRow(
+      "Peace voices",
+      `+${pct(a.peaceShare)} in 100 say peace`,
+      "Your realm wants this war over from the first day: past half, you must take a fair peace or pay for refusing it.",
+      true,
+    ),
+  );
+  if (a.alliesStayOut.length) {
+    const names = a.alliesStayOut.map((n) => esc(o.name(n)));
+    rows.push(reasonRow("Your allies", `${plural(a.alliesStayOut.length, "ally", "allies")} stay out`, `No ally owes you a war with no aim, and none will come: ${names.join(", ")}.`, true));
+  }
+  if (p.threatened.length) {
+    const names = p.threatened.map((n) => esc(o.name(n)));
+    rows.push(
+      reasonRow(
+        "Neighbours alarmed",
+        `${plural(p.threatened.length, "realm")} will hold <em>Threatened us</em>`,
+        `A war with no aim alarms everyone near you. These realms will hold the wrong <em>Threatened us</em> toward you: ${names.join(", ")}.`,
+        true,
+      ),
+    );
+  }
+  return `<div class="aimless-warn framed-soft">
+    <p class="warn">${HURT}A war with no aim: you hold no reason to fight ${esc(o.name(p.target))}.</p>
+    ${rows.join("")}
+    <p class="hint">Make a demand first: if they refuse, you hold an aim and none of this applies.</p>
+  </div>`;
+}
+
 /** The Price of war block (WAR-229): each line a row that opens its reason, hurting lines red. */
 export function priceOfWarHtml(p: PriceOfWar, o: Pick<DeclareSheetInput, "name" | "titles" | "income">): string {
   const them = esc(o.name(p.target));
@@ -101,7 +168,8 @@ export function priceOfWarHtml(p: PriceOfWar, o: Pick<DeclareSheetInput, "name" 
       behind,
     ),
   );
-  if (p.noAim && p.threatened.length) {
+  // An older price without the aimless block still lists the neighbours alarmed here.
+  if (p.noAim && !p.aimless && p.threatened.length) {
     const names = p.threatened.map((n) => esc(o.name(n)));
     rows.push(
       reasonRow(
@@ -112,7 +180,7 @@ export function priceOfWarHtml(p: PriceOfWar, o: Pick<DeclareSheetInput, "name" 
       ),
     );
   }
-  if (p.noAim && p.waveringLords > 0) {
+  if (p.noAim && !p.aimless && p.waveringLords > 0) {
     const word = p.waveringLords === 1 ? o.titles.lord : o.titles.lords;
     rows.push(reasonRow(`Your ${esc(o.titles.lords)}`, `${fmt(p.waveringLords)} ${esc(word)} will waver`, `You hold no fitting aim against ${them}: when you take land in this war, every one of your ${esc(o.titles.lords)} who isn't Warlike drops a step of loyalty.`, true));
   }
@@ -141,7 +209,7 @@ export function priceOfWarHtml(p: PriceOfWar, o: Pick<DeclareSheetInput, "name" 
       "A single peace can take at most a third of a realm's provinces, rounded up, and its capital only with its last province. Swallowing a realm takes several wars.",
     ),
   );
-  return `<section class="price-of-war"><h3 class="sub">Price of war</h3>${rows.join("")}</section>`;
+  return `<section class="price-of-war"><h3 class="sub">Price of war</h3>${aimlessWarHtml(p, o)}${rows.join("")}</section>`;
 }
 
 /**
@@ -163,7 +231,7 @@ export function declareSheetHtml(o: DeclareSheetInput): string {
         "Aim",
         aim,
         noAim
-          ? `You hold no aim against ${them}. A war with no aim alarms your neighbours and costs your lords' loyalty when you take land; a war aim (from a demand they refused, land you held, a pretender) makes it a war they understand.`
+          ? `You hold no aim against ${them}. A war with no aim costs you dearly the day you declare it (see the price): your lords turn, your name abroad darkens, your people call it unjust. A war aim (from a demand they refused, land you held, a pretender) makes it a war they understand.`
           : `The best aim you hold against ${them}, and the one this war is declared with: a war they understand, so your neighbours are not alarmed and your lords don't waver when you take land.${source}`,
         noAim,
       )}
@@ -177,7 +245,7 @@ export function declareSheetHtml(o: DeclareSheetInput): string {
     <div class="declare-cols">${price}${terms}</div>
     <div class="declare-confirm">
       <button class="paper" data-declare-back>Back</button>
-      <button class="wax" data-declare-confirm="${o.target}"${truce ? ` data-break-truce="1"` : ""}>${icon("swords", 1)}${truce ? "Break the truce and declare war" : `Declare war on ${them}`}</button>
+      <button class="wax" data-declare-confirm="${o.target}"${truce ? ` data-break-truce="1"` : ""}>${icon("swords", 1)}${truce ? "Break the truce and declare war" : noAim ? `Declare war with no aim` : `Declare war on ${them}`}</button>
     </div>
   </div>`;
 }
@@ -280,6 +348,12 @@ export function nameAbroadHtml(v: NameAbroadView, name: (n: number) => string): 
   const over = v.landsTaken >= v.threshold;
   const landsBar = `<span class="lands-bar${over ? " red" : v.landsTaken * 4 >= v.threshold * 3 ? " amber" : ""}" role="img" aria-label="${v.landsTaken} of ${v.threshold}"><i style="width:${fill.toFixed(0)}%"></i></span>`;
   const lands = `<details class="pow-line lands${over ? " hurt" : ""}"><summary>${over ? HURT : `<span class="calm-mark" aria-hidden="true"></span>`}<span class="what">Lands taken (20 years)</span>${landsBar}<span class="value">${over ? `${v.landsTaken} of ${v.threshold}: a league may form` : `${v.landsTaken} of ${v.threshold} before a league`}</span></summary><p class="hint">Provinces you took in the last 20 years and still hold. At ${v.threshold} in this era, the realms that border you or the land you took may join a league against you each new year. Land fades from the count after 20 years.</p></details>`;
+  const afraid = v.fearful ?? [];
+  const threatened = afraid.filter((f) => f.level === "threatened").length;
+  const fearList = `<ul class="league-members">${afraid.map((f) => `<li><button class="realm-link" data-realm="${f.nation}" data-realm-open="diplomacy"><b>${esc(name(f.nation))}</b></button><span>${f.level === "threatened" ? "Threatened" : "Wary"} · you are ${times(f.ratio)} their side</span></li>`).join("")}</ul>`;
+  const fear = afraid.length
+    ? `<details class="pow-line fearful${threatened ? " hurt" : ""}"><summary>${threatened ? HURT : `<span class="calm-mark" aria-hidden="true"></span>`}<span class="what">Neighbours who fear you</span><span class="value">${plural(afraid.length, "realm")}${threatened ? ` · ${fmt(threatened)} threatened` : ""}</span></summary>${fearList}<p class="hint">A neighbour is Wary of you when your strength is ${times(v.fearRatios.wary)} its side's (its own and half its allies'), Threatened from ${times(v.fearRatios.threatened)}. It keeps more men under arms against you, and a Threatened one borrows to pay them. Measured again each month.</p></details>`
+    : "";
   const noto = reasonRow(
     "Notoriety",
     `<b>${v.word}</b> <small>(${Math.round(v.notoriety)})</small>`,
@@ -288,6 +362,6 @@ export function nameAbroadHtml(v: NameAbroadView, name: (n: number) => string): 
   );
   return `<section class="name-abroad framed-soft" id="name-abroad">
     <h3 class="sub">Your name abroad</h3>
-    ${leagues.join("")}${noto}${lands}
+    ${leagues.join("")}${fear}${noto}${lands}
   </section>`;
 }

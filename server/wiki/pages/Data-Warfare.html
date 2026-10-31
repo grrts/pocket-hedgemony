@@ -85,8 +85,10 @@
 <div class="table-scroll"><table>
 <thead><tr><th>Key</th><th>Value</th></tr></thead>
 <tbody>
-<tr><td><code>bells_per_day</code></td><td>6</td></tr>
-<tr><td><code>max_days</code></td><td>3</td></tr>
+<tr><td><code>bells_per_day</code></td><td>3</td></tr>
+<tr><td><code>first_bell_hour</code></td><td>8</td></tr>
+<tr><td><code>contact_days</code></td><td>1</td></tr>
+<tr><td><code>max_days</code></td><td>5</td></tr>
 <tr><td><code>max_sectors</code></td><td>7</td></tr>
 <tr><td><code>max_sectors_sea</code></td><td>3</td></tr>
 <tr><td><code>bell_order</code></td><td>orders, shooting, charges, melee, breaking, depth and rotation</td></tr>
@@ -96,17 +98,17 @@
 <div class="table-scroll"><table>
 <thead><tr><th>Key</th><th>Value</th></tr></thead>
 <tbody>
-<tr><td><code>base</code></td><td>0.04</td></tr>
-<tr><td><code>era_VI</code></td><td>0.06</td></tr>
-<tr><td><code>era_VII</code></td><td>0.08</td></tr>
+<tr><td><code>base</code></td><td>0.025</td></tr>
+<tr><td><code>era_VI</code></td><td>0.04</td></tr>
+<tr><td><code>era_VII</code></td><td>0.05</td></tr>
 </tbody></table></div>
 <h3 id="by-invention"><a class="anchor" href="#by-invention" aria-label="Link to this section">#</a>By invention</h3>
 <div class="table-scroll"><table>
 <thead><tr><th>Name</th><th>needs</th><th>share</th></tr></thead>
 <tbody>
-<tr><td>1</td><td><a href="/wiki/Data-Research#inventions">W19 Machine gun</a></td><td>0.08</td></tr>
-<tr><td>2</td><td><a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a></td><td>0.06</td></tr>
-<tr><td>3</td><td><a href="/wiki/Data-Research#inventions">W16 Rifled musket</a></td><td>0.05</td></tr>
+<tr><td>1</td><td><a href="/wiki/Data-Research#inventions">W19 Machine gun</a></td><td>0.05</td></tr>
+<tr><td>2</td><td><a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a></td><td>0.04</td></tr>
+<tr><td>3</td><td><a href="/wiki/Data-Research#inventions">W16 Rifled musket</a></td><td>0.03</td></tr>
 </tbody></table></div>
 <h2 id="skill-growth"><a class="anchor" href="#skill-growth" aria-label="Link to this section">#</a>Skill growth</h2>
 <blockquote>
@@ -328,11 +330,11 @@
 <div class="table-scroll"><table>
 <thead><tr><th>Name</th><th>bell</th><th>max days</th><th>room</th></tr></thead>
 <tbody>
-<tr><td>I</td><td>2 hours</td><td>3</td><td>1</td></tr>
-<tr><td>II</td><td>2 hours</td><td>3</td><td>1</td></tr>
-<tr><td>III</td><td>2 hours</td><td>3</td><td>1</td></tr>
-<tr><td>IV</td><td>2 hours</td><td>3</td><td>1</td></tr>
-<tr><td>V</td><td>2 hours</td><td>3</td><td>1</td></tr>
+<tr><td>I</td><td>4 hours</td><td>5</td><td>1</td></tr>
+<tr><td>II</td><td>4 hours</td><td>5</td><td>1</td></tr>
+<tr><td>III</td><td>4 hours</td><td>5</td><td>1</td></tr>
+<tr><td>IV</td><td>4 hours</td><td>5</td><td>1</td></tr>
+<tr><td>V</td><td>4 hours</td><td>5</td><td>1</td></tr>
 <tr><td>VI</td><td>half a day</td><td>10</td><td>0.5</td></tr>
 <tr><td>VII</td><td>a day</td><td>30</td><td>0.25</td></tr>
 </tbody></table></div>
@@ -609,6 +611,18 @@
 <tr><td><code>fever_after_months</code></td><td>3</td></tr>
 <tr><td><code>fever_mul</code></td><td>2</td></tr>
 <tr><td><code>ration</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="castle-supply"><a class="anchor" href="#castle-supply" aria-label="Link to this section">#</a>Castle supply</h2>
+<blockquote>
+<p>Castles starve besiegers (Leroy, 19 Oct; WAR-263 to WAR-269): a held castle gathers the land&#39;s food behind its walls, so enemy foragers find less in its province (by castle step: earthwork, stone, bastion, star, concrete) and reach_share of that in the provinces it reaches by road; armies besieging it eat more by its step.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>provisional</code></td><td>yes</td></tr>
+<tr><td><code>forage_cut_by_step</code></td><td>0.3, 0.45, 0.6, 0.7, 0.8</td></tr>
+<tr><td><code>reach_share</code></td><td>0.5</td></tr>
+<tr><td><code>besieger_eat_by_step</code></td><td>1.15, 1.25, 1.3, 1.35, 1.4</td></tr>
 </tbody></table></div>
 <h2 id="storm"><a class="anchor" href="#storm" aria-label="Link to this section">#</a>Storm</h2>
 <div class="table-scroll"><table>

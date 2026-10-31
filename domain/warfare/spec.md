@@ -181,7 +181,7 @@ Newest decision first.
 - Holds: two sides (armies, castle garrison), battlefield sectors, bells fought, days fought, deployment,
   orders given, losses (killed, wounded, fled), result, one-line reason.
 - INV-WAR-16: A battlefield has at most 7 sectors (3 at sea).
-- INV-WAR-17: A battle day has 6 bells; the longest battle is 3 days in eras I–V.
+- INV-WAR-17: A battle day has 3 bells, fought in daylight; the longest battle is 5 days of fighting in eras I–V (F-168).
 - INV-WAR-18: Battles are resolved one at a time.
 
 **War** (identity: war id)
@@ -491,7 +491,7 @@ Newest decision first.
 ### 5.9 Battle: setting
 
 - WAR-089 When the day loop brings two hostile armies into the same province, the warfare system shall start a battle unless one withdraws first; an army may slip away before battle if its commander's Cunning is higher than the enemy's and it isn't trapped. [warfare §7.1; troop-movement §6.1; X-1]
-- WAR-090 The warfare system shall run a battle day as 6 bells and end a battle after at most 3 days (eras I–V), when the attacker pulls back. [warfare §7.1; eras §2]
+- WAR-090 The warfare system shall run a battle day as 3 bells, fought in daylight, and end a battle after at most 5 days of fighting (eras I–V), when the attacker pulls back. [warfare §7.1; eras §2; F-168]
 - WAR-091 The warfare system shall build the battlefield from up to 7 sectors, the middle 7 tiles of the province's tile row (all of them if fewer), each sector with its room and effects (sector table), and put each army's camp (wagons, food reserve, wounded, unplaced guns) behind it. [warfare §7.2]
 - WAR-092 The warfare system shall apply the province's ground on top of the sectors: foot, horse and guns modifiers, the defender bonus, and +10 % for locals in rough country. [warfare §7.2; province §3.1]
 - WAR-093 The warfare system shall stand men beyond a sector's room behind it as depth, and at the end of every bell move depth forward to fill the room. [warfare §7.2]
@@ -520,7 +520,7 @@ Newest decision first.
 
 - WAR-111 The warfare system shall run each bell in order: orders (less Cunning first, then the other, then Elite free orders); shooting; charges; melee; breaking; depth and rotation. [warfare §7.7]
 - WAR-112 In the first bell, the warfare system shall allow only shooting, unless an Assault commander advances. [warfare §7.7]
-- WAR-113 The warfare system shall compute each company's hits per bell as 4 % (by era) × men in the front × strength per man × roles × level × leader Might in its sector × sector and ground × inventions × tired (−10 % a bell) × hungry (−20 %) × forced march (−10 % on the first day). [warfare §7.8]
+- WAR-113 The warfare system shall compute each company's hits per bell as 2.5 % (by era) × men in the front × strength per man × roles × level × leader Might in its sector × sector and ground × inventions × tired (−10 % a bell) × hungry (−20 %) × forced march (−10 % on the first day). [warfare §7.8]
 - WAR-114 The warfare system shall make each hit take one man out of the line, and split it into fled by the flee share and the rest evenly into killed and wounded. [warfare §7.8]
 - WAR-115 The warfare system shall compute the flee share as 50 % − 30 % × the content share, where the content share is the share of people living in calm provinces (0 or 1 grievances). [warfare §7.8]
 - WAR-116 The warfare system shall take the content share by kind: levies and standing regiments from their home provinces; retinues from the lord's lands (half for a wavering lord, zero for a disloyal one); hired companies always 30 % flee share +10 % per month of pay owed; garrisons from their home provinces, fully content defending their own province's castle; rebel bands 50 % flee share. [warfare §7.8]
@@ -536,7 +536,7 @@ Newest decision first.
 
 ### 5.13 Night, aftermath, prisoners
 
-- WAR-123 When 6 bells pass without an army breaking, the warfare system shall bring night: either side may withdraw by its standing orders; the withdrawal is clean if its commander's Cunning is at least the enemy's, otherwise it counts as breaking with half the pursuit. [warfare §7.11]
+- WAR-123 When a day's 3 bells pass without an army breaking, the warfare system shall bring night: either side may withdraw by its standing orders; the withdrawal is clean if its commander's Cunning is at least the enemy's, otherwise it counts as breaking with half the pursuit. [warfare §7.11]
 - WAR-124 Overnight, the warfare system shall return fled men who will come back to their companies and refill ammunition. [warfare §7.11]
 - WAR-125 After a battle, the warfare system shall return two thirds of the field-holder's wounded after 5 weeks if the army is fed (the rest die), and make the broken side's wounded the winner's prisoners. [warfare §7.12]
 - WAR-126 After a battle, the warfare system shall return half of the field-holder's fled men within 2 weeks and send half home to recruits; of the broken side's fled, half return if the army reaches a friendly castle and half go home. [warfare §7.12]
@@ -552,8 +552,8 @@ Newest decision first.
 
 - WAR-134 The warfare system shall give each army standing orders that apply to every battle: retreat if outnumbered 2 to 1, 3 to 2, or never (checked before the battle and each night); attack or wait. [warfare §7.14]
 - WAR-135 The warfare system shall fight every running battle one round per step, in the order the battles started, with each result ready before its report shows. [warfare §7.15, §16; X-1]
-- WAR-136 While a battle the player's army or fleet is in is running, the warfare system shall fight it one round (one bell) per 4-hour step of the day loop, let the player change its standing orders, order a retreat or switch to another running battle at every step, offer no Skip to result, and after it ends show a battle report (who fought, where, the result, the losses and the one-line reason) that can be replayed later. [warfare §7.15; X-1; D-WAR-2]
-- WAR-137 When a battle involves no player, the warfare system shall fight its six rounds a day at once inside the day loop, never slowing the game, and put its report in the log; other armies may join it at the start of a day. [warfare §7.15; X-1]
+- WAR-136 While a battle the player's army or fleet is in is running, the warfare system shall fight it after its contact day one round (one bell) per daylight 4-hour step of the day loop (WAR-233, WAR-234), let the player change its standing orders, order a retreat or switch to another running battle at every step, offer no Skip to result, and after it ends show a battle report (who fought, where, the result, the losses and the one-line reason) that can be replayed later. [warfare §7.15; X-1; D-WAR-2]
+- WAR-137 When a battle involves no player, the warfare system shall fight its steps of the day (contact, bells and night alike, WAR-233, WAR-234) at once inside the day loop, never slowing the game, and put its report in the log; other armies may join it at the start of a day. [warfare §7.15; X-1]
 
 ### 5.15 Commander styles: origin, adoption, staleness, learning
 
@@ -570,7 +570,7 @@ Newest decision first.
 ### 5.16 Warfare through the eras
 
 - WAR-147 The warfare system shall fight each realm by the inventions it knows (W, B, S), with no world clock, so armies of different eras can meet on one field. [eras intro]
-- WAR-148 The warfare system shall scale battles by era: eras I–IV a bell is 2 hours, longest battle 3 days, room as in the sector table, hits 4 %; era V the same with 5 % at W16 and 6 % at W17; era VI a bell is half a day, longest battle 10 days, room halved, hits 6 % (8 % with W19); era VII a bell is a day, longest battle 30 days, room a quarter, hits 8 %. A battle longer than 3 days keeps its armies in the battle and carries over into the next month. [eras §2; D-WAR-10]
+- WAR-148 The warfare system shall scale battles by era: eras I–IV a bell is 4 hours, longest battle 5 days, room as in the sector table, hits 2.5 %; era V the same with 3 % at W16 and 4 % at W17; era VI a bell is half a day, longest battle 10 days, room halved, hits 4 % (5 % with W19); era VII a bell is a day, longest battle 30 days, room a quarter, hits 5 % (F-168). A battle longer than 3 days keeps its armies in the battle and carries over into the next month. [eras §2; D-WAR-10]
 - WAR-149 While an enemy knows the invention that made an arm obsolete, the warfare system shall have that arm fight at half strength against him. [eras §3]
 - WAR-150 When a realm learns the invention that makes one of its arms obsolete, the warfare system shall no longer let it raise that arm. [eras §3]
 - WAR-151 When a company re-arms to a new arm, the warfare system shall take its loads of arms and powder and drop it one level. [eras §3]
@@ -655,7 +655,7 @@ Newest decision first.
 ### Playtest feedback (17 October 2026)
 Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision, so it replaces the requirements it names.
 
-- WAR-207 The warfare system shall fight every battle one round per 4-hour step (X-1) and publish after each round each side's men, morale and losses so far; no battle is resolved in one go. [F-8; X-1]
+- WAR-207 The warfare system shall fight every battle over time, a bell per daylight 4-hour step after its contact day (X-1, WAR-233, WAR-234), and publish after each step each side's men, morale and losses so far and the battle's phase; the bells and losses are the resolver's own, bell by bell, never a length worked out from the men in it. [F-8; X-1; F-168]
 - WAR-208 The warfare system shall publish each siege's progress (days held, breaches, garrison left, food left in the castle) whenever it changes, for the map and the siege view. [F-9]
 - WAR-209 The warfare system shall never let an army exist without a commander: soldiers with no commander are their province's garrison troops (recruiting RECR-107), not an army. If an army loses its commander and no captain can take over, then it shall halt; in its own realm's land it becomes the garrison troops of the province it stands in, and abroad it waits there until a commander joins it. [F-13]
 - WAR-210 When a contract with a mercenary company is signed, the warfare system shall take the gold up front and have the company arrive at the realm's capital after the days it needs to march there from where it gathers, shown on the hire screen; until it arrives it is not on the map and cannot fight. While the capital is besieged or occupied, no company can be hired. [F-19; playtest feedback]
@@ -801,6 +801,62 @@ second call, and a retinue's losses in the peace voices (WAR-180).
   button, every row button is at least 44 × 44 points, states are words and not colour alone, and nothing needs hover.
   [X-26; X-19]
 
+### 5.27 Castles starve besiegers (Leroy 19 Oct)
+Leroy, 19 October: "Defensive buildings should help smaller countries survive longer and should deteriorate food of
+the attacker faster." A castle its owner still holds has gathered the land's food in behind its walls, so an invader
+living off that land runs short sooner, and an army camped round the walls eats more. Both rules only make the
+attacker's food run out faster: they never feed the defender and never touch an army on its own or a friendly realm's
+land. All numbers are `warfare.castle_supply.*` and provisional (DECISIONS rule 4; F-164).
+
+- WAR-263 While an army forages on the land of a realm it is at war with (F-83: enemy land keeps no reserve), the
+  warfare system shall cut what its foragers find in a province with a castle that province's owner holds (not occupied
+  or taken) by `warfare.castle_supply.forage_cut_by_step` for the castle's step (earthwork ring fort 30 %, stone castle
+  45 %, bastion fort 60 %, star fort 70 %, concrete fortress 80 %; a capital counts as at least a stone castle, as for its
+  walls). The food the foragers miss stays in the province's store. Armies on their own realm's land, an ally's or a
+  realm's they are not at war with forage as before. [F-164; F-83; WAR-159]
+- WAR-264 In a province within a held castle's reach (REALM-206: rings over its owner's land, 1 without a road, 2 with
+  a road), the warfare system shall cut enemy foragers' finds by `warfare.castle_supply.reach_share` (half) of that
+  castle's own cut; where several castles reach a province, the largest cut counts, never a sum. A castle the enemy
+  has taken or occupies cuts nothing; a besieged castle still does. [F-164; REALM-206]
+- WAR-265 While an army stands in a province under siege, at war with the realm that holds the walls, the warfare system
+  shall have it eat `warfare.castle_supply.besieger_eat_by_step` times its rations for the castle's step (earthwork
+  ×1.15, stone ×1.25, bastion ×1.3, star ×1.35, concrete ×1.4), from camp fevers and sallies against its foragers. This
+  comes on top of WAR-163 and WAR-168 and does not change what its wagons hold. [F-164; WAR-163; WAR-166]
+
+Not yet in the game: the AI choosing where to build castles by this rule (it builds castles by its existing works plan),
+and a besieger weighing the extra hunger before it lays siege.
+
+#### How the player uses it: castles starve besiegers
+- WAR-266 Where: an army's food line, on its row in the province card and on its commander screen, adds the reason
+  when it applies, in words: *foragers find 45 % less: Setúbal's castle has gathered the food in* (*Setúbal's castle
+  nearby* when the castle stands in another province) and *besieging: men eat 25 % more from camp fevers and sallies*.
+  Its months of food already count the extra eating and the smaller finds, so the player sees how long the army lasts
+  before deciding to stay or march on. [F-164; X-19]
+- WAR-267 Grouping: the defender learns it where castles are built and kept: the castle row of the build sheet says,
+  for its step, how much less enemy foragers find in the province and in the land it reaches and how much more
+  besiegers eat; the Walls line of any province card with walls its owner holds says the same for those walls, so the
+  attacker can read it on an enemy province before marching in. Nothing new is added to other panels. [F-164; X-19]
+- WAR-268 Overview: an army's months of food on its row (the Armies list of the province card and the commander
+  screen) is the at-a-glance state; a hungry army already shows there, and the reason sits in the same line. A
+  province's Walls line shows what its castle keeps from enemy foragers. [F-164; X-19]
+- WAR-269 Phone: the reasons are plain text inside the existing food line and Walls line, wrapping in the Wide and
+  Tall layouts; no new button or tap target is added (the army row's Move and Command buttons keep their 44-point
+  size), and nothing needs hover: the reasons are read, never shown only as a tooltip. [F-164; X-19]
+
+### 5.28 Battle length (F-168, Leroy 19 Oct)
+
+Battles were over in under a day and armies broke too fast. In 1378–1600 the fighting itself took a few hours to a day, but armies shadowed each other, scouted, parleyed and deployed for a day or more before it, fought only by daylight, and the loser lost most of his men in the rout. These requirements replace the length that came from the men in a battle.
+
+- WAR-233 The warfare system shall fight a battle's bells only in the daylight steps of the day, from `warfare.battle.first_bell_hour` (8 o'clock) for `warfare.battle.bells_per_day` (3) 4-hour steps; in the night steps nobody fights and the overnight rule (WAR-123, WAR-124) applies. [F-168]
+- WAR-234 When two armies make contact, the warfare system shall first pass a contact day, at least `warfare.battle.contact_days` (1) and until the next morning's first bell, in which the armies scout and deploy: nobody is lost, armies in reach may still join (WAR-206), and a side may still retreat (WAR-205). [F-168]
+- WAR-235 The warfare system shall deal a battle's losses bell by bell as the resolver fought them, and publish each side's morale as how far it still is from breaking (1 untouched, 0 broken), not as a share of the rounds played. [F-168; WAR-207]
+- WAR-236 After a battle in which a side broke, the warfare system shall apply the pursuit (WAR-127) to the fleeing men who would have come back, dealt with the last bell. [F-168]
+
+#### How the player uses it: battle length
+- WAR-237 Where: the battle viewer over the map and the battle on the map show the phase in words, "In contact, deploying", "Day 2, fighting" or "Night after day 2, the camps rest", above each side's bars of men and morale; the player can retreat at any step, and on the contact day nobody has yet been lost. [F-168; X-19]
+- WAR-238 Grouping and overview: the phase belongs to the one battle viewer, with the men and morale bars it already holds; the news line of the battle's start and its end stay the overview. [F-168; X-19]
+- WAR-239 Phone: the phase is one line of text in the viewer's header in both the Wide and Tall layouts, nothing needs hover, and the contact day and the nights play no slower than a day does, so the player waits only through the bells. [F-168; X-19]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -944,10 +1000,11 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
 | warfare.forced_march | Effects | sickness ×2, levies −2 % a week, −10 % first day | yes | warfare |
 | warfare.scouting.riders_per_province | Scout range | 500 riders per province | yes | warfare |
 | warfare.rumour_error | Rumour error | up to a third | yes | warfare |
-| warfare.battle.bells_per_day / max_days | Bells | 6 / 3 (eras I–V), 10 (VI), 30 (VII) | yes | warfare |
+| warfare.battle.bells_per_day / max_days | Bells | 3 / 5 (eras I–V), 10 (VI), 30 (VII) | yes | warfare |
+| warfare.battle.contact_days / first_bell_hour | Contact day before the first bell; the hour of a day's first bell | 1 / 8 | yes | warfare |
 | warfare.battle.max_sectors | Sectors | 7 (3 at sea) | yes | warfare |
 | warfare.sectors | Sector table | §4 | yes | warfare |
-| warfare.hits_per_bell | Hits share of front | 4 % (I–IV), 5 %/6 % W16/W17, 6 %/8 % W19 (VI), 8 % (VII) | yes | warfare |
+| warfare.hits_per_bell | Hits share of front | 2.5 % (I–IV), 3 %/4 % W16/W17, 4 %/5 % W19 (VI), 5 % (VII) | yes | warfare |
 | warfare.room_by_era | Room multiplier | 1 (I–V), ½ (VI), ¼ (VII) | yes | warfare |
 | warfare.flee.base / content_factor | Flee share | 50 % / 30 % | yes | warfare |
 | warfare.flee.hired / per_month_owed / rebel | Flee share | 30 % / +10 % / 50 % | yes | warfare |
@@ -983,6 +1040,9 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
 | warfare.siege.sally_share | Sally | a third | yes | warfare |
 | warfare.siege.hunger_loss / hunger_break | Garrison hunger | 10 % / −10 % | yes | warfare |
 | warfare.siege.fever_after_months | Camp fever | 3 (×2 sickness) | yes | warfare |
+| warfare.castle_supply.forage_cut_by_step | Share enemy foragers lose in a held castle's province, by castle step (WAR-263) | 30 / 45 / 60 / 70 / 80 % (Leroy 19 Oct, numbers provisional) | yes | warfare |
+| warfare.castle_supply.reach_share | Share of that cut in the provinces the castle reaches (WAR-264) | half | yes | warfare |
+| warfare.castle_supply.besieger_eat_by_step | Besiegers' eating, by castle step (WAR-265) | ×1.15 / 1.25 / 1.3 / 1.35 / 1.4 | yes | warfare |
 | warfare.storm.room_per_breach / losses / scaling | Storm | 500 / ×1.5 / ×2 | yes | warfare |
 | warfare.sack.plunder | Plunder | 1 year tax, 1 in 3 town buildings, 10 % townsfolk | yes | warfare |
 | warfare.relief_bonus | Relieved garrison | +10 % | yes | warfare |
@@ -1215,7 +1275,7 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-088 | features/supply.feature | Magazines in occupied provinces |
 | WAR-089 | features/battle-bells.feature | Worked example: Troyes, 1450 |
 | WAR-089 | features/battle-setup.feature | Two hostile armies in one province fight unless one slips away |
-| WAR-090 | features/battle-setup.feature | A battle day has 6 bells and a battle at most 3 days |
+| WAR-090 | features/battle-setup.feature | A battle day has 3 bells and a battle at most 5 days |
 | WAR-091 | features/battle-setup.feature | The battlefield is the province's middle tiles: Troyes 1450; A province with fewer tiles uses all of them; Sector room and effects; Waste is open or rough by ground; Fighting in the town burns town buildings |
 | WAR-092 | features/battle-setup.feature | The ground applies on top of the sectors |
 | WAR-093 | features/battle-setup.feature | The battlefield is the province's middle tiles: Troyes 1450; Depth steps forward; A narrow field favours the small army |
@@ -1347,3 +1407,5 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-229 … WAR-232 | features/price-of-war.feature | The declare sheet shows the price of war; The declare sheet names the aim the war is declared with; The war card |
 | WAR-240 … WAR-251 | features/peace-settlement.feature | What a province costs to demand; Capacity comes from what was won; Combining demands within the rules; The AI answers a demand; The AI asks by the same counts; A beaten AI surrenders; The peace table |
 | WAR-252 … WAR-262 | features/lords-retinues.feature | A lord's lands fill his retinue; Calling the lords; A lord leads his own retinue; A retinue goes home; A victory wins a lord's loyalty; The AI calls its lords; The Lords' men section |
+| WAR-233 … WAR-239 | features/battle-length.feature | A contact day before the first bell; Bells only by daylight; Losses and morale bell by bell; The pursuit after a rout; The phase in the battle viewer |
+| WAR-263 … WAR-269 | features/castles-starve-besiegers.feature | Foragers find less in a castle's province; Foragers find less in the land a castle reaches; A castle the enemy holds gathers nothing in; The owner's and other realms' armies forage as before; Besiegers eat more; The army's food line says why; The castle says what it keeps from foragers |

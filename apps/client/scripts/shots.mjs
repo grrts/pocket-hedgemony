@@ -33,6 +33,7 @@ for (const [name, view] of Object.entries(VIEWS)) {
 }
 await open();
 await page.click("[data-nation=france]");
+await page.click("[data-begin]");
 await page.click(".end-turn");
 await page.waitForSelector(".turn-label .day:text('18 Nov 1444')");
 await page.waitForTimeout(500);

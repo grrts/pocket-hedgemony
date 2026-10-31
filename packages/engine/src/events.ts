@@ -4,8 +4,10 @@ import bridge from "../../rules/data/domain/events-places.json" with { type: "js
 import rules from "../../rules/data/domain/events.json" with { type: "json" };
 import geography from "../../rules/data/domain/exploration-regions.json" with { type: "json" };
 import west from "../../rules/data/domain/events-bridge-west.json" with { type: "json" };
+import bridgeSouth from "../../rules/data/domain/events-bridge-south.json" with { type: "json" };
 import lordEvents from "../../rules/data/domain/events-bridge-lords.json" with { type: "json" };
 import sequels from "../../rules/data/domain/events-ambitions.json" with { type: "json" };
+import setup from "../../rules/data/domain/scenario-setup.json" with { type: "json" };
 import * as evt from "./domain/events/index.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as subj from "./domain/subjects/index.ts";
@@ -36,7 +38,7 @@ import { heritageStates } from "./domain/national-strengths/index.ts";
 type Campaign = Pick<evt.Tree, "ages" | "periods" | "events" | "modifiers" | "localization"> & { entities: Record<string, string> };
 /** A region's bridge events of 1378 to 1444, with the places, names and words they bring (EVT-085). */
 type Bridge = { events: Record<string, evt.EventDef>; places: Record<string, string[]>; entities: Record<string, string>; localization: Record<string, string> };
-const BRIDGES = [west, lordEvents] as unknown as Bridge[];
+const BRIDGES = [west, bridgeSouth, lordEvents] as unknown as Bridge[];
 /** Events that follow a realm's fulfilled ambition (HER-093). */
 const SEQUELS = sequels as unknown as Pick<Bridge, "events" | "localization">;
 const base = campaign as unknown as Campaign;
@@ -119,6 +121,17 @@ function regionOf(world: World, g: GameEvents, n: number): string | undefined {
 const provinceKey = (p: string) => `g:${p}`;
 
 /** The events of the tree, the bridge's aliases and places, set up for a new game. */
+/**
+ * The alternate-history preset the campaign plays with: the new game's events
+ * choice through its preset (SETUP-054, D-SETUP-7: historical → historical,
+ * free → plausible); a world made without campaign rules keeps the default.
+ */
+export function eventsModeOf(world: World): evt.AlternateHistoryMode {
+  const choice = world.options?.events;
+  const mode = choice ? (setup.events_presets as Record<string, string>)[choice] : undefined;
+  return (mode as evt.AlternateHistoryMode | undefined) ?? evt.defaultRules().mode;
+}
+
 export function createGameEvents(world: World): GameEvents {
   const tree = evt.emptyWorld(world.date.year, world.date.month);
   const aliases = bridge.aliases as Record<string, string>;
@@ -138,7 +151,7 @@ export function createGameEvents(world: World): GameEvents {
   for (const id of treeId) evt.country(tree, id).stats = { ...bridge.start.country };
   // A sleeping realm is not yet in the world (SETUP-082).
   treeId.forEach((id, n) => world.nationAsleep[n] && (evt.country(tree, id).exists = false));
-  const state = evt.newState(tree, { events: evt.campaignEvents(data.events), ages: data.ages, periods: data.periods });
+  const state = evt.newState(tree, { events: evt.campaignEvents(data.events), ages: data.ages, periods: data.periods }, { ...evt.defaultRules(), mode: eventsModeOf(world) });
   pastBridgeEvents(state, world.date.year, world.date.month);
   state.conditions = {};
   state.effects = { stat: treeStat };
@@ -857,6 +870,8 @@ function describe(world: World, g: GameEvents, e: evt.Effect, roles: Record<stri
 /** What a save keeps of the event tree: its world and clock, the dice and the bridge's own records (not the data). */
 export type SavedEvents = Omit<evt.EventState, "rules" | "events" | "ages" | "periods" | "log" | "conditions" | "effects" | "mayRefire" | "lean"> & {
   rng: number[];
+  /** The alternate-history preset the campaign plays with (SETUP-054); a save without it played the default. */
+  mode?: evt.AlternateHistoryMode;
   eventRelations: GameEvents["eventRelations"];
   /** The game's own adjustments ("adjust" would read as map adjacency to the save checks). */
   shifts: GameEvents["adjust"];
@@ -866,14 +881,16 @@ export function saveEvents(world: World): SavedEvents | undefined {
   const g = world.events;
   if (!g) return undefined;
   const { rules: _r, events: _e, ages: _a, periods: _p, log: _l, conditions: _c, effects: _f, mayRefire: _m, lean: _n, ...kept } = g.state;
-  return { ...kept, rng: [...g.rng.state], eventRelations: g.eventRelations, shifts: g.adjust };
+  return { ...kept, rng: [...g.rng.state], eventRelations: g.eventRelations, shifts: g.adjust, mode: g.state.rules.mode };
 }
 
 /** Puts a saved event tree back on a restored world; a save from before events keeps the fresh 1444 tree. */
 export function restoreEvents(world: World, saved: SavedEvents): void {
   const g = createGameEvents(world);
-  const { rng, eventRelations, shifts, ...state } = saved;
+  const { rng, eventRelations, shifts, mode, ...state } = saved;
   Object.assign(g.state, state);
+  // The preset stays the one the campaign began with; a save from before the options step played the default.
+  g.state.rules = { ...g.state.rules, mode: mode ?? evt.defaultRules().mode };
   g.rng = new Rng(Uint32Array.from(rng));
   g.eventRelations = eventRelations;
   g.adjust = shifts;

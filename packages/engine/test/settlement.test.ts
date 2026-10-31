@@ -93,6 +93,8 @@ function castileAtWar(seed = 7) {
   const me = n(w, "castile");
   const foe = n(w, "portugal");
   w.player = me;
+  // On a Punish aim, so the price of a war with no aim (F-167) stays out of the scoring.
+  w.diplomacy.aims.push({ holder: w.nationIds[me]!, target: w.nationIds[foe]!, aim: "punish", source: "test" });
   applyNow(w, { type: "declareWar", target: foe }, me);
   const capital = w.provinceIndex.get(rules.nations[foe]!.capital)!;
   const theirs = Array.from({ length: w.provinceCount }, (_, p) => p).filter((p) => w.provinceOwner[p] === foe);

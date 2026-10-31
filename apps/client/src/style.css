@@ -87,6 +87,19 @@ img,
   text-shadow: 3px 3px 0 var(--outline);
 }
 
+/* The map's own failure line (mapView drawFailed): low on the map, under the cards, so a screenshot shows it. */
+.map-failed {
+  position: absolute;
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: 16px;
+  margin: 0;
+  text-align: center;
+  color: var(--paper-light);
+  text-shadow: 2px 2px 0 var(--outline);
+  pointer-events: none;
+}
+
 /* ---- Frames ---- */
 
 .framed {
@@ -276,7 +289,8 @@ button.icon-only {
 
 @media (max-width: 420px) {
   .hud .subtitle,
-  .plaque small {
+  .plaque small,
+  .hud .research-plaque .plaque-text {
     display: none;
   }
 }
@@ -779,6 +793,174 @@ button.icon-only {
   color: #3a2414;
 }
 
+/* ---- The options step of a new game (SETUP-054): one card, a row of 44-point buttons per rule, Begin always in reach ---- */
+
+/* On a tall phone the sheet may rise higher than the realm picker's: the map matters less here. */
+.panel.chooser.ng-step {
+  max-height: 78vh;
+  padding-bottom: 0;
+}
+
+/* A phone held sideways: a wider side sheet with the rules two to a row, label above, so every rule shows with Begin. */
+@media (max-height: 500px) {
+  .panel.chooser.ng-step {
+    width: min(540px, 64vw);
+    max-height: none;
+  }
+
+  .ng-step .ng-rules {
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 10px;
+  }
+
+  .ng-step .ng-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ng-step .ng-label,
+  .ng-step .ng-seg,
+  .ng-step .ng-row select {
+    flex: none;
+  }
+
+  .ng-step .ng-label,
+  .ng-step .ng-seg button {
+    font-size: 17px;
+  }
+
+  .ng-step .ng-rules {
+    margin: 0;
+  }
+
+  .ng-step .ng-row {
+    gap: 0;
+  }
+
+  .ng-step .ng-label {
+    line-height: 1;
+    padding-top: 2px;
+  }
+
+  .ng-step .ng-realm {
+    margin: -2px 0 0;
+  }
+
+  .ng-step .ng-realm .flag {
+    height: 22px;
+    width: auto;
+  }
+
+  .ng-step .ng-begin {
+    margin-top: 6px;
+  }
+}
+
+.ng-realm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.ng-realm small {
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: 17px;
+  text-overflow: ellipsis;
+}
+
+.ng-rules {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.ng-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+}
+
+.ng-label {
+  flex: 0 0 5.6em;
+  font: 600 19px/1.1 var(--body);
+}
+
+.ng-seg {
+  display: flex;
+  flex: 1 1 200px;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* Each button grows from its own label, so "● Plausible" keeps room beside "Free". */
+.ng-seg button {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 2px;
+  font-size: 19px;
+  white-space: nowrap;
+}
+
+/* The chosen value stays pressed in, marked with a dot, like a tax rate. */
+.ng-seg button.paper.on {
+  border-image-source: var(--ui-btn-paper-down);
+}
+
+.ng-seg button.on::before {
+  content: "●";
+  margin-right: 4px;
+  font-size: 0.7em;
+  vertical-align: 0.1em;
+}
+
+.ng-row select {
+  flex: 1 1 200px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 8px;
+  border-style: solid;
+  border-width: 8px;
+  border-image: var(--ui-btn-paper) 4 fill / 8px stretch;
+  background: none;
+  border-radius: 0;
+  color: var(--ink);
+  font: 600 19px/1 var(--body);
+}
+
+.ng-row select option {
+  background: #f1e3c0;
+  color: #3a2414;
+}
+
+.ng-meaning {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--ink-soft);
+  font-size: 17px;
+  line-height: 1.15;
+}
+
+/* Begin stays at the foot of the sheet however far the rules scroll. */
+.ng-begin {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin: 8px 0 max(6px, env(safe-area-inset-bottom));
+}
+
+.menu-rules {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.menu-rules small {
+  color: var(--ink-soft);
+}
+
 .pick-count {
   margin: 0 0 4px;
 }
@@ -1100,6 +1282,11 @@ button.small {
 
 .hud .dispatches.urgent {
   animation: blink 1s steps(2, jump-none) infinite;
+}
+
+/* Research with nothing studied asks for a study in cloth red (RSCH-117). */
+.hud .research-plaque.idle {
+  color: var(--cloth);
 }
 
 @keyframes blink {
@@ -2873,15 +3060,37 @@ button.learning-line.idle {
   font-size: 15px;
   color: var(--ink-soft);
 }
-/* A desktop window: the card widens for the tree, the map still in view at the right. */
-@media (min-width: 900px) and (min-height: 600px) {
-  .panel.research {
-    width: min(1180px, 72vw);
+/* Research is a screen of its own: it fills the screen under the top bar on every layout, and
+   keeps a strip at the right for the End turn button, so it never covers a button (RSCH-118). */
+.panel.research {
+  left: 0;
+  right: 0;
+  width: auto;
+  min-width: 0;
+  max-height: none;
+  padding: 4px calc(max(8px, env(safe-area-inset-right)) + 76px) calc(8px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+}
+/* On a phone held sideways the tree needs the height: the realm's name gives way and the
+   Back, Fold and Close buttons sit at the end of the section row (RSCH-118). */
+@media (max-height: 500px) {
+  .panel.research > header {
+    position: absolute;
+    top: 4px;
+    right: calc(max(8px, env(safe-area-inset-right)) + 76px);
+    margin: 0;
+    padding: 0;
+    background: none;
+  }
+  .panel.research > header .ribbon {
+    display: none;
+  }
+  .panel.research .sections {
+    margin-right: 148px;
   }
 }
 .learn-screen {
   container-type: inline-size;
-  /* The tree's pinned parts stack inside the tab, under the card's own pinned header. */
+  /* The tree's pinned parts stack inside the screen, under its own pinned header. */
   isolation: isolate;
   --lw: 26px;
   --b1: #5f7f3a;
@@ -2889,32 +3098,21 @@ button.learning-line.idle {
   --b3: #3d5a80;
   --b4: #2f7f7a;
   min-width: 0;
+  max-width: 1280px;
 }
-.learn-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 2px 0 4px;
-}
-.learn-head > button {
-  flex: none;
-}
-.learn-standing {
-  flex: 1;
-  min-width: 0;
+.panel .learn-standing {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0 8px;
-  margin: 0;
+  margin: 4px 0 6px;
   line-height: 1.1;
 }
-.learn-standing .standing {
+.learn-stand {
   font-weight: 600;
 }
-.learn-standing button.standing {
-  white-space: normal;
-  text-align: left;
+button.learn-stand {
+  min-height: 44px;
   color: var(--cloth);
 }
 .learn-standing small {
@@ -2937,91 +3135,167 @@ button.learning-line.idle {
   color: var(--cloth);
   font-weight: 600;
 }
-/* The queue: the study, then the queued chips in order; it scrolls sideways in itself only. */
-.queue-strip {
-  display: flex;
-  align-items: stretch;
+/* Next: the study and the queue at the left, what can be started at the right; stacked when narrow (RSCH-116). */
+.next-part {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(0, 2fr);
+  gap: 12px;
+  align-items: start;
+}
+@container (max-width: 560px) {
+  .next-part {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.next-left,
+.next-right {
+  display: grid;
   gap: 6px;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  padding: 2px 0 6px;
-  scrollbar-width: thin;
-}
-.queue-strip > * {
-  flex: none;
-}
-button.q-study {
-  width: 230px;
-  min-height: 44px;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
-  gap: 0;
-  padding: 0 6px;
-  text-align: left;
-  line-height: 1;
-}
-.q-study .q-name {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.q-study small {
-  font-size: 15px;
-}
-p.q-study.idle {
-  width: 220px;
-  margin: 0;
-  padding: 2px 8px;
-  border: 2px dashed var(--cloth);
-  line-height: 1.1;
-  font-size: 17px;
-}
-.q-item {
-  display: flex;
-  gap: 4px;
-  align-items: stretch;
-}
-.q-item.on {
-  padding: 2px;
-  margin: -2px 0;
-  background: rgb(168 50 62 / 0.12);
-  outline: 2px solid var(--cloth);
-}
-button.q-chip {
-  min-height: 44px;
-  max-width: 190px;
-  justify-content: flex-start;
-  gap: 6px;
-  padding: 2px 8px 2px 4px;
-  text-align: left;
-  line-height: 1;
-  white-space: normal;
-}
-.q-chip > span {
-  display: flex;
-  flex-direction: column;
   min-width: 0;
 }
-.q-chip b {
-  font-weight: 400;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+.panel p.next-label {
+  margin: 4px 0 0;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
 }
-.q-chip small {
+button.next-now,
+p.next-now {
+  display: grid;
+  justify-content: stretch;
+  justify-items: stretch;
+  gap: 4px;
+  margin: 0;
+  padding: 8px 10px;
+  text-align: left;
+  white-space: normal;
+  line-height: 1.1;
+}
+p.next-now.idle {
+  display: block;
+  border: 2px dashed var(--cloth);
+  font-size: 18px;
+}
+.next-name {
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.05;
+}
+.next-does {
+  font-size: 17px;
+  color: var(--ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.next-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 17px;
+}
+.next-queue,
+.next-cards {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.next-q {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px 44px;
+  gap: 4px;
+}
+.next-q button {
+  min-height: 44px;
+  padding: 0 6px;
+}
+.next-q .q-name {
+  justify-content: flex-start;
+  gap: 6px;
+  text-align: left;
+  white-space: normal;
+  line-height: 1.05;
+}
+.next-q .q-name span {
+  flex: 1;
+  min-width: 0;
+}
+.next-q .q-name small {
   font-size: 15px;
   color: var(--ink-soft);
 }
-.q-chip.waiting {
-  outline: 2px dashed var(--cloth);
-  outline-offset: -6px;
-}
-.q-chip.waiting small {
+.next-q.waiting .q-name small {
   color: var(--cloth);
+}
+.next-q .q-out {
+  color: var(--cloth);
+}
+.panel p.next-empty {
+  margin: 0;
+  padding: 8px 10px;
+  border: 2px dashed var(--ink-soft);
+  color: var(--ink-soft);
+  font-size: 17px;
+  line-height: 1.15;
+}
+.next-cards {
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+}
+.next-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px;
+  min-width: 0;
+}
+button.next-pick {
+  display: grid;
+  justify-content: stretch;
+  justify-items: start;
+  align-content: start;
+  gap: 3px;
+  min-height: 76px;
+  padding: 6px 8px;
+  text-align: left;
+  white-space: normal;
+  line-height: 1.1;
+}
+button.next-act {
+  min-height: 76px;
+  padding: 0;
+  font-size: 22px;
+}
+.next-act[disabled] {
+  font-size: 17px;
+}
+.next-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+.next-tags .tag {
+  padding: 0 5px;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--paper-light);
+  background: var(--sea);
+}
+.next-tags .tag.catch {
+  background: var(--cloth);
+}
+.next-tags .tag.known-by {
+  background: #4f7a3a;
+}
+.next-tags .tag.ahead {
+  background: var(--wood-dark);
+}
+button.next-more {
+  justify-self: start;
+  min-height: 44px;
 }
 i.qn {
   display: inline-grid;
@@ -5195,6 +5469,44 @@ button.link {
   font-size: 19px;
 }
 
+/* A choice of more than four values (Colour vision): a grid of buttons under the name, each a full tap target. */
+.set-control.wide {
+  flex-basis: 100%;
+}
+
+.seg.many {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 168px), 1fr));
+  width: 100%;
+}
+
+/* What Colour vision draws: sample realms and a lens ramp in the chosen mode (SET-095). */
+.vision-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  flex-basis: 100%;
+}
+
+.vision-sample {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vision-sample small {
+  margin-right: 4px;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+
+.vision-sample .swatch {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--ink);
+}
+
 .reset-section {
   margin: 10px 0 4px;
 }
@@ -5230,8 +5542,69 @@ button.link {
 }
 
 .cloud-form button,
-.cloud-sign-out {
+.cloud-sign-out,
+.cloud-steam {
   min-height: 48px;
+}
+
+/* Sign in with Steam fills the column, above the email form (SAVE-146, SAVE-148). */
+.cloud-steam {
+  width: 100%;
+}
+
+/* Apple, Google and Steam in the browser: full width, 48 points high (SAVE-155, SAVE-157). */
+.cloud-store {
+  width: 100%;
+  min-height: 48px;
+}
+
+/* Apple asks for its button in black with white text (Human Interface Guidelines, Sign in with Apple). */
+.cloud-store.cloud-apple {
+  background: #000;
+  color: #fff;
+}
+
+/* Add a sign-in, under the Sign-ins row (SAVE-156): 44 points high, wrapping on a narrow phone. */
+.cloud-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cloud-add {
+  flex: 1 1 auto;
+  min-height: 44px;
+}
+
+/* The Unlock card: one scrolling column, Buy full width and 48 high, Restore purchases 44 (SAVE-185). */
+.unlock-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.unlock-what,
+.unlock-done {
+  margin: 4px 0;
+  font-size: 19px;
+}
+
+.unlock-buy {
+  width: 100%;
+  min-height: 48px;
+}
+
+.unlock-restore {
+  width: 100%;
+  min-height: 44px;
+}
+
+/* The start screen's small Full game ribbon while the full game is locked here (SHELL-029, SAVE-184). */
+.start-ribbon {
+  align-self: center;
+  min-height: 44px;
+  padding: 0 14px;
 }
 
 .cloud-status {
@@ -5243,13 +5616,185 @@ button.link {
   color: var(--cloth);
 }
 
-.cloud-device .set-control {
+.cloud-device .set-control,
+.cloud-sign-in .set-control {
   flex-wrap: wrap;
+}
+
+.cloud-sign-in .set-control button {
+  min-height: 44px;
+}
+
+/* The question when an Add brings a sign-in of another account (SAVE-194, SAVE-197): in the card's one
+   column, Combine accounts full width and 48 points high, Keep apart and OK 44. */
+.cloud-combine {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 3px solid var(--outline);
+  background: var(--paper-light);
+}
+
+.cloud-combine p {
+  margin: 0;
+}
+
+.cloud-combine-yes {
+  width: 100%;
+  min-height: 48px;
+  font-weight: 600;
+}
+
+.cloud-combine-no {
+  width: 100%;
+  min-height: 44px;
+}
+
+/* Delete account (SAVE-205, SAVE-208): set apart below Sign out so neither is tapped for the other; the
+   question sits in the card's one column, Delete account full width and 48 points high, Keep 44. */
+.cloud-delete-ask {
+  margin-top: 24px;
+  min-height: 44px;
+}
+
+.cloud-delete {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 24px;
+  padding: 8px;
+  border: 3px solid var(--cloth);
+  background: var(--paper-light);
+}
+
+.cloud-delete p {
+  margin: 0;
+}
+
+.cloud-delete-yes {
+  width: 100%;
+  min-height: 48px;
+  font-weight: 600;
+}
+
+.cloud-delete-no {
+  width: 100%;
+  min-height: 44px;
 }
 
 .cloud-invite {
   flex: none;
   margin-top: 6px;
+}
+
+/* The Share sheet (SAVE-133, SAVE-136): one scrolling column, the three choices 64 points high. */
+.share-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.share-sheet label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.share-sheet label small {
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+
+.share-sheet input,
+.share-sheet textarea,
+.open-shared input {
+  min-height: 44px;
+  padding: 4px 8px;
+  border: 3px solid var(--outline);
+  background: var(--paper-light);
+  font: 400 21px/1.1 var(--body);
+  color: var(--ink);
+  resize: vertical;
+}
+
+.share-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 0;
+  padding: 0;
+  border: 0;
+}
+
+.share-choices legend {
+  padding: 0;
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.share-choice {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 64px;
+  padding: 4px 10px;
+  border-image-source: var(--ui-btn-paper);
+  color: var(--ink);
+  text-shadow: none;
+  text-align: left;
+}
+
+.share-choice small {
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+
+.share-choice.on {
+  outline: 3px solid var(--brass);
+}
+
+.share-post,
+.share-links > * {
+  min-height: 48px;
+}
+
+.share-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cloud-shared .set-control {
+  flex-wrap: wrap;
+}
+
+/* Open a shared save, at the bottom of the Load card (SAVE-132). */
+.open-shared {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 6px;
+  flex: none;
+  margin-top: 6px;
+}
+
+.open-shared label {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 180px;
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.open-shared input {
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* A tall window: the sections first, a section full screen with Back (SET-012). */
@@ -6377,6 +6922,16 @@ small.why {
 .inst-fold.small {
   background: var(--paper);
 }
+/* A section folded on the province card says its name on the fold's line already (SHELL-187). */
+.inst-body > .governance > h3.sub:first-child,
+.inst-body > .castle-own > h3.sub:first-child {
+  display: none;
+}
+.inst-body > .governance {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
 .seat-reasons {
   margin: 4px 0 8px;
   padding: 6px 8px;
@@ -7330,6 +7885,18 @@ div.chron-row {
   grid-template-columns: 1fr 1fr;
   gap: 6px;
 }
+/* ---- Fear of a stronger neighbour (DIPL-235): a line under what a realm thinks of you ---- */
+p.fear {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  min-height: 44px;
+  margin: 4px 0;
+}
+p.fear.threatened {
+  color: var(--cloth);
+}
 
 /* ---- Chapters (SHELL-183, SHELL-184) ---- */
 
@@ -7546,4 +8113,205 @@ div.chron-row {
 
 .start-band[hidden] {
   display: none;
+}
+
+/* ---- First-launch question (SHELL-131, TUT-104) ----
+   Over the start screen, in More's frame: three ways in, each with one line on what it is. */
+.start-ask {
+  width: min(360px, calc(100% - 32px));
+  max-height: calc(100% - 16px);
+  overflow-y: auto;
+}
+
+.start-ask button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 52px;
+  padding: 6px 12px;
+  text-align: left;
+}
+
+.start-ask button small {
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+/* The consent card (SHELL-014): the same frame, a short paragraph above the three answers. */
+/* On a phone the card scrolls rather than squeezing its answers. */
+.start-consent > * {
+  flex-shrink: 0;
+}
+
+.start-consent p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+/* ---- The tutorial "Murad's Frontier" (onboarding TUT-131 … TUT-134, D-TUT-19) ----
+   One parchment note with the Grand Vizier's label and the step counter, placed like the hints'
+   note so it never covers what it points at; a spotlight that takes no taps rings the thing to tap
+   and dims the rest of the screen to half (TUT-060, TUT-061). */
+.coach-note {
+  position: fixed;
+  left: 50%;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 11;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 10px;
+  width: min(480px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) - 150px));
+  max-height: 33vh;
+  overflow: auto;
+  padding: 2px 4px 4px 6px;
+  border-width: 8px;
+  border-image-width: 8px;
+  font-size: 18px;
+  line-height: 1.15;
+  animation: hint-in 0.2s steps(4);
+}
+
+.coach-note.top {
+  bottom: auto;
+  top: calc(env(safe-area-inset-top) + 50px);
+}
+
+.coach-note[hidden] {
+  display: none;
+}
+
+.coach-face {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+}
+
+.coach-face b {
+  font: 600 16px/1 var(--body);
+}
+
+.coach-face small {
+  margin-left: 6px;
+  font: 600 15px/1 var(--body);
+  color: var(--ink-soft);
+}
+
+.coach-note p {
+  flex: 1 1 14em;
+  margin: 0;
+  color: var(--ink);
+}
+
+/* A place named in the step moves the camera there; its tap area reaches 44 points without moving the line. */
+.coach-place {
+  display: inline;
+  min-height: 0;
+  margin: -13px -2px;
+  padding: 13px 2px;
+  border: 0;
+  border-image: none;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink);
+  text-shadow: none;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.coach-buttons {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.coach-buttons button {
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 17px;
+}
+
+.coach-buttons .leave {
+  width: 44px;
+  padding: 0;
+}
+
+.coach-note.end .coach-buttons {
+  flex-wrap: wrap;
+}
+
+.coach-spot {
+  position: fixed;
+  z-index: 10;
+  pointer-events: none;
+  border: 3px solid var(--brass-light);
+  box-shadow:
+    0 0 0 3px var(--outline),
+    inset 0 0 0 2px var(--outline);
+}
+
+.coach-dim {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background: rgb(0 0 0 / 0.5);
+}
+
+.coach-spot[hidden],
+.coach-dim[hidden] {
+  display: none;
+}
+
+/* Idle on a do step: the ring pulses again (TUT-033); never under reduced motion (TUT-111). */
+.coach-spot.pulse {
+  animation: hint-pulse 1s steps(2) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coach-spot.pulse {
+    animation: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .coach-note {
+    width: calc(100vw - 2 * max(8px, env(safe-area-inset-left), env(safe-area-inset-right)));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) + 72px);
+  }
+}
+
+/* A phone held upright shows only its turn-sideways notice; the step waits (TUT-134). */
+@media (orientation: portrait) and (pointer: coarse) {
+  .coach-note,
+  .coach-dim,
+  .coach-spot {
+    display: none !important;
+  }
+}
+
+/* A war with no aim (F-167): its costs sit framed in red at the head of the Price of war. */
+.aimless-warn {
+  margin: 4px 0 8px;
+  padding: 6px 8px;
+  border-color: var(--cloth);
+}
+.aimless-warn > .warn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 2px;
+  font-weight: 700;
+  color: var(--cloth);
+}
+.aimless-warn > .hint {
+  margin: 6px 0 0;
 }

@@ -41,20 +41,30 @@ export interface PersonDeath {
   name: string;
   age: number;
   cause: DeathCause;
+  /** An official's post as he left it: its type (an OFFICIALS index) and the day he took it, for whoever fills it next. */
+  post?: { type: number; since: number };
   /** A commander's army slot and fleet id the moment before he died, -1 for none: what is left without a leader (leaderless.ts). */
   led?: { army: number; fleet: number };
 }
 
 export type DeathListener = (world: World, death: PersonDeath, news: News[]) => void;
 
-const listeners: DeathListener[] = [];
+/**
+ * The listeners, kept on a function rather than a module constant: a module
+ * that people.ts itself loads (through officials, recruiting and the turn) may
+ * hang its reaction while this file is still loading.
+ */
+function listeners(): DeathListener[] {
+  const store = listeners as { list?: DeathListener[] };
+  return (store.list ??= []);
+}
 
 /** Hangs a reaction on every death (an army going home, an event, a dispatch); returns a function that takes it off again. */
 export function onPersonDeath(fn: DeathListener): () => void {
-  listeners.push(fn);
+  listeners().push(fn);
   return () => {
-    const k = listeners.indexOf(fn);
-    if (k >= 0) listeners.splice(k, 1);
+    const k = listeners().indexOf(fn);
+    if (k >= 0) listeners().splice(k, 1);
   };
 }
 
@@ -124,7 +134,7 @@ function describe(world: World, who: PersonRef): Omit<PersonDeath, "who" | "caus
     case "official": {
       const n = world.provinceOwner[who.p]!;
       const name = officialAt(world, who.p);
-      return name && n >= 0 ? { nation: n, name, age: officialAge(world, who.p) } : null;
+      return name && n >= 0 ? { nation: n, name, age: officialAge(world, who.p), post: { type: world.provinceOfficial[who.p]!, since: world.provinceOfficialSince[who.p]! } } : null;
     }
     case "commander": {
       const n = world.commanderOwner[who.c]!;
@@ -283,7 +293,7 @@ export function personDies(world: World, who: PersonRef, cause: DeathCause, news
       governorDies(world, who.id, death, news);
       break;
   }
-  for (const fn of [...listeners]) fn(world, death, news);
+  for (const fn of [...listeners()]) fn(world, death, news);
 }
 
 /** The army and fleet a commander leads, -1 for none. */

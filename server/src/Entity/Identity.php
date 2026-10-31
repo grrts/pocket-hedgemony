@@ -7,7 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * A store sign-in an account holds (SAVE-112): a Steam account today, Apple and Google later.
+ * A store sign-in an account holds (SAVE-112): a Steam account, an Apple id or a Google id.
  * Email and password stay on the account itself.
  */
 #[ORM\Entity(repositoryClass: IdentityRepository::class)]
@@ -15,6 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
 class Identity
 {
     public const STEAM = 'steam';
+    public const APPLE = 'apple';
+    public const GOOGLE = 'google';
+    public const PROVIDERS = [self::STEAM, self::APPLE, self::GOOGLE];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -34,6 +37,14 @@ class Identity
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $createdAt;
+
+    /** Sign in with Apple only: Apple's refresh token, kept so it can be revoked (SAVE-203, SAVE-204). */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $appleRefreshToken = null;
+
+    /** The client id Apple issued that token to: the app's bundle id or the website's Services ID. */
+    #[ORM\Column(length: 191, nullable: true)]
+    private ?string $appleClientId = null;
 
     public function __construct(Account $account, string $provider, string $subject, \DateTimeImmutable $now)
     {
@@ -66,5 +77,21 @@ class Identity
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getAppleRefreshToken(): ?string
+    {
+        return $this->appleRefreshToken;
+    }
+
+    public function getAppleClientId(): ?string
+    {
+        return $this->appleClientId;
+    }
+
+    public function keepAppleToken(string $refreshToken, string $clientId): void
+    {
+        $this->appleRefreshToken = $refreshToken;
+        $this->appleClientId = $clientId;
     }
 }

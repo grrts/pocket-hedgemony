@@ -18,6 +18,7 @@ import { restoreTribes, saveTribes, type SavedTribes } from "../../tribes.ts";
 import { restorePlague, savePlague, type SavedPlague } from "../../plague.ts";
 import { restorePeoples, savePeoples, type SavedPeoples } from "../../peoples.ts";
 import { restoreCampaignEnd, saveCampaignEnd, type SavedCampaignEnd } from "../../campaignEnd.ts";
+import { worldOptionsOf } from "../scenario-setup/campaign.ts";
 import { refreshWorks, WORK_COUNT, workIndex, WORKS, type QueuedWork, type Site } from "../../works.ts";
 import { MAX_TILES } from "../../land.ts";
 import { restoreNavy, saveNavy, type SavedNavy } from "../../navy.ts";
@@ -223,6 +224,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   world.date = { ...meta.date } as typeof world.date;
   world.rng = new Rng(core.arrays.rng as Uint32Array);
   world.weatherSeed = meta.weatherSeed ?? 0;
+  // The campaign rules travel with the save (SETUP-055), for the systems that read them (difficulty, the events preset).
+  if (meta.options) world.options = worldOptionsOf(meta.options);
 
   // Nations: by id, then the nation table, else gone with a warning.
   const nationMap = ids.nations.map((id) => {

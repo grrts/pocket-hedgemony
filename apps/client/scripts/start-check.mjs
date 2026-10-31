@@ -40,6 +40,7 @@ async function play(device, tag, query, nation, firstWeek) {
   await page.waitForSelector(`.wax.play[data-nation=${nation}]`, { timeout: 10000 });
   await page.screenshot({ path: `${out}/${tag}-card.png` });
   await page.click(`.wax.play[data-nation=${nation}]`);
+  await page.click("[data-begin]");
   await page.waitForTimeout(1500);
   await page.screenshot({ path: `${out}/${tag}-start.png` });
   await page.click(".end-turn");

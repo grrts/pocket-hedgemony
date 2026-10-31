@@ -13,6 +13,10 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\UniqueConstraint(name: 'uniq_account_email', fields: ['email'])]
 class Account implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    /** The account every community post of a deleted account is shown under (SAVE-200); no one signs in to it. */
+    public const DELETED_PLAYER_ID = '00000000-0000-7000-8000-000000000000';
+    public const DELETED_PLAYER_NAME = 'Deleted player';
+
     #[ORM\Id]
     #[ORM\Column(type: 'uuid')]
     private Uuid $id;
@@ -33,7 +37,7 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Roles beyond ROLE_PLAYER, such as ROLE_MODERATOR (granted by app:community:moderator).
-     * Nullable so adding the column to a filled table needs nothing but doctrine:schema:update.
+     * Nullable so adding the column to a filled table needs no default.
      *
      * @var list<string>|null
      */
@@ -46,6 +50,15 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = null === $email ? null : mb_strtolower(trim($email));
         $this->displayName = trim($displayName);
         $this->createdAt = new \DateTimeImmutable();
+    }
+
+    /** "Deleted player" (SAVE-200): no email, no password, no sign-in, so nothing opens it. */
+    public static function deletedPlayer(): self
+    {
+        $account = new self(null, self::DELETED_PLAYER_NAME);
+        $account->id = Uuid::fromString(self::DELETED_PLAYER_ID);
+
+        return $account;
     }
 
     public function getId(): Uuid
@@ -62,6 +75,13 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): void
     {
         $this->email = mb_strtolower(trim($email));
+    }
+
+    /** Removes email and password sign-in (SAVE-193), or hands it on when two accounts are combined (SAVE-187). */
+    public function removeEmail(): void
+    {
+        $this->email = null;
+        $this->password = '';
     }
 
     public function getDisplayName(): string

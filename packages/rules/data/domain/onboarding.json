@@ -134,6 +134,10 @@
       ]
     }
   ],
+  "playable_now": [
+    0
+  ],
+  "playable_now_comment": "D-TUT-19: the chapters the game can play today, from the normal 1378 start: their steps' anchors and Done-when conditions exist on the real screens. The others wait for their chapter saves and scripted events (TUT-012, TUT-024).",
   "scripted_events": [
     {
       "id": "tut_byzantine_tribute",
@@ -610,7 +614,12 @@
       "tut.ch5.lost_clash": "Your army broke. Fall back behind the walls of Edirne and call the levy.",
       "tut.ch6.open_food_policy": "Your castles feed the land around them. Open {ui:food_policy}.",
       "tut.ch6.choose_marriage": "Germiyan offers a bride for Bayezid, with {place:kutahya} as her dowry. Its castles would join your reach.",
-      "tut.idle.stuck": "Stuck? {btn:skip_step} to skip this step."
+      "tut.idle.stuck": "Stuck? {btn:skip_step} to skip this step.",
+      "tut.end.playable_done": "That is your land, my bey. The chapters after this one are not ready yet: rule on as the Ottomans, or begin a campaign of your own.",
+      "tut.end.keep_ruling": "Keep ruling the Ottomans",
+      "tut.end.new_campaign": "New campaign",
+      "tut.note.next": "Next",
+      "tut.note.leave": "Leave the tutorial"
     }
   },
   "step_kinds": {
@@ -698,6 +707,15 @@
       "komotini": "Komotini",
       "serres": "Serres",
       "thessaloniki": "Thessaloniki",
+      "kutahya": "Kütahya"
+    },
+    "place_province": {
+      "edirne": "Edirne",
+      "bursa": "Bursa",
+      "gallipoli": "Çanakkale",
+      "constantinople": "Istanbul",
+      "pera": "Istanbul",
+      "plovdiv": "Plovdiv",
       "kutahya": "Kütahya"
     },
     "lord": {

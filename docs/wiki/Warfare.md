@@ -148,7 +148,7 @@ Food is counted in rations (food for one person for a month). A commander cuts w
 
 ### Battle
 
-A battle starts when two hostile armies end a day in the same province, unless one withdraws first. An army may slip away before battle if its commander's Cunning is higher than the enemy's and it isn't trapped. A battle day has **6 bells** (about two hours each in eras I to V), and a battle lasts at most 3 days. Battles are decided by the commanders' styles and skills, the troop types and levels, the realm's inventions and the place, with **no dice and no player orders during the fight**.
+A battle starts when two hostile armies end a day in the same province, unless one withdraws first. An army may slip away before battle if its commander's Cunning is higher than the enemy's and it isn't trapped. Before any fighting the armies spend a **contact day** scouting and deploying, as armies of the age did; nobody is lost, others can march in and either side can still pull out. Then a battle day has **3 bells**, fought by daylight from 8 to 20 o'clock (4 hours each in eras I to V), the nights resting, and a battle lasts at most 5 days of fighting. A typical battle runs 3 to 4 days from contact to rout. Battles are decided by the commanders' styles and skills, the troop types and levels, the realm's inventions and the place, with **no dice and no player orders during the fight**.
 
 **The battlefield** is the middle 7 tiles of the province's tile row (all of them if fewer), each a **sector** with a room:
 
@@ -198,17 +198,17 @@ War elephants whose sector loses a bell badly panic and trample their own side f
 
 **The bell** runs in order: orders (less Cunning first, then the other, then Elite free orders), shooting, charges, melee, breaking, then depth and rotation. The first bell is shooting only, unless an Assault commander advances.
 
-**Hits.** Each company takes out 4 % (by era) × men in the front × strength per man × roles × level × leader's Might in its sector × sector and ground × inventions × tired × hungry (−20 %) × forced march (−10 % on the first day). Each hit takes one man out of the line: a share flees and the rest are split evenly between killed and wounded.
+**Hits.** Each company takes out 2.5 % (by era) × men in the front × strength per man × roles × level × leader's Might in its sector × sector and ground × inventions × tired × hungry (−20 %) × forced march (−10 % on the first day). Each hit takes one man out of the line: a share flees and the rest are split evenly between killed and wounded.
 
 **The flee share** is 50 % − 30 % × the content share, where the content share is the share of your people living in calm provinces (0 or 1 grievances). Levies and standing regiments use their home provinces; retinues use the lord's lands (half for a wavering lord, zero for a disloyal one); hired companies always flee at 30 % plus 10 % per month of pay owed; garrisons use their home provinces and are fully content defending their own castle; rebel bands flee at 50 %. Fled men count toward the break point.
 
 **Breaking.** A company whose losses pass its break point leaves the line. A sector with no company of one side is lost by that side and won by the other, who may Turn or Drive next bell. An army breaks when it has lost more than half the sectors it started in, or its total losses pass its men-weighted break point, or its camp is taken by Drive and it has lost at least a third of its sectors. If both break in the same bell, only the one further past breaks.
 
-**Night.** After 6 bells without a break, night falls. Either side may withdraw by its standing orders; the withdrawal is clean if its commander's Cunning is at least the enemy's, otherwise it counts as breaking with half the pursuit. Overnight, fled men who will come back return and ammunition refills.
+**Night.** After a day's 3 bells without a break, night falls. Either side may withdraw by its standing orders; the withdrawal is clean if its commander's Cunning is at least the enemy's, otherwise it counts as breaking with half the pursuit. Overnight, fled men who will come back return and ammunition refills.
 
-**Troyes, 1450.** Troyes' sectors are Fields, Fields, Fields, Pasture, Pasture, Woods, Town. Dunois defends for France in Three battles (Might 3, Cunning 4, Logistics 2) with 4,000 levy infantry, 2,000 archers and 1,000 knights. The Bastard of Burgundy attacks in Charge en haie (Might 3, Cunning 2, Logistics 1) with 5,000 hired heavy infantry and 2,000 knights. With 70 % of the French living in calm provinces, the French flee share is 29 %. In bell 2 the Burgundian knights charge the pastures and both pasture sectors break. In bell 3 Burgundy gives 2 orders first and France 3 after. After bell 6 neither army has broken; at night the Burgundian withdrawal counts as breaking with half the pursuit because his Cunning is lower, and France holds the field.
+**Troyes, 1450.** Troyes' sectors are Fields, Fields, Fields, Pasture, Pasture, Woods, Town. Dunois defends for France in Three battles (Might 3, Cunning 4, Logistics 2) with 4,000 levy infantry, 2,000 archers and 1,000 knights. The Bastard of Burgundy attacks in Charge en haie (Might 3, Cunning 2, Logistics 1) with 5,000 hired heavy infantry and 2,000 knights. With 70 % of the French living in calm provinces, the French flee share is 29 %. In bell 2 the Burgundian knights charge the pastures and both pasture sectors break. In bell 3 Burgundy gives 2 orders first and France 3 after. After the day's last bell neither army has broken; at night the Burgundian withdrawal counts as breaking with half the pursuit because his Cunning is lower, and France holds the field.
 
-Battles play out over time, a round every 4 hours. On the map and in the battle viewer you see each side's men and a bar of men and morale left, updated every round, so you can follow the fight and decide when to retreat.
+Battles play out over time: the contact day, then a bell every daylight 4 hours. On the map and in the battle viewer you see the phase ("In contact, deploying", "Day 2, fighting", "Night after day 2, the camps rest") and each side's men and a bar of men and morale left, updated every step; morale shows how far a side still is from breaking. The contact day and the nights pass quickly, so you wait only through the bells. After a rout the winner's horse catch 1 in 4 of the fleeing men.
 
 ### After the battle
 
@@ -220,7 +220,7 @@ Battles play out over time, a round every 4 hours. On the map and in the battle 
 - Victories and defeats are added to the commanders and countries, scars are awarded, and all killed count as Fallen.
 - **Prisoners** can be ransomed (gold by rank), exchanged, released (a gift that wins goodwill), enlisted as a hired company at level 1, or held (they eat). Realms with capture warfare (Mesoamerica and some forest-zone realms at the start) take half the enemy's killed as prisoners instead.
 
-**Standing orders** apply to every battle: retreat if outnumbered 2 to 1, 3 to 2, or never (checked before battle and each night), and attack or wait. Battles start on the day two hostile armies meet and are fought over time: each bell is one round of 4 hours on the map, six a day. While one of your battles runs, the map slows to those 4-hour steps; at every step you can change standing orders, order a retreat (it takes effect at once, cleanly if your commander's Cunning is at least the enemy's) or switch between your battles, and the result can't be skipped. Armies that march in join their side's reserve. Afterwards the battle report shows, and any battle can be replayed later from its notice. Battles between other realms never slow the game: they fight their six rounds a day at once and go to the log.
+**Standing orders** apply to every battle: retreat if outnumbered 2 to 1, 3 to 2, or never (checked before battle and each night), and attack or wait. Battles start on the day two hostile armies meet and are fought over time: after the contact day each bell is one round of 4 hours on the map, three a day by daylight. While one of your battles runs, the map slows to those 4-hour steps; at every step you can change standing orders, order a retreat (it takes effect at once, cleanly if your commander's Cunning is at least the enemy's) or switch between your battles, and the result can't be skipped. Armies that march in join their side's reserve. Afterwards the battle report shows, and any battle can be replayed later from its notice. Battles between other realms never slow the game: they play their steps of the day at once and go to the log.
 
 ### Commander styles
 
@@ -269,7 +269,7 @@ There is no national bonus card: how different peoples fight falls out of styles
 | W13 | guns can Shift with the line; Bombardment keeps the line back only 1 bell |
 | W14 | +1 order a bell for every commander; armies split and join in a day |
 | W15 | troop cap shares doubled; levies serve 12 months before going home |
-| W16, W17 | riflemen; hits 5 % then 6 % of the front per bell |
+| W16, W17 | riflemen; hits 3 % then 4 % of the front per bell |
 | W18 | troop cap +1 %; levies gather in days along railways |
 | W19 | shooting from dug-in sectors ×2; charges into them always fail |
 | W20 | Ambush companies shoot from woods unseen |
@@ -285,10 +285,10 @@ Each realm fights by the inventions it knows, with no world clock, so armies of 
 
 | Era | Years | A bell | Longest battle | Sector room | Hits per bell |
 |---|---|---|---|---|---|
-| I to IV | 1378 to 1800 | 2 hours | 3 days | as the table | 4 % |
-| V | 1800 to 1870 | 2 hours | 3 days | as the table | 5 % with W16, 6 % with W17 |
-| VI | 1870 to 1914 | half a day | 10 days | halved | 6 % (8 % with W19) |
-| VII | 1914 to 1939 | a day | 30 days | a quarter | 8 % |
+| I to IV | 1378 to 1800 | 4 hours | 5 days | as the table | 2.5 % |
+| V | 1800 to 1870 | 4 hours | 5 days | as the table | 3 % with W16, 4 % with W17 |
+| VI | 1870 to 1914 | half a day | 10 days | halved | 4 % (5 % with W19) |
+| VII | 1914 to 1939 | a day | 30 days | a quarter | 5 % |
 
 A battle of 10 or 30 days keeps its armies in place while it lasts and simply carries on into the next turn. An invention belongs to the era the research tree gives it. Styles first seen after 31 August 1939 are not in the game.
 
@@ -339,6 +339,18 @@ An AI garrison accepts honours when it has a breach or under a month of food and
 
 A siege shows its progress on the map: how long the castle has held, its breaches, and the garrison and food left inside.
 
+#### Castles starve besiegers
+
+*Leroy, 19 October:* castles should help smaller realms hold out longer and make the attacker's food run out faster. A castle its owner still holds has gathered the land's food in behind its walls, so an invader living off that land goes hungry sooner:
+
+- **Foragers find less.** An army foraging on the land of a realm it is at war with finds less in a province with that realm's castle: 30 % less beside an earthwork ring fort, 45 % beside a stone castle (a capital counts as at least one), 60 % a bastion fort, 70 % a star fort and 80 % a concrete fortress. In the provinces the castle reaches (1 ring, 2 with a road at the castle, as for its food) foragers find half that cut: 23 % less near a stone castle. Where several castles reach, the biggest cut counts. The food they miss stays in the province.
+- **Besiegers eat more.** An army besieging a castle eats more from camp fevers and sallies against its foragers: a quarter more round a stone castle (15 % an earthwork, 30 % a bastion fort, 35 % a star fort, 40 % a concrete fortress), on top of its campaign rations. Its wagons hold no more, so they empty sooner.
+- **Only against the enemy.** Your own armies, an ally's and anyone not at war with the castle's owner forage as before, and a castle the enemy has taken or occupies gathers nothing in. A besieged castle still does.
+
+**Example.** A Castilian army of 10,000 lays siege to Setúbal, Portugal's capital. Foragers there find 45 % less than on open land, and the men eat a quarter more, so wagons holding two months of campaign food empty in about 1.6 months once there is nothing left to forage. The army card says so: *foragers find 45 % less: Setúbal's castle has gathered the food in · besieging: men eat 25 % more from camp fevers and sallies*.
+
+**Where you see it.** Your army's food line, on its row in the province card and on its commander screen, gives the reasons in words whenever they apply, and its months of food already count them. A province card's Walls line says what its castle keeps from enemy foragers, and the castle row of the build sheet says it for the step you would build, so you know what a castle adds to your defence. The numbers are provisional (`warfare.castle_supply`).
+
 ### Occupation and raids
 
 Taking a province's castle, or holding a province with no castle for a season, **occupies** it: you get its tax, recruits, food and trade, and its lord wavers toward the side holding his land. A horse-only army set to **Raid** can't besiege or occupy; each week it burns one tile and takes loot (gold from market and town, herds and horses from pasture) up to 1 load per 50 riders, then moves on, and castles there may sally.
@@ -366,7 +378,7 @@ With over half saying peace, the ruler must accept a peace asking only for provi
 
 Every war costs gold, men, people and your lords' patience, and one peace takes only part of a realm, so war is a choice with a price and not the best answer to everything.
 
-- **The declare sheet.** *Declare war* on a realm's Diplomacy tab no longer acts at once: it opens a sheet with the **Price of war** above *Confirm*. It lists who will be called against you (each realm with its soldiers and how it comes in: an ally, a protection pledge, a league against you or a subject), your allies who will come to your side, both sides' soldiers, the neighbours who will hold *Threatened us* for a war with no aim, how many of your lords (or boyars, beys, daimyo: your realm's own word) will waver, a truce you would break and when it would have ended, the monthly pay of your armies at war, and the most one peace can take ("at most 5 of their 14 provinces"). Beside it, the terms name the **aim** the war will be declared with: the best fitting aim you hold against them (Take land first), with the province it names and why you hold it, for example *Take land: Normandy*, held within 50 years. *Confirm* declares with that aim. Only when you hold no fitting aim (or your regency may not use it) does it read *No aim* in red, and only then does the price list the neighbours alarmed and the lords who will waver. Lines that hurt are red with a "!" mark, and every line opens its reason when you tap it. A faith head's censure warning sits above *Confirm*, and a button opens your *Your name abroad* card. On a phone held sideways the price sits on the left and the terms on the right; in the Tall layout it is one scrolling column. *Confirm* stays pinned at the foot; with a truce it reads *Break the truce and declare war*.
+- **The declare sheet.** *Declare war* on a realm's Diplomacy tab no longer acts at once: it opens a sheet with the **Price of war** above *Confirm*. It lists who will be called against you (each realm with its soldiers and how it comes in: an ally, a protection pledge, a league against you or a subject), your allies who will come to your side, both sides' soldiers, for a war with no aim its whole cost at the head of the sheet in a red frame (your lords lose two steps of loyalty at once, notoriety, *Unjust war* in every province, peace voices, allies who stay out; see [Diplomacy](Diplomacy)) and the neighbours who will hold *Threatened us*, how many of your lords (or boyars, beys, daimyo: your realm's own word) will waver, a truce you would break and when it would have ended, the monthly pay of your armies at war, and the most one peace can take ("at most 5 of their 14 provinces"). Beside it, the terms name the **aim** the war will be declared with: the best fitting aim you hold against them (Take land first), with the province it names and why you hold it, for example *Take land: Normandy*, held within 50 years. *Confirm* declares with that aim. Only when you hold no fitting aim (or your regency may not use it) does it read *No aim* in red, and only then does the price list the neighbours alarmed and the lords who will waver. Lines that hurt are red with a "!" mark, and every line opens its reason when you tap it. A faith head's censure warning sits above *Confirm*, and a button opens your *Your name abroad* card. On a phone held sideways the price sits on the left and the terms on the right; in the Tall layout it is one scrolling column. *Confirm* stays pinned at the foot; with a truce it reads *Break the truce and declare war*.
 - **Levies at war are paid from their first month** (in peace they serve three months free), and occupied provinces pay their occupier only half their tax and no trade, so occupation doesn't pay for the war.
 - **The dead are missed at home**: men killed in a levy are lost from their province's peasants and counted among its fallen.
 - **One peace takes at most a third** of the loser's provinces, rounded up, and the capital only with the last one. Swallowing a realm takes several wars.
@@ -389,6 +401,7 @@ During the turn, inside the day loop: contacts, the withdraw check and battles; 
 - **The battle report**: who fought, where, the result, the losses and a one-line reason. Any battle can be replayed later from its notice.
 - **The battle playback**: the tile row, companies as blocks with level chevrons, the camps, and a one-line action per bell ("Dunois commits his knights to the pastures").
 - **The forage limit**, shown when you drag an army over a province.
+- **Why an army goes hungry**: its food line names an enemy castle that has gathered the food in and the extra eating while besieging; a province's Walls line says what its castle keeps from enemy foragers.
 - **Rumours** of unseen armies.
 - **Notifications** for battle won or lost (with the reason), a breach, terms offered, peace voices passing half, pay owed and an army hungry.
 - **The war aim**, shown to everyone.
@@ -456,6 +469,8 @@ All warfare values live in `packages/rules/data/domain/warfare.json`; most are p
 | `warfare.siege.close_ratio`, `shot_per_month`, `b7_multiplier` | 3; bombard 2, field gun 1; ×1.5 |
 | `warfare.siege.repair_men`, `sally_share`, `fever_after_months` | 200, a third, 3 |
 | `warfare.storm.room_per_breach` / `losses` / `scaling` | 500 / ×1.5 / ×2 |
+| `warfare.castle_supply.forage_cut_by_step` / `reach_share` | 30 / 45 / 60 / 70 / 80 %; half in the castle's reach |
+| `warfare.castle_supply.besieger_eat_by_step` | ×1.15 / 1.25 / 1.3 / 1.35 / 1.4 |
 | `warfare.raid.loot_per_riders` | 1 load per 50 riders |
 | `warfare.peace.capital_share` / `warlike_ignore` / `half` / `three_quarters` | a third / a quarter / 50 % / 75 % |
 | `warfare.peace.tribute_years` / `open_roads_years`, `warfare.raid_war_months` | 20 / 10, 12 |
