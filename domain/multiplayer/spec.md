@@ -117,12 +117,12 @@ Newest decision first.
 - MP-025 When a signed-in player takes a free realm in a game that has not started, the server shall seat them there; if they already hold another realm in that game, the seat moves. [prototype]
 - MP-026 If the realm is held by another account, then the server shall refuse the seat with "taken". [prototype]
 - MP-027 If the game has started, then the server shall refuse new seats. [prototype]
-- MP-028 While a game has not started, a player shall be able to leave it, freeing their realm; when the host leaves, the game shall end for everyone. [design]
-- MP-029 When the host starts a game with at least two seats, the server shall fix the human realms as the seated realms in realm order and mark the game started. [prototype]
+- MP-028 While a game has not started, a player shall be able to leave it, freeing their realm; when the host leaves, the host's part passes on (MP-082). [design; D-MP-3]
+- MP-029 When the host starts a game with at least two seats, the server shall fix the human realms as the seated realms in realm order, keep the turn limit the host picked (MP-080) and mark the game started. [prototype]
 - MP-030 If anyone but the host starts a game, or it has fewer than two seats, then the server shall refuse. [prototype]
 - MP-031 The server shall hold at most `multiplayer.max_players` seats in a game. [design] @placeholder
 - MP-032 When a seated player sends a week's orders, the server shall keep them with the device's week-start hash, once (INV-MP-6, INV-MP-7). [prototype]
-- MP-033 If a week's orders arrive for a realm whose account is not the sender, for a game not started, or for a week whose previous week is not complete, then the server shall refuse them. [design]
+- MP-033 If a week's orders arrive for a realm whose account is not the sender, for a game not started, for a week other than the one the table is on, or for a realm handed to the AI, then the server shall refuse them. [design]
 - MP-034 When two week's orders for the same week carry different week-start hashes, the server shall mark the game out of step from that week, and every device shall show it. [prototype]
 - MP-035 The server shall give a seated player the game, its seats (realm, player's name, when taken, whether the seat is theirs) and the week's orders from a week the device asks for; a player not seated sees the game and seats but no orders. [design]
 - MP-036 The server shall give each game a version that changes on every change, so a device that asks again with the version it has gets "not changed" at no cost. [design]
@@ -130,7 +130,12 @@ Newest decision first.
 - MP-038 When the device comes back to a started game, the game shall play the weeks already complete again at once, a day at a time, then plan the current week. [prototype]
 - MP-039 The server shall limit writes (host, seat, start, orders) per account and per device to `multiplayer.writes_per_10_minutes`, and reads to `multiplayer.reads_per_10_minutes`. [design] @placeholder
 - MP-040 The server shall refuse a week's orders larger than `multiplayer.max_orders_kb` KB. [design] @placeholder
-- MP-041 When an account is deleted, the server shall remove its seats; a game whose host is gone and has not started ends. [accounts §5; design]
+- MP-041 When an account is deleted, the server shall take it out of every game as leaving for good does: before the start its seat goes, after it its realm goes to the AI (MP-081), and the host's part passes on (MP-082). When two accounts are combined and both sit in one game, the other account leaves that game the same way. [accounts §5; design; D-MP-2]
+
+### Turn limit, leaving for good and the host
+- MP-080 When the host starts a game, they shall pick how long each week stays open for orders from `multiplayer.turn_limits`, No limit by default. A week opens when the one before it is complete (week 1 at the start). When a week's time has run out, the server shall keep empty orders, marked skipped, for every realm still played by a person that sent none, so the week is complete and the next one opens; only one request closes a week, however many devices ask at once. Every device plays the week without those orders and tells the player whose orders missed it. [Leroy 31 Oct; D-MP-1] @placeholder
+- MP-081 After the start, the host shall be able to hand any player's realm to the AI, and a player their own. From the week the table is on, the realm plays as a computer realm on every device, its orders are no longer waited for, the game leaves its player's Your games and the player cannot sit down at it again. [Leroy 31 Oct; D-MP-2]
+- MP-082 When the host's realm is handed to the AI, or the host leaves before the start, the host's part shall pass to the player who sat down first among those still playing; when nobody is left, the game ends. [Leroy 31 Oct; D-MP-3]
 
 ### Your games
 - MP-050 The server shall list the account's games, newest activity first: code, realm, started or not, the week being planned, which realms it waits on, and whether it waits on this account. [Leroy 19 Oct]
@@ -143,12 +148,13 @@ Newest decision first.
 ### How the player uses it
 - MP-070 Where: the start screen shall have a **Multiplayer** button that opens the Multiplayer dialog with **Pass and play**, **Online** (Host a game; Join a game with a code field and Join button) and **Your games**. [X-19; prototype]
 - MP-071 Where: hosting or joining shall open the realm chooser over the map, as for a game of one; tapping a realm sits down and opens the lobby card. [X-19; prototype]
-- MP-072 Grouping: everything about multiplayer shall be in three places: the Multiplayer dialog (games), the lobby card (one game before it starts: code, players with their names and realms, Start for the host, Leave) and the Players card (one game while it runs: who is ready, this week's resolution order, out of step, Leave). [X-19]
-- MP-073 Overview: while a multiplayer campaign runs, the top bar shall show the Players plaque: every human realm's pennant, lit when its orders are in, and "ready/total"; tapping it opens the Players card. [X-19]
+- MP-072 Grouping: everything about multiplayer shall be in three places: the Multiplayer dialog (games), the lobby card (one game before it starts: code, players with their names and realms, the turn limit and Start for the host, Leave) and the Players card (one game while it runs: who is ready, the time left, this week's resolution order, out of step, handing a realm to the AI, Leave for now). [X-19]
+- MP-073 Overview: while a multiplayer campaign runs, the top bar shall show the Players plaque: the pennant of every realm still played by a person, lit when its orders are in, "ready/total" and, with a turn limit, the time left counting down; tapping it opens the Players card. [X-19]
 - MP-074 Overview: Your games shall mark the games waiting on this player's orders, so a player with several games sees where they are needed. [X-19; design]
 - MP-075 Phone in landscape: the dialog, lobby card, Players card and cover shall be the game's parchment cards inside the safe areas, in Wide and Tall layouts, with every button and the code field at least 44 points tall, and nothing that needs hover. [X-19]
 - MP-076 The lobby card shall show the code large, with "Others open Multiplayer and type this code". [prototype]
 - MP-077 If a write is refused (not signed in, taken, started, gone, offline, limited), then the game shall say why in the player's words where they are looking. [prototype]
+- MP-083 Where and how: the host picks the turn limit in the lobby card from one row of four buttons (No limit, 5 min, 1 hour, 1 day), the picked one marked, with a line on what happens when time runs out; the others see the time left once the game runs. On the Players card the host has **To the AI** on every other player's row, and everyone has **Leave for now** and **Hand my realm to the AI**. Handing a realm to the AI cannot be undone, so it takes a second tap on the same button, which then reads "Tap again" with a line saying what it does. A player whose realm went to the AI is taken back to the start screen with the reason in the Multiplayer dialog. Every button is at least 44 points tall, nothing needs hover, and the rows wrap in the Tall layout. [X-19]
 
 ## 6. Commands
 
@@ -157,8 +163,9 @@ Newest decision first.
 | HostGame(realm) | player | signed in | game with code, host seated | GameHosted |
 | TakeSeat(code, realm) | player | signed in; game not started; realm free or theirs | seated | SeatTaken |
 | LeaveGame(code) | player | seated | seat freed (before start), game hidden (after start), game ended (host before start) | SeatLeft / GameEnded |
-| StartGame(code) | host | ≥ 2 seats; not started | human realms fixed | GameStarted |
-| SendWeek(code, week, orders, hash) | player | seated; started; previous week complete | week's orders kept | WeekSent, WeekComplete, OutOfStep |
+| StartGame(code, turnLimit) | host | ≥ 2 seats; not started; turn limit offered | human realms and turn limit fixed | GameStarted |
+| HandToAI(code, realm) | host (any realm), player (their own) | started; realm still played by a person | realm played by the AI from the week the table is on | RealmToAI, HostPassed, GameEnded |
+| SendWeek(code, week, orders, hash) | player | seated; started; the week the table is on; realm not handed to the AI | week's orders kept | WeekSent, WeekComplete, OutOfStep |
 | Ready | player | planning; no event or revolution waiting | the device sends the week (online) or covers for the next player (pass and play) | — |
 
 Every engine order inside a week's orders is the same command a game of one uses (time-and-turns, no player-only shortcuts).
@@ -173,11 +180,15 @@ Every engine order inside a week's orders is the same command a game of one uses
 | WeekSent | a realm's orders arrive | code, week, realm | Players plaque |
 | WeekComplete | every human realm sent a week | code, week | every device: resolution, then the week is played |
 | OutOfStep | two hashes differ for a week | code, week | Players card and plaque |
-| GameEnded | the host leaves before start, or the host's account is deleted | code | lobby card |
+| WeekTimedOut | a week's time ran out with orders missing | code, week, realms skipped | every device: the week plays, the late player is told |
+| RealmToAI | a realm is handed to the AI | code, realm, from week | every device: the realm plays as a computer realm; its player's device leaves the game |
+| HostPassed | the host's realm goes to the AI, or the host leaves before the start | code, new host realm | lobby and Players cards |
+| GameEnded | nobody is left playing | code | lobby card, Your games |
 
 ## 8. Policies
 
-- When an account is deleted (saves), then its seats are removed and games it hosts that have not started end.
+- When an account is deleted (saves), then it leaves every game for good: its seats before the start, its realms to the AI after it, the host's part passed on (MP-041).
+- When two accounts are combined (saves), then the other account leaves the games both sit in, the same way.
 - When a device is signed out (saves), then its open online game stops asking the server and the Multiplayer dialog asks for sign-in.
 
 ## 9. Each turn
@@ -197,6 +208,7 @@ through the time-and-turns steps unchanged; at its end each device works out the
 | multiplayer.writes_per_10_minutes | Write limit per account and per device | 300 | yes | server |
 | multiplayer.reads_per_10_minutes | Read limit per account | 1200 | yes | server |
 | multiplayer.max_orders_kb | Largest week's orders | 256 | yes | server |
+| multiplayer.turn_limits | Turn limits the host picks from, in seconds (0: no limit) | 0, 300, 3600, 86400 | yes | server `config/packages/multiplayer.yaml`; client `TURN_LIMITS` |
 | pass_and_play.max_realms | Realms in Pass and play | 4 | no | client |
 
 ## 11. Seams
@@ -217,8 +229,9 @@ between two human realms are not answered by the AI.
 
 ## 13. Open questions and contradictions
 
-- OQ-MP-1: A player who never presses Ready: is there a timer, and what happens to the realm then (AI takes it, the week plays without its orders)? The prototype has none.
-- OQ-MP-2: Dropping a player or moving the host after start.
+- **D-MP-1** (was OQ-MP-1) A player who never presses Ready: the host picks a turn limit at the start, No limit by default (MP-080). When it runs out, the realms that sent nothing play the week on no orders, which is the simplest rule that keeps every device the same: an AI choosing for a realm still played by a person would break MP-007, and waiting forever lets one player stop the game. The server closes a late week lazily, on the next request about the game, claiming the week's opening time in the database first so it is closed once; no timer process is needed. A player who is away for good is handed to the AI (D-MP-2).
+- **D-MP-2** (was OQ-MP-2) Dropping a player: the host may hand any realm to the AI and a player their own (MP-081), from the week the table is on, so every device switches it on the same week and stays in step; the engine's `resolve` takes the realms still played by people. It cannot be undone: coming back would need the AI's choices undone. Leaving for now (MP-051) stays the way to pause. Deleting or combining accounts uses the same rule (MP-041).
+- **D-MP-3** (was part of OQ-MP-2) The host's part passes to the earliest seat still playing, before and after the start (MP-082), and the game ends only when nobody is left, so one player leaving no longer ends a game for the others.
 - OQ-MP-3: Games that never start: how long the server keeps them before removing them.
 - OQ-MP-4: Out of step: the server marks it, but the only cure is replaying from the start. Should a device that disagrees fetch the agreed world instead?
 - OQ-MP-5: Diplomacy between players beyond war and peace (alliances, calls to arms, envoys' asks) and Imperial votes have not been played through.
@@ -233,5 +246,6 @@ between two human realms are not answered by the AI.
 | MP-007 … MP-010 | simultaneous-weeks.feature | Humans choose for themselves; The week does not stop |
 | MP-020 … MP-041 | online-games.feature | all scenarios (server: `server/tests/Controller/GamesTest.php`) |
 | MP-050, MP-051 | online-games.feature | Your games |
+| MP-080 … MP-082 | online-games.feature | The turn limit; A realm handed to the AI; The host's part passes on (server: `server/tests/Controller/GamesTest.php`; engine: `packages/engine/test/multiplayer.test.ts`) |
 | MP-060, MP-061 | pass-and-play.feature | all scenarios |
-| MP-070 … MP-077 | multiplayer-screens.feature | all scenarios (checked by `apps/client/scripts/multiplayer-shots.mjs`) |
+| MP-070 … MP-077, MP-083 | multiplayer-screens.feature | all scenarios (checked by `apps/client/scripts/multiplayer-shots.mjs` and `multiplayer-server-shots.mjs`) |

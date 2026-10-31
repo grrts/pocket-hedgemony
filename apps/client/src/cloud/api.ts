@@ -228,10 +228,28 @@ export interface Changes {
 
 /** An online game as the server gives it (server/src/Controller/GamesController.php). */
 export interface GameTable {
-  game: { code: string; seed: number; host: string; created: number; humans: string[]; started: boolean; ended: boolean; version: number; outOfStep: number | null };
+  /** The server's clock (ms), for the time left in a week on a device whose clock is off. */
+  now?: number;
+  game: {
+    code: string;
+    seed: number;
+    host: string;
+    created: number;
+    humans: string[];
+    started: boolean;
+    ended: boolean;
+    version: number;
+    outOfStep: number | null;
+    /** Seconds a week stays open for orders; null: no limit (MP-080). */
+    turnLimit?: number | null;
+    /** When the week the table is on opened (ms). */
+    weekOpened?: number | null;
+    /** The realms handed to the AI, and the week from which (MP-081). */
+    dropped?: Record<string, number>;
+  };
   seats: { realm: string; player: string; at: number; mine: boolean }[];
-  /** Only for a seated account. */
-  weeks: { week: number; realm: string; orders: unknown; hash: string }[];
+  /** Only for a seated account. `skipped`: the realm sent nothing before the week's time ran out. */
+  weeks: { week: number; realm: string; orders: unknown; hash: string; skipped?: boolean }[];
 }
 
 export interface MyGameRow {
@@ -535,9 +553,14 @@ export class CloudApi {
     await this.call("DELETE", `/api/games/${encodeURIComponent(code)}/seats/mine`);
   }
 
-  /** `POST /api/games/{code}/start`, by the host. */
-  startGame(code: string): Promise<GameTable> {
-    return this.json<GameTable>("POST", `/api/games/${encodeURIComponent(code)}/start`);
+  /** `POST /api/games/{code}/start`, by the host, with how long each week stays open (seconds, 0: no limit; MP-080). */
+  startGame(code: string, turnLimit = 0): Promise<GameTable> {
+    return this.json<GameTable>("POST", `/api/games/${encodeURIComponent(code)}/start`, { turnLimit });
+  }
+
+  /** `POST /api/games/{code}/seats/{realm}/drop`: the realm goes to the AI (MP-081). */
+  dropRealm(code: string, realm: string): Promise<GameTable> {
+    return this.json<GameTable>("POST", `/api/games/${encodeURIComponent(code)}/seats/${encodeURIComponent(realm)}/drop`);
   }
 
   /** `PUT /api/games/{code}/weeks/{week}`: a realm's orders for one week. */

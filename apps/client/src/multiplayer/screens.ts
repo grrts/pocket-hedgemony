@@ -1,5 +1,5 @@
 import { icon } from "../art/ui.ts";
-import type { MyGame, OnlineGame, Seat } from "./lobby.ts";
+import { limitName, timeLeft, type MyGame, type OnlineGame, type Seat } from "./lobby.ts";
 
 /** What the screens need to name and draw a realm. */
 export interface RealmLook {
@@ -52,14 +52,23 @@ export function menuHtml(
   </div>`;
 }
 
-/** The lobby card: the game's code, who sits where, and Start for the host. */
-export function lobbyHtml(look: RealmLook, game: OnlineGame, seats: Seat[], me: string, closeButtons: string): string {
+/** The host's turn limit picker in the lobby: how long each week stays open for orders (MP-080). */
+function limitPickerHtml(choices: readonly number[], picked: number): string {
+  return `<fieldset class="mp-limits"><legend>Time for each week's orders</legend>${choices
+    .map((c) => `<button class="${c === picked ? "wax" : "paper"}" data-mp-limit="${c}" aria-pressed="${c === picked}">${limitName(c)}</button>`)
+    .join("")}</fieldset>
+    <p class="mp-note">${picked ? `A realm whose orders are not in when the time runs out does nothing that week.` : "The week plays when everyone is ready, however long that takes."}</p>`;
+}
+
+/** The lobby card: the game's code, who sits where, the turn limit and Start for the host. */
+export function lobbyHtml(look: RealmLook, game: OnlineGame, seats: Seat[], me: string, closeButtons: string, limits?: { choices: readonly number[]; picked: number }): string {
   const host = game.host === me;
   return `<header><h2 class="ribbon">Game ${esc(game.code)}</h2>${closeButtons}</header>
     <p class="mp-note">Share the code <b class="mp-code">${esc(game.code)}</b>: others open Multiplayer, type it under Join a game and choose a realm.</p>
     <ul class="mp-players">${seats
       .map((s) => `<li>${look.pennant(s.realm)}<b>${esc(look.name(s.realm))}</b><small>${s.player ? `${esc(s.player)} · ` : ""}${s.realm === me ? "you" : s.realm === game.host ? "host" : "ready to start"}</small></li>`)
       .join("")}</ul>
+    ${host && limits ? limitPickerHtml(limits.choices, limits.picked) : ""}
     ${
       host
         ? `<button class="wax play" data-mp-start ${seats.length < 2 ? "disabled" : ""}>${icon("crown", 2)}${seats.length < 2 ? "Waiting for a second realm" : `Start with ${seats.length} realms`}</button>`
@@ -75,21 +84,69 @@ export function hotseatPickHtml(look: RealmLook, chosen: string[]): string {
 
 export interface PlayerRow {
   realm: string;
-  state: "planning" | "ready" | "waiting" | "you" | "done";
+  /** `ai`: handed to the AI (MP-081). */
+  state: "planning" | "ready" | "waiting" | "you" | "done" | "ai";
   hash?: string;
 }
 
-/** The Players card: who plays, who is ready, whether the devices agree, the order orders go in. */
+/** A clock that counts down to `due` (ms); main.ts sets its text every second. */
+export const clockHtml = (due: number, now = Date.now()): string => `<b data-mp-clock="${due}">${timeLeft(due - now)}</b>`;
+
+/**
+ * The Players card: who plays, who is ready, the time left, whether the devices
+ * agree, the order orders go in; for the host, handing a player's realm to the
+ * AI, and for everyone, their own (MP-081). A hand-over takes a second tap.
+ */
 export function playersHtml(
   look: RealmLook,
-  o: { mode: "hotseat" | "online"; code?: string; week: number; rows: PlayerRow[]; order: string[]; outOfStep: string | null; reach?: string },
+  o: {
+    mode: "hotseat" | "online";
+    code?: string;
+    week: number;
+    rows: PlayerRow[];
+    order: string[];
+    outOfStep: string | null;
+    reach?: string;
+    /** When the week's time runs out (ms), or null with no limit. */
+    due?: number | null;
+    /** The host's realm, and this device's, online. */
+    host?: string;
+    me?: string;
+    /** The table can hand a realm to the AI. */
+    canDrop?: boolean;
+    /** The realm whose hand-over waits on its second tap. */
+    confirm?: string | null;
+  },
   closeButtons: string,
 ): string {
-  const word: Record<PlayerRow["state"], string> = { planning: "planning", ready: "ready", waiting: "still planning", you: "you: planning", done: "orders in" };
+  const word: Record<PlayerRow["state"], string> = { planning: "planning", ready: "ready", waiting: "still planning", you: "you: planning", done: "orders in", ai: "played by the AI" };
+  const isHost = !!o.me && o.host === o.me;
+  const dropButton = (r: PlayerRow) =>
+    o.canDrop && isHost && r.realm !== o.me && r.state !== "ai"
+      ? `<button class="${o.confirm === r.realm ? "wax" : "paper"} mp-drop" data-mp-drop="${esc(r.realm)}">${o.confirm === r.realm ? "Tap again" : "To the AI"}</button>`
+      : "";
+  const online = o.mode === "online";
+  const time = !online ? "" : o.due ? `<p class="mp-note">${clockHtml(o.due)} left for this week's orders; a realm without orders then does nothing this week.</p>` : `<p class="mp-note">No turn limit: the week plays when everyone is ready.</p>`;
+  const mine = o.me && o.rows.some((r) => r.realm === o.me && r.state !== "ai");
   return `<header><h2 class="ribbon">Players</h2>${closeButtons}</header>
     <p class="mp-note">${o.mode === "hotseat" ? "Pass and play on this device." : `Online game <b>${esc(o.code ?? "")}</b>${o.reach === "this browser" ? " (this browser's tabs only)" : ""}.`} Week ${o.week + 1}.</p>
-    <ul class="mp-players">${o.rows.map((r) => `<li>${look.pennant(r.realm)}<b>${esc(look.name(r.realm))}</b><small class="mp-${r.state}">${word[r.state]}</small></li>`).join("")}</ul>
+    ${time}
+    <ul class="mp-players">${o.rows
+      .map(
+        (r) =>
+          `<li>${look.pennant(r.realm)}<b>${esc(look.name(r.realm))}</b><small class="mp-${r.state}">${online && r.realm === o.host ? "host · " : ""}${word[r.state]}</small>${dropButton(r)}</li>`,
+      )
+      .join("")}</ul>
+    ${o.confirm && o.confirm !== o.me ? `<p class="mp-note mp-bad" role="alert">Tap again to hand ${esc(look.name(o.confirm))} to the AI for the rest of the game. Its player cannot come back to it.</p>` : ""}
     <p class="mp-note">This week's orders are carried out in this order: ${o.order.map((r) => esc(look.name(r))).join(", then ")}. It turns each week.</p>
     <p class="mp-note ${o.outOfStep ? "mp-bad" : ""}">${o.outOfStep ? esc(o.outOfStep) : "All devices agree on the world."}</p>
-    <button class="paper" data-mp-leave>${icon("back", 2)}Leave the game</button>`;
+    <div class="mp-leave">
+      <button class="paper" data-mp-leave>${icon("back", 2)}${online ? "Leave for now" : "Leave the game"}</button>
+      ${
+        online && o.canDrop && mine
+          ? `<button class="${o.confirm === o.me ? "wax" : "paper"}" data-mp-drop="${esc(o.me!)}">${o.confirm === o.me ? "Tap again to give up your realm" : "Hand my realm to the AI"}</button>`
+          : ""
+      }
+    </div>
+    ${online ? `<p class="mp-note">${o.confirm === o.me ? "The AI plays your realm from this week and you leave the game for good." : "Leave for now and come back from Your games; or hand your realm to the AI to leave for good."}</p>` : ""}`;
 }

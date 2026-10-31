@@ -16,8 +16,6 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **OQ-VIEW-12** (map-presentation): (default chosen) Footprint scale: `sqrt(town thousands) × 1.5`, capped at 30 cells, so Toledo's 119 thousand town people in 1444 make the design's 15 to 20 cells (at 1.0 it was 11); to be tuned so big cities read clearly without swallowing small provinces. [OQ-LIVE-2]
 - **OQ-VIEW-13** (map-presentation): (default chosen) Street level on the phone default: Medium has no street level, to spare the battery; High only. [OQ-LIVE-3]
 - **OQ-VIEW-14** (map-presentation): (default chosen) First landmarks: Toledo, Constantinople (Hagia Sophia), Rome, Paris, Venice, Cairo, Beijing (the Forbidden City) and Cuzco. [OQ-LIVE-4]
-- **OQ-MP-1** (multiplayer): A player who never presses Ready: is there a timer, and what happens to the realm then (AI takes it, the week plays without its orders)? The prototype has none.
-- **OQ-MP-2** (multiplayer): Dropping a player or moving the host after start.
 - **OQ-MP-3** (multiplayer): Games that never start: how long the server keeps them before removing them.
 - **OQ-MP-4** (multiplayer): Out of step: the server marks it, but the only cure is replaying from the start. Should a device that disagrees fetch the agreed world instead?
 - **OQ-MP-5** (multiplayer): Diplomacy between players beyond war and peace (alliances, calls to arms, envoys' asks) and Imperial votes have not been played through.
@@ -277,6 +275,12 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-VIEW-7**: (was OQ-VIEW-7) New systems' zoom content: a system with no zoom table shows its lens at every zoom and its card at Local only. Simplest default with no new content.
 - **D-VIEW-9**: (was OQ-VIEW-9) Battery saver: it only lowers the frame rate, animation and music voices; the AI's budget is counted in work steps, the same on every device, and `engine.worker_budget` is dropped. X-15 settles it.
 - **D-VIEW-10**: (was OQ-VIEW-10) Map detail Low: Low keeps 4 × 4 art at every zoom, Local included, and that is a valid close-in view. It only lowers detail and changes nothing else.
+
+### Multiplayer (multiplayer)
+
+- **D-MP-1**: (was OQ-MP-1) A player who never presses Ready: the host picks a turn limit at the start, No limit by default (MP-080). When it runs out, the realms that sent nothing play the week on no orders, which is the simplest rule that keeps every device the same: an AI choosing for a realm still played by a person would break MP-007, and waiting forever lets one player stop the game. The server closes a late week lazily, on the next request about the game, claiming the week's opening time in the database first so it is closed once; no timer process is needed. A player who is away for good is handed to the AI (D-MP-2).
+- **D-MP-2**: (was OQ-MP-2) Dropping a player: the host may hand any realm to the AI and a player their own (MP-081), from the week the table is on, so every device switches it on the same week and stays in step; the engine's `resolve` takes the realms still played by people. It cannot be undone: coming back would need the AI's choices undone. Leaving for now (MP-051) stays the way to pause. Deleting or combining accounts uses the same rule (MP-041).
+- **D-MP-3**: (was part of OQ-MP-2) The host's part passes to the earliest seat still playing, before and after the start (MP-082), and the game ends only when nobody is left, so one player leaving no longer ends a game for the others.
 
 ### National strengths (national-strengths)
 

@@ -1,6 +1,7 @@
 // Plays an online multiplayer game against our real server (domain/multiplayer, server/src/Controller/GamesController.php):
 // two accounts on two separate browsers (no shared storage), one hosts on a phone and one joins by the code on a
-// tablet, three weeks are played, and the joiner comes back from Your games on a fresh browser of the same account.
+// tablet with a one-hour turn limit, three weeks are played, the joiner comes back from Your games on a fresh
+// browser of the same account, and the host hands the joiner's realm to the AI (MP-080, MP-081).
 // Usage:
 //   cd server && php bin/console doctrine:schema:create && php -S 127.0.0.1:8077 -t public   (CORS_ALLOW_ORIGINS must list http://localhost:4174)
 //   VITE_CLOUD_API=http://127.0.0.1:8077 pnpm --filter @ph/client exec vite build --outDir <dist> --emptyOutDir
@@ -52,6 +53,9 @@ async function device(name, tokens) {
   page.on("pageerror", (e) => console.log(`[${name}] page error: ${e.message}`));
   await page.goto(base);
   await ready(page);
+  // A build that can send reports asks first (SHELL-014): nothing is sent from these runs.
+  const none = page.locator("[data-start=consent][data-choice=none]");
+  if (await none.count()) await none.click();
   return page;
 }
 
@@ -95,6 +99,11 @@ async function play() {
   await a.waitForSelector("[data-mp-start]:not([disabled])", { timeout: 20000 });
   const lobby = await a.textContent(".mp-players");
   check(lobby.includes("Leroy") && lobby.includes("Ana"), "the lobby names both players");
+  // The host picks the turn limit (MP-080).
+  check((await a.locator("[data-mp-limit]").count()) === 4, "the host picks a turn limit from four");
+  await a.click('[data-mp-limit="3600"]');
+  await a.waitForSelector('[data-mp-limit="3600"][aria-pressed=true]');
+  check(!(await b.locator("[data-mp-limit]").count()), "only the host picks the turn limit");
   await a.screenshot({ path: `${out}/2-lobby-host.png` });
   await b.screenshot({ path: `${out}/3-lobby-joined.png` });
 
@@ -129,7 +138,11 @@ async function play() {
     const [sa, sb] = [await mpState(a), await mpState(b)];
     check(sa.hash === sb.hash && !sa.outOfStep && !sb.outOfStep, `week ${week}: both devices agree (${sa.hash} / ${sb.hash})`);
   }
+  check(/\d+ h \d\d|\d:\d\d/.test(await a.textContent(".mp-plaque [data-mp-clock]")), "the Players plaque counts down the week's time");
   await a.click(".mp-plaque");
+  await a.waitForSelector('[data-mp-drop="france"]');
+  check((await a.textContent("#panel")).includes("left for this week's orders"), "the Players card says the time left");
+  check(!(await b.locator("[data-mp-drop=castile]").count()), "only the host hands another player's realm to the AI");
   await a.screenshot({ path: `${out}/6-players.png` });
 
   // Ana comes back on a fresh browser of her account: Your games comes from the server (MP-050, MP-038).
@@ -142,6 +155,23 @@ async function play() {
   const [sc, sa] = [await mpState(c), await mpState(a)];
   check(sc.hash === sa.hash, `a device coming back catches up to the same world (${sc.hash} / ${sa.hash})`);
   await c.screenshot({ path: `${out}/7-came-back.png`, timeout: 90000 }).catch(() => console.log("(no screenshot of the device that came back: the page was busy)"));
+  await c.context().close();
+
+  // The host hands France to the AI (MP-081): a second tap does it, Ana's device leaves the game, and the week
+  // plays on Castile's orders alone.
+  if (!(await a.locator('[data-mp-drop="france"]').count())) await a.click(".mp-plaque");
+  await a.click('[data-mp-drop="france"]');
+  await a.waitForSelector("#panel [role=alert]");
+  await a.screenshot({ path: `${out}/8-hand-over-confirm.png` });
+  await a.click('[data-mp-drop="france"]');
+  await a.waitForFunction(() => document.querySelector("#panel")?.textContent?.includes("played by the AI"), null, { timeout: 20000 });
+  await b.waitForSelector(".mp-menu [role=alert]", { timeout: 60000 });
+  check((await b.textContent(".mp-menu [role=alert]")).includes("handed to the AI"), "the player whose realm went to the AI is told, back on the start screen");
+  await b.screenshot({ path: `${out}/9-handed-to-the-ai.png` });
+  check(!(await b.locator(`[data-mp-rejoin="${code}"]`).count()), "the game leaves Your games of that player");
+  await ready_(a);
+  await a.waitForFunction(() => globalThis.__phMp()?.turn === 4 && !globalThis.__phMp()?.waiting, null, { timeout: 90000 });
+  check(true, "with France played by the AI, the week plays on the host's orders alone");
 }
 
 try {

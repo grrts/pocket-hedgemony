@@ -8037,6 +8037,52 @@ p.fear.threatened {
   font-weight: 600;
 }
 
+/* The host's turn limit: one row of choices, 44 points tall. */
+.mp-limits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 6px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.mp-limits legend {
+  margin-bottom: 4px;
+  font: 600 20px/1 var(--body);
+}
+
+.mp-limits button {
+  flex: 1 1 0;
+  min-width: 72px;
+  min-height: 44px;
+}
+
+.mp-players .mp-ai {
+  font-style: italic;
+}
+
+.mp-players .mp-drop {
+  min-height: 44px;
+  min-width: 88px;
+}
+
+.mp-leave {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mp-leave button {
+  flex: 1 1 160px;
+  min-height: 44px;
+}
+
+.mp-plaque [data-mp-clock] {
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
 .mp-chosen {
   display: flex;
   flex-wrap: wrap;

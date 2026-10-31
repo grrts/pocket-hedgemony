@@ -20,6 +20,28 @@ Feature: Multiplayer screens
     And one game before it starts is in the lobby card, with the players' names and realms
     And one game while it runs is in the Players card, with Leave
 
+  @MP-083
+  Scenario: The host picks the turn limit in the lobby
+    Given "Leroy" hosts a game
+    Then the lobby card shows No limit, 5 min, 1 hour and 1 day, with No limit picked
+    When they tap 5 min
+    Then 5 min is picked and the card says a realm whose orders are late does nothing that week
+    And the other players see no turn limit buttons
+
+  @MP-083
+  Scenario: Handing a realm to the AI takes a second tap
+    Given the host opens the Players card
+    When they tap To the AI on Ana's row
+    Then the button reads "Tap again" and a line says Ana cannot come back to the realm
+    When they tap it again
+    Then the row reads "played by the AI"
+    And Ana's device goes back to the start screen saying their realm was handed to the AI
+
+  @MP-073
+  Scenario: The Players plaque counts down
+    Given an online campaign with a turn limit of 1 hour
+    Then the Players plaque shows the time left, counting down
+
   @MP-073
   Scenario: The Players plaque
     Given an online campaign with three human realms where one has pressed Ready

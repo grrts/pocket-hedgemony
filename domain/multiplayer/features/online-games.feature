@@ -44,11 +44,13 @@ Feature: Online games on our server
     When "Ana" takes "Aragon"
     Then they hold the seat of "Aragon" and "Portugal" is free
 
-  @MP-028
-  Scenario: The host leaving ends a game that has not started
+  @MP-028 @MP-082
+  Scenario: The host leaving before the start hands the game on
     Given "Ana" sits in Leroy's game before it starts
     When "Leroy" leaves the game
-    Then the game ends for "Ana"
+    Then "Ana" is the host and may start it
+    When "Ana" leaves too
+    Then the game has ended
 
   @MP-029 @MP-030 @MP-027
   Scenario: Only the host starts, with two or more realms
@@ -118,3 +120,39 @@ Feature: Online games on our server
     Given "Ana" sits in a game that has not started
     When "Ana" deletes their account
     Then their realm is free
+    Given "Ana" plays "Portugal" in a started game
+    When "Ana" deletes their account
+    Then the AI plays "Portugal" from the week the table is on
+
+  @MP-080 @placeholder
+  Scenario: The turn limit
+    Given "Leroy" started the game with a turn limit of 5 minutes
+    And "Leroy" sent their orders for week 0 and "Ana" did not
+    When 5 minutes have passed since week 0 opened
+    Then the next request about the game keeps empty orders for "Portugal" in week 0, marked skipped
+    And week 1 opens
+    And every device plays week 0 with no orders for "Portugal"
+    And "Ana" is told their orders missed week 1
+
+  @MP-080
+  Scenario: Only the offered turn limits
+    When "Leroy" starts the game with a turn limit of 10 seconds
+    Then they are refused
+
+  @MP-081
+  Scenario: A realm handed to the AI
+    Given the game has started and the table is on week 2
+    When "Leroy" hands "Portugal" to the AI
+    Then from week 2 the AI plays "Portugal" on every device
+    And the table no longer waits for "Portugal"
+    And the game leaves Ana's Your games, and they cannot sit down at it again
+    When "Ana" hands "Castile" to the AI
+    Then they are refused
+
+  @MP-081 @MP-082
+  Scenario: The host's part passes on
+    Given "Leroy", "Ana" and "Bo" play a started game hosted by "Leroy"
+    When "Leroy" hands their own realm to the AI
+    Then the host is "Ana", who sat down first among the others
+    When "Ana" and "Bo" hand their realms to the AI
+    Then the game has ended

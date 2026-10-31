@@ -1,15 +1,33 @@
 import type { PlayerOrders } from "@ph/engine";
 import type { CloudApi, GameTable } from "../cloud/api.ts";
-import type { OnlineGame, Seat, Table, TurnDoc } from "./lobby.ts";
+import { activeIn, type OnlineGame, type Seat, type Table, type TurnDoc } from "./lobby.ts";
 
 /** How often an open game asks the server for changes (MP-037; provisional). */
 export const POLL_MS = 2_000;
 export const POLL_HIDDEN_MS = 15_000;
 
-const gameOf = (t: GameTable): OnlineGame | null =>
-  t.game.ended ? null : { code: t.game.code, seed: t.game.seed, host: t.game.host, created: t.game.created, humans: t.game.humans, started: t.game.started, outOfStep: t.game.outOfStep };
+/** The turn limits the host picks from, in seconds (MP-080; the server's multiplayer.turn_limits). */
+export const TURN_LIMITS = [0, 300, 3600, 86400] as const;
+
+const gameOf = (t: GameTable): OnlineGame | null => {
+  if (t.game.ended) return null;
+  // The week's opening by this device's clock: the server's clock may differ from it.
+  const skew = t.now ? Date.now() - t.now : 0;
+  return {
+    code: t.game.code,
+    seed: t.game.seed,
+    host: t.game.host,
+    created: t.game.created,
+    humans: t.game.humans,
+    started: t.game.started,
+    outOfStep: t.game.outOfStep,
+    turnLimit: t.game.turnLimit ?? null,
+    weekOpened: t.game.weekOpened ? t.game.weekOpened + skew : null,
+    dropped: t.game.dropped ?? {},
+  };
+};
 const seatsOf = (t: GameTable): Seat[] => t.seats.map((s) => ({ realm: s.realm, at: s.at, mine: s.mine, player: s.player }));
-const turnsOf = (t: GameTable): TurnDoc[] => t.weeks.map((w) => ({ turn: w.week, realm: w.realm, orders: w.orders as PlayerOrders, hash: w.hash }));
+const turnsOf = (t: GameTable): TurnDoc[] => t.weeks.map((w) => ({ turn: w.week, realm: w.realm, orders: w.orders as PlayerOrders, hash: w.hash, ...(w.skipped ? { skipped: true } : {}) }));
 
 /**
  * One open game, asked for every few seconds while anything watches it. The
@@ -104,9 +122,12 @@ class Poll {
       if (!s) this.have.set(d.turn, (s = new Set()));
       s.add(d.realm);
     }
-    // The weeks every realm has sent are not asked for again.
-    const humans = t.game.humans;
-    if (humans.length) while (humans.every((h) => this.have.get(this.since)?.has(h))) this.since++;
+    // The weeks every realm still played has sent are not asked for again.
+    for (;;) {
+      const active = activeIn(t.game, this.since);
+      if (!active.length || !active.every((h) => this.have.get(this.since)?.has(h))) break;
+      this.since++;
+    }
   }
 }
 
@@ -164,9 +185,14 @@ export function serverTable(api: CloudApi): Table {
     async leave(code) {
       await api.leaveGame(code);
     },
-    async start(game) {
-      await api.startGame(game.code);
+    turnLimits: TURN_LIMITS,
+    async start(game, _seats, turnLimit = 0) {
+      await api.startGame(game.code, turnLimit);
       kick(game.code);
+    },
+    async drop(code, realm) {
+      await api.dropRealm(code, realm);
+      kick(code);
     },
     async send(code, doc) {
       await api.sendWeek(code, doc.turn, { realm: doc.realm, orders: doc.orders, hash: doc.hash });

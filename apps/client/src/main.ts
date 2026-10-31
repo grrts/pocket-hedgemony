@@ -130,9 +130,9 @@ import { loadLastChoices, newGameOptionsHtml, rulesLine, saveLastChoices, setRul
 import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, firstLaunchQuestion, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, gate, longDate, newCampaign, newManualSave, saveStart, savesConfig, sharedFromLine, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { mpStore } from "./multiplayer/store.ts";
-import { cleanCode, storeTable, type MyGame, type OnlineGame, type Seat, type Table, type TurnDoc } from "./multiplayer/lobby.ts";
+import { activeIn, cleanCode, storeTable, timeLeft, weekDue, type MyGame, type OnlineGame, type Seat, type Table, type TurnDoc } from "./multiplayer/lobby.ts";
 import { serverTable } from "./multiplayer/server.ts";
-import { hotseatPickHtml, lobbyHtml, menuHtml, playersHtml, type PlayerRow, type RealmLook } from "./multiplayer/screens.ts";
+import { clockHtml, hotseatPickHtml, lobbyHtml, menuHtml, playersHtml, type PlayerRow, type RealmLook } from "./multiplayer/screens.ts";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { FileSaveStore, moveIntoFolder, type SaveStoreLike } from "./saves/fileStore.ts";
 import { desktopBridge } from "./desktop.ts";
@@ -557,7 +557,9 @@ let mp: MpState | null = null;
 /** Choosing realms for a multiplayer game: what tapping a realm does. */
 let mpPicking: { kind: "hotseat"; chosen: string[] } | { kind: "host" } | { kind: "join"; code: string } | null = null;
 /** An online game waiting for its host to start it. */
-let mpLobby: { table: Table; game: OnlineGame; seats: Seat[]; realm: string; stop: () => void } | null = null;
+let mpLobby: { table: Table; game: OnlineGame; seats: Seat[]; realm: string; stop: () => void; limit: number } | null = null;
+/** The realm whose hand-over to the AI waits on its second tap on the Players card (MP-081). */
+let mpConfirm: string | null = null;
 /** The Players card is open. */
 let mpView = false;
 /** The Multiplayer dialog over the start screen: the table it reaches, and what it last has to say. */
@@ -1008,6 +1010,9 @@ async function boot(): Promise<void> {
   renderPanel();
   hideLoading();
   sound.title();
+  // Why the last online game closed (a realm handed to the AI, a game ended), said once the start screen is back.
+  const notice = takeMpNotice();
+  if (notice) openMpMenu(notice);
   // A hint waits while a card is up: an event, a revolution, a realm founded, the loading screen (TUT-126, SETUP-094), and while a multiplayer game is chosen or played: hints teach a game of one.
   // The tutorial's note teaches while it runs: the hints wait for it to end (D-TUT-19).
   hints.mount({ target: hintTarget, moment: () => ({ eventOpen: coach.running || !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden || !!alerts.querySelector(".founding") || loadingShown() || !!mp || !!mpPicking || !!mpLobby, turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
@@ -9648,7 +9653,7 @@ function enterLobby(table: Table, game: OnlineGame, realm: string): void {
   mpPicking = null;
   selectedProvince = -1;
   const stops: (() => void)[] = [];
-  mpLobby = { table, game, seats: [], realm, stop: () => stops.forEach((f) => f()) };
+  mpLobby = { table, game, seats: [], realm, stop: () => stops.forEach((f) => f()), limit: 0 };
   let seen = false;
   stops.push(
     table.watchSeats(game.code, (seats) => {
@@ -9685,7 +9690,20 @@ function enterLobby(table: Table, game: OnlineGame, realm: string): void {
 
 function renderMpLobby(): void {
   const l = mpLobby!;
-  panel.innerHTML = lobbyHtml(mpLook, l.game, l.seats, l.realm, `<span class="panel-buttons"><button class="close" data-mp-leave-lobby aria-label="Leave the game">${icon("close", 2)}</button></span>`);
+  panel.innerHTML = lobbyHtml(
+    mpLook,
+    l.game,
+    l.seats,
+    l.realm,
+    `<span class="panel-buttons"><button class="close" data-mp-leave-lobby aria-label="Leave the game">${icon("close", 2)}</button></span>`,
+    l.table.turnLimits ? { choices: l.table.turnLimits, picked: l.limit } : undefined,
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-mp-limit]").forEach((b) =>
+    b.addEventListener("click", () => {
+      l.limit = Number(b.dataset.mpLimit);
+      renderPanel();
+    }),
+  );
   panel.querySelector("[data-mp-leave-lobby]")!.addEventListener("click", () => {
     l.stop();
     void l.table.leave(l.game.code).catch(() => {});
@@ -9696,7 +9714,7 @@ function renderMpLobby(): void {
   panel.querySelector<HTMLButtonElement>("[data-mp-start]")?.addEventListener("click", (e) => {
     const button = e.currentTarget as HTMLButtonElement;
     button.disabled = true;
-    l.table.start(l.game, l.seats).catch((err: unknown) => {
+    l.table.start(l.game, l.seats, l.limit).catch((err: unknown) => {
       button.disabled = false;
       alertPlayer(mpFailure(err), "crown");
     });
@@ -9728,11 +9746,25 @@ async function startMpGame(seed: number, humanIds: string[], me: string, mode: M
   if (online) {
     const m = mp;
     m.online = { ...online, turns: new Map(), stop: () => {} };
-    m.online.stop = online.table.watchTurns(online.game.code, (docs) => {
+    const me = idOf(m.planning);
+    // The game first: who still plays each week (MP-081), the host (MP-082) and the week's time (MP-080) come with it.
+    const stopGame = online.table.watchGame(online.game.code, (g) => {
+      if (mp !== m || !m.online) return;
+      if (!g) return mpClosed(`Game ${online.game.code} has ended: nobody plays it any more.`);
+      m.online.game = g;
+      if (!activeIn(g, Number.MAX_SAFE_INTEGER).includes(me)) return mpClosed(`${nations[m.planning]!.name} was handed to the AI in game ${g.code}: the AI plays it from now on.`);
+      renderHud();
+      if (mpView) renderPanel();
+    });
+    const stopTurns = online.table.watchTurns(online.game.code, (docs) => {
       if (mp !== m || !m.online) return;
       for (const d of docs) m.online.turns.set(`${d.turn}-${d.realm}`, d);
       void mpAdvanceIfReady();
     });
+    m.online.stop = () => {
+      stopGame();
+      stopTurns();
+    };
   } else if (mode === "hotseat") mpCover(mp.local[0]!);
 }
 
@@ -9751,8 +9783,11 @@ async function mpAdvanceIfReady(): Promise<void> {
   if (!m?.online || mpBusy || playing || !snapshot) return;
   const t = snapshot.turn;
   const docOf = (n: number, turn = t) => m.online!.turns.get(`${turn}-${idOf(n)}`);
+  // The realms people still play this week: a realm handed to the AI sends nothing more (MP-081).
+  const activeAt = (turn: number) => activeIn(m.online!.game, turn).map((id) => nationIndex.get(id)!);
+  const active = activeAt(t);
   // Every device writes the hash it had at the week's start: one that differs is out of step.
-  for (const n of m.humans) {
+  for (const n of active) {
     const d = docOf(n);
     if (d && d.hash && m.weekHash && d.hash !== m.weekHash && !m.outOfStep) {
       m.outOfStep = `Out of step with ${nations[n]!.name} since week ${t + 1}: the devices no longer agree on the world. Leave and come back to the game to play it again from the start.`;
@@ -9760,7 +9795,7 @@ async function mpAdvanceIfReady(): Promise<void> {
     }
   }
   if (docOf(m.planning) && !m.waiting) m.waiting = true;
-  const docs = m.humans.map((n) => docOf(n));
+  const docs = active.map((n) => docOf(n));
   if (!docs.every(Boolean)) {
     renderHud();
     renderActions();
@@ -9770,9 +9805,15 @@ async function mpAdvanceIfReady(): Promise<void> {
   mpBusy = true;
   try {
     // Catching up: the next week is also complete, so this one is played without the playback.
-    const quick = m.humans.every((n) => docOf(n, t + 1));
+    const quick = activeAt(t + 1).every((n) => docOf(n, t + 1));
+    // The week's time ran out before this player's orders were in (MP-080).
+    if (!quick && docOf(m.planning)?.skipped) alertPlayer(`Time ran out before your orders were in: ${nations[m.planning]!.name} did nothing in week ${t + 1}.`, "scroll");
     // Orders act for the realm whose seat sent them, whatever realm they name (MP-012).
-    await mpResolve(docs.map((d) => ({ ...d!.orders, nation: nationIndex.get(d!.realm)! })), quick);
+    await mpResolve(
+      docs.map((d) => ({ ...d!.orders, nation: nationIndex.get(d!.realm)! })),
+      quick,
+      active.map(idOf),
+    );
   } finally {
     mpBusy = false;
   }
@@ -9809,6 +9850,9 @@ async function mpReady(): Promise<void> {
   try {
     await m.online!.table.send(m.online!.game.code, { turn: snapshot.turn, realm: idOf(m.planning), orders: r.orders, hash: m.weekHash });
   } catch (e) {
+    const code = (e as { code?: string }).code;
+    // The week's time ran out first: the table played it without these orders, and says so when it plays (MP-080).
+    if (code === "already_sent" || code === "not_this_week") return;
     m.waiting = false;
     alertPlayer(`Your orders did not reach the table (${e instanceof Error ? e.message : String(e)}). Press Ready again.`, "scroll");
     renderActions();
@@ -9816,9 +9860,9 @@ async function mpReady(): Promise<void> {
 }
 
 /** Every player's orders together, from the week's start, then the week played. */
-async function mpResolve(all: PlayerOrders[], quick: boolean): Promise<void> {
+async function mpResolve(all: PlayerOrders[], quick: boolean, humans?: string[]): Promise<void> {
   const t = snapshot!.turn;
-  takeSnapshot(await engine.send({ type: "resolve", all }), 0);
+  takeSnapshot(await engine.send({ type: "resolve", all, ...(humans ? { humans } : {}) }), 0);
   applySnapshot();
   logNews(snapshot!);
   for (const r of snapshot!.rejectedOrders) alertPlayer(`Not done: ${r.reason}.`, "scroll");
@@ -9907,6 +9951,7 @@ function mpRows(): PlayerRow[] {
   return m.humans.map((n): PlayerRow => {
     const realm = idOf(n);
     if (m.mode === "hotseat") return { realm, state: m.orders.has(n) ? "ready" : n === m.planning && m.cover < 0 ? "planning" : "waiting" };
+    if (m.online && !activeIn(m.online.game, t).includes(realm)) return { realm, state: "ai" };
     // The game is entered (and its HUD drawn) before the online table is watched.
     if (m.online?.turns.has(`${t}-${realm}`)) return { realm, state: "ready" };
     return { realm, state: n === m.planning ? "you" : "waiting" };
@@ -9916,19 +9961,29 @@ function mpRows(): PlayerRow[] {
 /** The HUD's Players plaque: every player's pennant, lit once their orders are in. */
 function mpPlaque(): string {
   if (!mp || !snapshot) return "";
-  const rows = mpRows();
+  const rows = mpRows().filter((r) => r.state !== "ai");
   const ready = rows.filter((r) => r.state === "ready").length;
-  return `<button class="plaque mp-plaque${mp.outOfStep ? " urgent" : ""}" data-mp-players title="Players: ${ready} of ${rows.length} ready this week">${rows
+  const due = mp.online ? weekDue(mp.online.game) : null;
+  return `<button class="plaque mp-plaque${mp.outOfStep ? " urgent" : ""}" data-mp-players title="Players: ${ready} of ${rows.length} ready this week${due ? `, ${timeLeft(due - Date.now())} left` : ""}">${rows
     .map((r) => `<span class="mp-pip${r.state === "ready" ? " ready" : ""}">${mpLook.pennant(r.realm, 1)}</span>`)
-    .join("")}<small>${ready}/${rows.length}</small></button>`;
+    .join("")}<small>${ready}/${rows.length}</small>${due ? clockHtml(due) : ""}</button>`;
 }
 
 function renderMpPlayers(): void {
   const m = mp!;
   const s = snapshot!;
+  const o = m.online;
+  const playing = o ? activeIn(o.game, s.turn).map((id) => nationIndex.get(id)!) : m.humans;
   panel.innerHTML = playersHtml(
     mpLook,
-    { mode: m.mode, ...(m.online ? { code: m.online.game.code, reach: m.online.table.reach } : {}), week: s.turn, rows: mpRows(), order: resolutionOrder(m.humans, s.turn).map(idOf), outOfStep: m.outOfStep },
+    {
+      mode: m.mode,
+      ...(o ? { code: o.game.code, reach: o.table.reach, due: weekDue(o.game), host: o.game.host, me: idOf(m.planning), canDrop: !!o.table.drop, confirm: mpConfirm } : {}),
+      week: s.turn,
+      rows: mpRows(),
+      order: resolutionOrder(playing, s.turn).map(idOf),
+      outOfStep: m.outOfStep,
+    },
     closeButton(),
   );
   bindClose();
@@ -9937,8 +9992,62 @@ function renderMpPlayers(): void {
     const left = m.online ? m.online.table.leave(m.online.game.code).catch(() => {}) : Promise.resolve();
     void left.then(() => location.reload());
   });
+  panel.querySelectorAll<HTMLButtonElement>("[data-mp-drop]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const realm = b.dataset.mpDrop!;
+      if (!o?.table.drop) return;
+      // A hand-over cannot be undone: it takes a second tap on the same button.
+      if (mpConfirm !== realm) {
+        mpConfirm = realm;
+        return renderPanel();
+      }
+      mpConfirm = null;
+      b.disabled = true;
+      o.table.drop(o.game.code, realm).then(
+        () => {
+          if (realm === idOf(m.planning)) mpClosed(`You handed ${nations[m.planning]!.name} to the AI and left game ${o.game.code}.`);
+          else renderPanel();
+        },
+        (err: unknown) => {
+          alertPlayer(mpFailure(err), "crown");
+          renderPanel();
+        },
+      );
+    }),
+  );
   showPanel(true);
 }
+
+const MP_NOTICE = "ph-mp-notice";
+
+/** The online game this device played has closed for it: back to the start screen, saying why. */
+function mpClosed(why: string): void {
+  mp?.online?.stop();
+  try {
+    sessionStorage.setItem(MP_NOTICE, why);
+  } catch {
+    /* private mode: the start screen comes back without the reason */
+  }
+  location.reload();
+}
+
+function takeMpNotice(): string | null {
+  try {
+    const v = sessionStorage.getItem(MP_NOTICE);
+    sessionStorage.removeItem(MP_NOTICE);
+    return v;
+  } catch {
+    return null;
+  }
+}
+
+// The week's time left counts down where it shows (MP-080); the table closes the week on the next ask after it runs out.
+setInterval(() => {
+  const clocks = document.querySelectorAll<HTMLElement>("[data-mp-clock]");
+  if (!clocks.length) return;
+  const now = Date.now();
+  clocks.forEach((c) => (c.textContent = timeLeft(Number(c.dataset.mpClock) - now)));
+}, 1000);
 
 renderDiagnostics();
 void selfTest();

@@ -21,7 +21,12 @@ export interface Table {
   sit(code: string, realm: string): Promise<void>;
   /** Before the start the realm is free again; after it the game leaves Your games. */
   leave(code: string): Promise<void>;
-  start(game: OnlineGame, seats: Seat[]): Promise<void>;
+  /** `turnLimit`: seconds each week stays open, 0 for none; only where `turnLimits` is offered (MP-080). */
+  start(game: OnlineGame, seats: Seat[], turnLimit?: number): Promise<void>;
+  /** The turn limits the host may pick from, in seconds (0: none); absent where the table keeps no time. */
+  turnLimits?: readonly number[];
+  /** Hands a realm to the AI from the week the table is on (MP-081); absent where the table cannot. */
+  drop?(code: string, realm: string): Promise<void>;
   send(code: string, doc: TurnDoc): Promise<void>;
   watchGame(code: string, cb: (game: OnlineGame | null) => void): () => void;
   watchSeats(code: string, cb: (seats: Seat[]) => void): () => void;
@@ -42,6 +47,38 @@ export interface OnlineGame {
   started: boolean;
   /** The first week two devices disagreed on, as the server saw it. */
   outOfStep?: number | null;
+  /** Seconds a week stays open for orders; null or absent: no limit (MP-080). */
+  turnLimit?: number | null;
+  /** When the week the table is on opened, by this device's clock (ms). */
+  weekOpened?: number | null;
+  /** The realms handed to the AI, and the week from which they play as computer realms (MP-081). */
+  dropped?: Record<string, number>;
+}
+
+/** The realms people still play in week `week`: the others were handed to the AI by then (MP-081). */
+export function activeIn(game: Pick<OnlineGame, "humans" | "dropped">, week: number): string[] {
+  return game.humans.filter((h) => !(game.dropped && h in game.dropped && game.dropped[h]! <= week));
+}
+
+/** When the week the table is on closes (ms, this device's clock), or null with no limit. */
+export function weekDue(game: Pick<OnlineGame, "turnLimit" | "weekOpened">): number | null {
+  return game.turnLimit && game.weekOpened ? game.weekOpened + game.turnLimit * 1000 : null;
+}
+
+/** Time left, as a clock reads it: "4:05", "2 h 10", "1 d 3 h"; "0:00" once it ran out. */
+export function timeLeft(ms: number): string {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  if (s < 3600) return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  if (s < 86400) return `${Math.floor(s / 3600)} h ${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}`;
+  return `${Math.floor(s / 86400)} d ${Math.floor((s % 86400) / 3600)} h`;
+}
+
+/** A turn limit in the host's picker. */
+export function limitName(seconds: number): string {
+  if (!seconds) return "No limit";
+  if (seconds < 3600) return `${Math.round(seconds / 60)} min`;
+  if (seconds < 86400) return `${Math.round(seconds / 3600)} hour${seconds === 3600 ? "" : "s"}`;
+  return `${Math.round(seconds / 86400)} day${seconds === 86400 ? "" : "s"}`;
 }
 
 export interface Seat {
@@ -59,6 +96,8 @@ export interface TurnDoc {
   orders: PlayerOrders;
   /** The world's hash at the start of the week, on the device that wrote it: every device's must agree. */
   hash: string;
+  /** The realm sent nothing before the week's time ran out: it does nothing that week (MP-080). */
+  skipped?: boolean;
 }
 
 /** A game in Your games. */
