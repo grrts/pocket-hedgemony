@@ -108,7 +108,8 @@ export type EngineRequest =
   /** Multiplayer: the orders the realm on screen has given this week, to send to the other players. */
   | { id: number; type: "planned" }
   /** Multiplayer: back to the week's start, then every player's orders in turn; the week is then played with advance. */
-  | { id: number; type: "resolve"; all: PlayerOrders[] };
+  /** `humans`: the realms still played by people from this week on (a dropped player's realm goes to the AI, MP-081); unchanged when not given. */
+  | { id: number; type: "resolve"; all: PlayerOrders[]; humans?: string[] };
 
 /** A save already kept: its path and its header's bytes. */
 export interface SaveListing {
@@ -862,6 +863,10 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         }
         case "resolve": {
           if (!world || !base) throw new Error("no multiplayer game in progress");
+          if (req.humans) {
+            // Set on the week's start too, so planning the week again (pass and play) sees it.
+            base.humans = req.humans.map((h) => base!.nationIndex.get(h) ?? -1).filter((n) => n >= 0).sort((a, b) => a - b);
+          }
           world = cloneWorld(base);
           world.player = player;
           const r = applyAll(world, req.all);

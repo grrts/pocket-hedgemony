@@ -9,15 +9,19 @@ use App\Entity\Entitlement;
 use App\Entity\Identity;
 use App\Entity\IronmanHead;
 use App\Entity\MetricEvent;
+use App\Entity\MpGame;
+use App\Entity\MpSeat;
 use App\Entity\Post;
 use App\Entity\PostReport;
 use App\Entity\SaveChange;
 use App\Entity\SharedSave;
 use App\Entity\Topic;
+use App\Multiplayer\GameTable;
 use App\Repository\CloudSaveRepository;
 use App\Repository\EntitlementRepository;
 use App\Repository\IdentityRepository;
 use App\Repository\IronmanHeadRepository;
+use App\Repository\MpSeatRepository;
 use App\Repository\SharedSaveRepository;
 use App\Saves\SaveObjects;
 use Doctrine\ORM\EntityManagerInterface;
@@ -44,6 +48,8 @@ final class AccountCombiner
         private readonly EntitlementRepository $entitlements,
         private readonly SharedSaveRepository $shared,
         private readonly SaveObjects $objects,
+        private readonly MpSeatRepository $mpSeats,
+        private readonly GameTable $mpTable,
         private readonly ClockInterface $clock,
         #[Autowire('%cloud.quota_saves%')] private readonly int $quotaSaves,
         #[Autowire('%cloud.quota_mb%')] private readonly int $quotaMb,
@@ -222,6 +228,16 @@ final class AccountCombiner
         $this->reassign(Entitlement::class, 'account', $staying, $other);
 
         $moved['sharedSaves'] = $this->reassign(SharedSave::class, 'account', $staying, $other);
+
+        // Online games (domain/multiplayer): a game both sit in keeps the staying seat, the other leaves it.
+        foreach ($this->mpSeats->findBy(['account' => $other]) as $seat) {
+            if (null !== $this->mpSeats->findOneBy(['game' => $seat->getGame(), 'account' => $staying])) {
+                $this->mpTable->leaveSeat($seat);
+            }
+        }
+        $this->em->flush();
+        $this->reassign(MpSeat::class, 'account', $staying, $other);
+        $this->reassign(MpGame::class, 'host', $staying, $other);
 
         // The community: topics and posts keep their author; a post both reported keeps one report.
         $this->reassign(Topic::class, 'author', $staying, $other);

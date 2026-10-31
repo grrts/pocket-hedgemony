@@ -7,6 +7,7 @@ use App\Entity\Device;
 use App\Entity\MpGame;
 use App\Entity\MpSeat;
 use App\Entity\MpWeek;
+use App\Multiplayer\GameTable;
 use App\Repository\MpGameRepository;
 use App\Repository\MpSeatRepository;
 use App\Repository\MpWeekRepository;
@@ -44,11 +45,14 @@ final class GamesController
         private readonly MpGameRepository $games,
         private readonly MpSeatRepository $seats,
         private readonly MpWeekRepository $weeks,
+        private readonly GameTable $rules,
         private readonly ClockInterface $clock,
         private readonly RateLimiterFactoryInterface $apiGamesLimiter,
         private readonly RateLimiterFactoryInterface $apiGamesReadLimiter,
         #[Autowire('%multiplayer.max_players%')] private readonly int $maxPlayers,
         #[Autowire('%multiplayer.max_orders_kb%')] private readonly int $maxOrdersKb,
+        /** @var list<int> */
+        #[Autowire('%multiplayer.turn_limits%')] private readonly array $turnLimits,
     ) {
     }
 
@@ -93,15 +97,16 @@ final class GamesController
         $games = [];
         foreach ($mine as $seat) {
             $game = $seat->getGame();
-            if ($game->isEnded()) {
+            if ($game->isEnded() || isset($game->getDropped()[$seat->getRealm()])) {
                 continue;
             }
-            [$week, $waiting] = $this->week($game);
+            $this->rules->closeIfLate($game);
+            [$week, $waiting] = $this->rules->week($game);
             $games[] = [
                 'code' => $game->getCode(),
                 'realm' => $seat->getRealm(),
                 'started' => $game->isStarted(),
-                'week' => $week,
+                'week' => $game->isStarted() ? $week : null,
                 'waitingOn' => $waiting,
                 'yourMove' => $game->isStarted() && \in_array($seat->getRealm(), $waiting, true),
             ];
@@ -124,6 +129,8 @@ final class GamesController
         if (null === $game || $game->isEnded()) {
             return self::error('not_found', "No game $code.", Response::HTTP_NOT_FOUND);
         }
+        // A week whose time ran out closes when anyone looks (MP-080).
+        $this->rules->closeIfLate($game);
         $since = max(0, $request->query->getInt('since'));
         $etag = '"'.$game->getVersion().'-'.$since.'"';
         if (\in_array($etag, $request->getETags(), true)) {
@@ -153,6 +160,9 @@ final class GamesController
         $now = $this->clock->now();
         $mine = $this->seats->findOneBy(['game' => $game, 'account' => $account]);
         if ($game->isStarted()) {
+            if (null !== $mine && $mine->getRealm() === $realm && isset($game->getDropped()[$realm])) {
+                return self::error('dropped', 'Your realm in this game was handed to the AI.', Response::HTTP_CONFLICT);
+            }
             if (null !== $mine && $mine->getRealm() === $realm) {
                 // Typing the code of a game left from the Players card brings it back (MP-051).
                 $mine->hide(false);
@@ -187,8 +197,8 @@ final class GamesController
     }
 
     /**
-     * Leaves: before the start the realm is free again, and the host leaving ends the game (MP-028);
-     * after it the game leaves the account's Your games (MP-051).
+     * Leaves: before the start the realm is free again, and the host's part passes on (MP-028, MP-082);
+     * after it the game leaves the account's Your games until its code is typed again (MP-051).
      */
     #[Route('/api/games/{code}/seats/mine', name: 'games_leave', requirements: ['code' => self::CODE], methods: ['DELETE'], priority: 1)]
     public function leave(#[CurrentUser] Account $account, string $code): Response
@@ -198,15 +208,10 @@ final class GamesController
         if (null === $game || null === $mine) {
             return new Response(status: Response::HTTP_NO_CONTENT);
         }
-        $now = $this->clock->now();
         if ($game->isStarted()) {
             $mine->hide();
         } else {
-            if ($game->isHost($account)) {
-                $game->end($now);
-            }
-            $this->em->remove($mine);
-            $game->touch($now);
+            $this->rules->leaveSeat($mine);
         }
         $this->em->flush();
         $this->games->bump($game);
@@ -235,7 +240,43 @@ final class GamesController
         if (\count($realms) < 2) {
             return self::error('too_few', 'A game needs a second realm.', Response::HTTP_CONFLICT);
         }
-        $game->start($realms, $this->clock->now());
+        // The host picks how long a week stays open for orders; none by default (MP-080).
+        $limit = '' === $request->getContent() ? 0 : ($this->decode($request)['turnLimit'] ?? 0);
+        if (!\is_int($limit) || !\in_array($limit, $this->turnLimits, true)) {
+            return self::error('invalid_input', 'That turn limit is not offered.', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        $game->start($realms, $limit > 0 ? $limit : null, $this->clock->now());
+        $this->em->flush();
+        $this->games->bump($game);
+
+        return new JsonResponse($this->table($game, $account, 0));
+    }
+
+    /**
+     * Hands a realm to the AI from the week the table is on (MP-081): the host may hand any realm, a
+     * player their own. The host's part passes on when it is the host's realm (MP-082).
+     */
+    #[Route('/api/games/{code}/seats/{realm}/drop', name: 'games_drop', requirements: ['code' => self::CODE], methods: ['POST'])]
+    public function drop(#[CurrentUser] Account $account, Request $request, string $code, string $realm): JsonResponse
+    {
+        if ($limited = $this->limited($account, $request)) {
+            return $limited;
+        }
+        $game = $this->games->findOneBy(['code' => $code]);
+        if (null === $game || $game->isEnded()) {
+            return self::error('not_found', "No game $code.", Response::HTTP_NOT_FOUND);
+        }
+        if (!$game->isStarted()) {
+            return self::error('not_started', 'Before the start a player leaves the lobby instead.', Response::HTTP_CONFLICT);
+        }
+        $seat = $this->seats->findOneBy(['game' => $game, 'realm' => $realm]);
+        if (null === $seat || !\in_array($realm, $game->activeIn(\PHP_INT_MAX), true)) {
+            return self::error('not_playing', 'Nobody plays that realm now.', Response::HTTP_CONFLICT);
+        }
+        if (!$game->isHost($account) && !$seat->isOf($account)) {
+            return self::error('not_host', 'Only the host hands another player\'s realm to the AI.', Response::HTTP_FORBIDDEN);
+        }
+        $this->rules->drop($game, $realm);
         $this->em->flush();
         $this->games->bump($game);
 
@@ -274,6 +315,10 @@ final class GamesController
         if (null === $seat || !$seat->isOf($account)) {
             return self::error('not_your_realm', 'Only its player sends a realm\'s orders.', Response::HTTP_FORBIDDEN);
         }
+        if (isset($game->getDropped()[$realm])) {
+            return self::error('dropped', 'This realm was handed to the AI.', Response::HTTP_CONFLICT);
+        }
+        $this->rules->closeIfLate($game);
         $json = json_encode($orders, \JSON_THROW_ON_ERROR);
         $kept = $this->weeks->findOneBy(['game' => $game, 'realm' => $realm, 'week' => $week]);
         if (null !== $kept) {
@@ -281,8 +326,8 @@ final class GamesController
                 ? new JsonResponse(['week' => $kept->toArray(), 'game' => $game->toArray()])
                 : self::error('already_sent', 'This week\'s orders were already sent.', Response::HTTP_CONFLICT);
         }
-        [$current] = $this->week($game);
-        if (null !== $current && $week !== $current) {
+        [$current] = $this->rules->week($game);
+        if ($week !== $current) {
             return self::error('not_this_week', "The table is on week $current.", Response::HTTP_CONFLICT);
         }
         $now = $this->clock->now();
@@ -295,6 +340,7 @@ final class GamesController
         $this->em->persist($sent);
         $game->touch($now);
         $this->em->flush();
+        $this->rules->weekMayHaveClosed($game, $week);
         $this->games->bump($game);
 
         return new JsonResponse(['week' => $sent->toArray(), 'game' => $game->toArray()], Response::HTTP_CREATED);
@@ -315,32 +361,11 @@ final class GamesController
         }
 
         return [
+            'now' => (int) $this->clock->now()->format('Uv'),
             'game' => $game->toArray(),
             'seats' => array_map(static fn (MpSeat $s) => $s->toArray($viewer), $seats),
             'weeks' => $weeks,
         ];
-    }
-
-    /**
-     * The week the table is on and the realms it waits on: the newest week anyone sent, or the one
-     * after it once every realm has sent it. Null before the first week is sent (INV-MP-7).
-     *
-     * @return array{0: ?int, 1: list<string>}
-     */
-    private function week(MpGame $game): array
-    {
-        if (!$game->isStarted()) {
-            return [null, []];
-        }
-        $last = $this->weeks->createQueryBuilder('w')->select('MAX(w.week)')->where('w.game = :g')->setParameter('g', $game)->getQuery()->getSingleScalarResult();
-        if (null === $last) {
-            return [null, $game->getHumans()];
-        }
-        $last = (int) $last;
-        $sent = array_map(static fn (MpWeek $w) => $w->getRealm(), $this->weeks->findBy(['game' => $game, 'week' => $last]));
-        $waiting = array_values(array_diff($game->getHumans(), $sent));
-
-        return [] === $waiting ? [$last + 1, $game->getHumans()] : [$last, $waiting];
     }
 
     private function newCode(): ?string

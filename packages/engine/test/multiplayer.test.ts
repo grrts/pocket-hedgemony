@@ -114,6 +114,21 @@ describe("multiplayer", () => {
     expect(playWeek(H, 42).hash).toBe(playWeek(D, 3).hash);
   });
 
+  it("hands a dropped player's realm to the AI from the week it is dropped, alike on every device", () => {
+    const humans = ["castile", "portugal"];
+    const A = createEngineHost(() => rules);
+    const B = createEngineHost(() => rules);
+    snap(A, { id: 1, type: "newGame", seed: 4, playerNation: "castile", humans });
+    snap(B, { id: 1, type: "newGame", seed: 4, playerNation: "portugal", humans });
+    const portugal = rules.nations.findIndex((n) => n.id === "portugal");
+    const all = [planned(A), planned(B)];
+    snap(A, { id: 2, type: "resolve", all: [all[0]!], humans: ["castile"] });
+    snap(B, { id: 2, type: "resolve", all: [all[0]!], humans: ["castile"] });
+    expect(A.world()!.humans).toEqual([rules.nations.findIndex((n) => n.id === "castile")]);
+    expect(B.world()!.humans).not.toContain(portugal);
+    expect(playWeek(A, 42).hash).toBe(playWeek(B, 6).hash);
+  });
+
   it("leaves peace between two players to the one asked", () => {
     const humans = ["castile", "portugal"];
     const A = createEngineHost(() => rules);

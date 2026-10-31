@@ -2,6 +2,8 @@
 parameters:
     multiplayer.max_players: 8
     multiplayer.max_orders_kb: 256
+    # The turn limits the host may pick, in seconds; 0 is none (MP-080).
+    multiplayer.turn_limits: [0, 300, 3600, 86400]
 
 framework:
     rate_limiter:

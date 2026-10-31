@@ -40,6 +40,24 @@ class MpWeek
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $sentAt;
 
+    /** The week's time ran out before the realm's orders came: it plays the week on no orders (MP-080). */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $skipped = false;
+
+    /** The row of a realm whose orders did not come in time: no orders, no hash. */
+    public static function skippedFor(MpGame $game, string $realm, int $week, \DateTimeImmutable $now): self
+    {
+        $w = new self($game, $realm, $week, '{"nation":-1,"orders":[],"created":[]}', '', $now);
+        $w->skipped = true;
+
+        return $w;
+    }
+
+    public function isSkipped(): bool
+    {
+        return $this->skipped;
+    }
+
     public function __construct(MpGame $game, string $realm, int $week, string $orders, string $hash, \DateTimeImmutable $now)
     {
         $this->game = $game;
@@ -72,6 +90,6 @@ class MpWeek
 
     public function toArray(): array
     {
-        return ['week' => $this->week, 'realm' => $this->realm, 'orders' => json_decode($this->orders, true), 'hash' => $this->hash];
+        return ['week' => $this->week, 'realm' => $this->realm, 'orders' => json_decode($this->orders, true), 'hash' => $this->hash, 'skipped' => $this->skipped];
     }
 }

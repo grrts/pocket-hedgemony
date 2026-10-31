@@ -117,7 +117,7 @@ final class GamesTest extends WebTestCase
         self::assertSame(['castile', 'aragon'], array_column($data['seats'], 'realm'), 'the seat moves; Portugal is free');
     }
 
-    public function testTheHostLeavingEndsAGameThatHasNotStarted(): void
+    public function testTheHostLeavingHandsTheGameOnBeforeTheStart(): void
     {
         $code = $this->call('POST', '/api/games', $this->leroy, ['realm' => 'castile'])['game']['code'];
         $this->call('PUT', "/api/games/$code/seats/portugal", $this->ana);
@@ -125,9 +125,16 @@ final class GamesTest extends WebTestCase
         self::assertResponseStatusCodeSame(204);
         self::assertCount(1, $this->call('GET', "/api/games/$code", $this->leroy)['seats']);
 
+        // The host leaves: the host's part passes to the player who sat down first (MP-082).
         $this->call('PUT', "/api/games/$code/seats/portugal", $this->ana);
         $this->call('DELETE', "/api/games/$code/seats/mine", $this->leroy);
-        $this->call('GET', "/api/games/$code", $this->ana);
+        $data = $this->call('GET', "/api/games/$code", $this->ana);
+        self::assertSame('portugal', $data['game']['host']);
+        self::assertSame(['portugal'], array_column($data['seats'], 'realm'));
+
+        // Nobody left: the game ends.
+        $this->call('DELETE', "/api/games/$code/seats/mine", $this->ana);
+        $this->call('GET', "/api/games/$code", $this->leroy);
         self::assertResponseStatusCodeSame(404);
     }
 
@@ -275,5 +282,82 @@ final class GamesTest extends WebTestCase
         $code = $this->started();
         $this->call('PUT', "/api/games/$code/weeks/0", $this->ana, ['realm' => 'portugal', 'orders' => $this->orders(2, 8000), 'hash' => 'ab12cd34']);
         self::assertResponseStatusCodeSame(413);
+    }
+
+    private function send(string $code, string $token, string $realm, int $week, string $hash = 'ab12cd34'): array
+    {
+        return $this->call('PUT', "/api/games/$code/weeks/$week", $token, ['realm' => $realm, 'orders' => $this->orders(1), 'hash' => $hash]);
+    }
+
+    public function testTheHostPicksATurnLimit(): void
+    {
+        $code = $this->call('POST', '/api/games', $this->leroy, ['realm' => 'castile'])['game']['code'];
+        $this->call('PUT', "/api/games/$code/seats/portugal", $this->ana);
+        self::assertSame('invalid_input', $this->call('POST', "/api/games/$code/start", $this->leroy, ['turnLimit' => 42])['error']);
+        $data = $this->call('POST', "/api/games/$code/start", $this->leroy, ['turnLimit' => 3600]);
+        self::assertSame(3600, $data['game']['turnLimit']);
+        self::assertSame((int) $this->clock->now()->format('Uv'), $data['game']['weekOpened']);
+    }
+
+    public function testAWeekWhoseTimeRanOutIsPlayedWithoutTheLateOrders(): void
+    {
+        $code = $this->call('POST', '/api/games', $this->leroy, ['realm' => 'castile'])['game']['code'];
+        $this->call('PUT', "/api/games/$code/seats/portugal", $this->ana);
+        $this->call('POST', "/api/games/$code/start", $this->leroy, ['turnLimit' => 300]);
+        $this->send($code, $this->leroy, 'castile', 0);
+        $this->clock->sleep(299);
+        self::assertCount(1, $this->call('GET', "/api/games/$code", $this->leroy)['weeks'], 'still open');
+
+        $this->clock->sleep(1);
+        $weeks = $this->call('GET', "/api/games/$code", $this->leroy)['weeks'];
+        self::assertSame([[0, 'castile', false], [0, 'portugal', true]], array_map(fn ($w) => [$w['week'], $w['realm'], $w['skipped']], $weeks));
+        self::assertSame([], $weeks[1]['orders']['orders']);
+        // Ana's orders come too late: the week is closed, and the table is on week 1.
+        self::assertSame('already_sent', $this->send($code, $this->ana, 'portugal', 0)['error']);
+        $this->send($code, $this->ana, 'portugal', 1);
+        self::assertResponseStatusCodeSame(201);
+        // Week 1 opened when week 0 closed: its own five minutes.
+        $this->clock->sleep(200);
+        self::assertCount(1, $this->call('GET', "/api/games/$code?since=1", $this->leroy)['weeks']);
+    }
+
+    public function testTheHostHandsALatePlayersRealmToTheAI(): void
+    {
+        $code = $this->started();
+        $this->send($code, $this->leroy, 'castile', 0);
+        self::assertSame('not_host', $this->call('POST', "/api/games/$code/seats/castile/drop", $this->ana)['error']);
+
+        $data = $this->call('POST', "/api/games/$code/seats/portugal/drop", $this->leroy);
+        self::assertResponseIsSuccessful();
+        self::assertSame(['portugal' => 0], $data['game']['dropped']);
+        // The week no longer waits on Portugal; the table is on week 1, waiting only on Castile.
+        $this->send($code, $this->leroy, 'castile', 1);
+        self::assertResponseStatusCodeSame(201);
+        self::assertSame('dropped', $this->send($code, $this->ana, 'portugal', 1)['error']);
+        self::assertSame([], $this->call('GET', '/api/games', $this->ana)['games']);
+        self::assertSame('dropped', $this->call('PUT', "/api/games/$code/seats/portugal", $this->ana)['error']);
+    }
+
+    public function testAPlayerHandsTheirOwnRealmToTheAIAndTheHostsPartPassesOn(): void
+    {
+        $code = $this->started();
+        $this->call('POST', "/api/games/$code/seats/castile/drop", $this->leroy);
+        $data = $this->call('GET', "/api/games/$code", $this->ana);
+        self::assertSame('portugal', $data['game']['host']);
+        self::assertSame(['castile' => 0], $data['game']['dropped']);
+        $this->call('POST', "/api/games/$code/seats/portugal/drop", $this->ana);
+        $this->call('GET', "/api/games/$code", $this->ana);
+        self::assertResponseStatusCodeSame(404, 'nobody plays any more');
+    }
+
+    public function testADeletedAccountsRealmGoesToTheAI(): void
+    {
+        $code = $this->started();
+        $this->call('DELETE', '/api/account', $this->leroy);
+        self::assertResponseIsSuccessful();
+        $data = $this->call('GET', "/api/games/$code", $this->ana);
+        self::assertSame(['castile' => 0], $data['game']['dropped']);
+        self::assertSame('portugal', $data['game']['host']);
+        self::assertSame(['portugal'], array_column($data['seats'], 'realm'));
     }
 }

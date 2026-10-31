@@ -55,6 +55,18 @@ class MpGame
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $activeAt;
 
+    /** Seconds a week stays open for orders, chosen by the host at the start; null for no limit (MP-080). */
+    #[ORM\Column(nullable: true)]
+    private ?int $turnLimit = null;
+
+    /** When the week the table is on opened: the start, then each time a week was complete (MP-080). */
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $weekOpenedAt = null;
+
+    /** @var array<string, int> realms handed to the AI, with the week from which the AI plays them (MP-081) */
+    #[ORM\Column(type: Types::JSON)]
+    private array $dropped = [];
+
     /** The first week two devices sent different week-start hashes for (MP-034). */
     #[ORM\Column(nullable: true)]
     private ?int $outOfStep = null;
@@ -94,10 +106,57 @@ class MpGame
         return null !== $this->startedAt;
     }
 
-    /** A game whose host left before it started is over for everyone (MP-028, MP-041). */
+    /** A game with nobody left to hand the host's part to is over for everyone (MP-028, MP-082). */
     public function isEnded(): bool
     {
-        return null === $this->host && !$this->isStarted();
+        return null === $this->host;
+    }
+
+    public function getHostRealm(): string
+    {
+        return $this->hostRealm;
+    }
+
+    public function getTurnLimit(): ?int
+    {
+        return $this->turnLimit;
+    }
+
+    public function getWeekOpenedAt(): ?\DateTimeImmutable
+    {
+        return $this->weekOpenedAt;
+    }
+
+    /** @return array<string, int> */
+    public function getDropped(): array
+    {
+        return $this->dropped;
+    }
+
+    /**
+     * The realms people still play in `week`: a realm handed to the AI from week w is the AI's from w on.
+     *
+     * @return list<string>
+     */
+    public function activeIn(int $week): array
+    {
+        return array_values(array_filter($this->humans, fn (string $r) => !isset($this->dropped[$r]) || $week < $this->dropped[$r]));
+    }
+
+    public function drop(string $realm, int $week, \DateTimeImmutable $now): void
+    {
+        $this->dropped[$realm] = $week;
+        $this->touch($now);
+    }
+
+    /** The host's part passes to another seat, or the game ends when there is none (MP-082). */
+    public function handOver(?Account $to, ?string $realm, \DateTimeImmutable $now): void
+    {
+        $this->host = $to;
+        if (null !== $realm) {
+            $this->hostRealm = $realm;
+        }
+        $this->touch($now);
     }
 
     /** @return list<string> */
@@ -117,17 +176,13 @@ class MpGame
     }
 
     /** @param list<string> $realms */
-    public function start(array $realms, \DateTimeImmutable $now): void
+    public function start(array $realms, ?int $turnLimit, \DateTimeImmutable $now): void
     {
         sort($realms);
         $this->humans = $realms;
         $this->startedAt = $now;
-        $this->touch($now);
-    }
-
-    public function end(\DateTimeImmutable $now): void
-    {
-        $this->host = null;
+        $this->turnLimit = $turnLimit;
+        $this->weekOpenedAt = $now;
         $this->touch($now);
     }
 
@@ -160,6 +215,9 @@ class MpGame
             'ended' => $this->isEnded(),
             'version' => $this->version,
             'outOfStep' => $this->outOfStep,
+            'turnLimit' => $this->turnLimit,
+            'weekOpened' => null === $this->weekOpenedAt ? null : (int) $this->weekOpenedAt->format('Uv'),
+            'dropped' => (object) $this->dropped,
         ];
     }
 }
