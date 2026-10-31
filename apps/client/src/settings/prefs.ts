@@ -65,13 +65,14 @@ if (firstLaunch) {
   saveSettings(prefs, store);
 }
 
-// Ambience became on by default (D-AUD-17); a device that saved the old default gets it on once.
+// Ambience is off by default again (D-AUD-18): a device that had it on from D-AUD-17 gets it off once,
+// and a player who turns it back on keeps it.
 try {
-  if (!firstLaunch && localStorage.getItem("ph-ambience-on") === null) {
-    prefs.values["audio.ambience"] = true;
+  if (localStorage.getItem("ph-ambience-quiet") === null && prefs.values["audio.ambience"] !== false) {
+    prefs.values["audio.ambience"] = false;
     saveSettings(prefs, store);
   }
-  localStorage.setItem("ph-ambience-on", "1");
+  localStorage.setItem("ph-ambience-quiet", "1");
 } catch {
   // Storage refused: the saved setting stands.
 }
