@@ -1,6 +1,6 @@
 # Deploying the server
 
-The server (`server/`) is one Symfony app: the game's JSON API (accounts, cloud saves, shared saves, purchases), the website, the wiki and the community forum. Nothing is deployed yet; this is how it should go once a host is picked.
+The server (`server/`) is one Symfony app: the game's JSON API (accounts, cloud saves, shared saves, purchases), the website, the wiki and the community forum. To put the whole thing on one rented server for testing, follow [A test server on one VPS](#a-test-server-on-one-vps); the rest of this page is how the launch setup should go once a host is picked.
 
 ## The shape
 
@@ -37,6 +37,100 @@ The rate limiters have no lock between servers, so two requests landing on two s
 ## Picking a host
 
 What to look for: PHP 8.3 with `pdo_pgsql` and `intl`, a managed PostgreSQL 16 with daily snapshots and point-in-time recovery, and S3-compatible storage with object versioning. Examples that fit: a VPS or two (Hetzner, DigitalOcean) with their managed Postgres; Fly.io or Render with their Postgres; any of these with Cloudflare R2, Backblaze B2 or AWS S3 for the bucket. Keep the database and the bucket in the same region as the app servers.
+
+## A test server on one VPS
+
+Everything on one machine with Docker: the website, the wiki, the forum, the JSON API and the web game at `https://<your domain>/play/`, with PostgreSQL 16 next to it and an HTTPS certificate that Caddy gets and renews by itself. The files are in [`deploy/`](../deploy/README.md). The web game is built to talk to the same address, so cloud saves, accounts and (once it is merged) online play work from the browser with nothing else to set up.
+
+### 1. Rent the server and point a domain at it
+
+1. Create a server: Ubuntu 24.04, at least 2 vCPU and 4 GB of memory (building the game needs about 2 GB). Hetzner's CX22 or DigitalOcean's 4 GB droplet are enough. Add your SSH key while creating it.
+2. In your domain's DNS, add an **A record** for the address players will open (for example `play.example.com`) pointing at the server's IPv4 address, and an **AAAA record** for its IPv6 address if it has one. Wait until `ping play.example.com` answers from that address; Caddy can't get a certificate before it does.
+3. If the host has a firewall in its control panel, allow TCP 22, 80 and 443 and UDP 443.
+
+### 2. Install Docker and get the code
+
+SSH in (`ssh root@play.example.com`) and run:
+
+```sh
+curl -fsSL https://get.docker.com | sh          # Docker Engine and the compose plugin
+git clone https://github.com/grrts/pocket-hedgemony.git /srv/pocket-hegemony
+cd /srv/pocket-hegemony
+```
+
+If the repository is private, `git clone` asks for a GitHub user and a token: make a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new) with read access to this repository's contents, and paste it as the password.
+
+### 3. Fill in the settings
+
+```sh
+cp deploy/.env.example deploy/.env
+sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 32)/; s/^APP_SECRET=.*/APP_SECRET=$(openssl rand -hex 32)/" deploy/.env
+nano deploy/.env        # set DOMAIN=play.example.com (no https://)
+```
+
+`deploy/.env` holds the database password and `APP_SECRET`; keep a copy in your password manager. Everything else in the [settings table](#settings) is filled in from `DOMAIN` by `deploy/compose.yaml`. For extras (Steam, Apple and Google sign-in, store purchases, S3 for the save files) put the lines from `server/.env` into `deploy/server.env`; it is read if it exists.
+
+### 4. Start it
+
+```sh
+docker compose -f deploy/compose.yaml up -d --build
+docker compose -f deploy/compose.yaml logs -f app    # Ctrl+C to stop watching
+```
+
+The first build takes a few minutes. When it starts, the app container builds its cache, runs the database migrations (the first time this makes the whole schema), and Caddy fetches the certificate; the log shows `certificate obtained successfully`. Then check:
+
+- `https://play.example.com/api/health` answers `{"status":"ok"}`.
+- `https://play.example.com/` is the website, and its Play button opens `https://play.example.com/play/`.
+- In the game, the account card's sign-up works and a cloud save appears on a second device or browser.
+
+To make yourself the forum's first moderator after signing up on the website: `docker compose -f deploy/compose.yaml exec app php bin/console app:community:moderator you@example.com`.
+
+### Updating to the latest main
+
+```sh
+cd /srv/pocket-hegemony
+git pull
+docker compose -f deploy/compose.yaml up -d --build
+```
+
+The new container runs any new migrations before it takes requests. Players see the new game on their next page load (the page itself is never cached; its scripts have new names each build).
+
+### Everyday commands
+
+All from `/srv/pocket-hegemony`; `dc` below stands for `docker compose -f deploy/compose.yaml`.
+
+| What | Command |
+|---|---|
+| See what's running | `dc ps` |
+| Follow the server's log | `dc logs -f app` |
+| A Symfony console command | `dc exec app php bin/console <command>` |
+| Where the migrations stand | `dc exec app php bin/console doctrine:migrations:status` |
+| A database shell | `dc exec database psql -U app app` |
+| Stop everything (data is kept) | `dc down` |
+
+The data lives in Docker volumes: `pocket-hegemony_database_data` (the database), `pocket-hegemony_saves` (cloud save files, while `S3_BUCKET` is unset) and `pocket-hegemony_caddy_data` (the certificates). `dc down` keeps them; `dc down -v` deletes them all, so never add `-v` on a server with players.
+
+### Scheduled jobs and backups
+
+Add the [scheduled jobs](#scheduled-jobs) and a nightly database dump to root's crontab (`crontab -e`):
+
+```cron
+15 3 * * * cd /srv/pocket-hegemony && for c in app:saves:purge app:crashes:purge app:stores:google-voided cache:pool:prune; do docker compose -f deploy/compose.yaml exec -T app php bin/console $c; done
+45 3 * * * cd /srv/pocket-hegemony && mkdir -p backups && docker compose -f deploy/compose.yaml exec -T database pg_dump -U app -Fc app > backups/db-$(date +\%F).dump && find backups -name 'db-*.dump' -mtime +7 -delete
+```
+
+A dump on the same machine doesn't survive losing the machine: turn on the host's server backups or snapshots too, and copy `backups/` somewhere else (`rclone copy backups offsite:ph-db-backups`) once players' data matters. To restore a dump into a fresh database: `dc exec -T database pg_restore -U app -d app --clean --if-exists < backups/db-YYYY-MM-DD.dump`, then `dc restart app`.
+
+### When something goes wrong
+
+- **No certificate, the browser warns**: the DNS record doesn't point at the server yet, or port 80 or 443 is closed. `dc logs app | grep -i acme` says which. Caddy retries by itself; Let's Encrypt allows only a few failed tries an hour, so fix the DNS before restarting again and again.
+- **The app container keeps restarting**: `dc logs app`. "APP_SECRET is not set" or "Set DOMAIN in deploy/.env" mean a setting is missing; "Migrations failed" means the database refused, usually a changed `POSTGRES_PASSWORD` after the database was first made (the password is fixed when the volume is created).
+- **The build stops with "Killed"**: the server ran out of memory building the game. Add swap (`fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile`) or pick a bigger server.
+- **The game says it can't reach the server**: open `https://play.example.com/api/health` in the same browser. The game is built for the address in `DOMAIN`; after changing `DOMAIN`, rebuild with `up -d --build`.
+
+### Testing the image on your own computer
+
+With Docker Desktop: put `DOMAIN=localhost`, `SERVER_NAME=:80`, `PUBLIC_URL=http://localhost` and the two secrets in `deploy/.env`, run `docker compose -f deploy/compose.yaml up -d --build`, and open `http://localhost/play/`. `SERVER_NAME=:80` and `PUBLIC_URL` turn HTTPS off for that test only; never set them on a real server.
 
 ## Settings
 

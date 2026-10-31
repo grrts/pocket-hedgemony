@@ -10,3 +10,5 @@ server/vendor/
 server/.env.local
 server/.env.*.local
 server/.phpunit.cache/
+deploy/.env
+deploy/server.env

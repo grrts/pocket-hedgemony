@@ -1,0 +1,31 @@
+# One address for everything: the website, the wiki, the forum and the JSON API from Symfony, and the
+# web game under /play. Caddy gets and renews the HTTPS certificate for SERVER_NAME by itself.
+{
+	{$CADDY_GLOBAL_OPTIONS}
+	frankenphp
+}
+
+{$SERVER_NAME:localhost} {
+	root * /app/public
+	encode zstd br gzip
+
+	# The web game: plain files from apps/client's build.
+	redir /play /play/ 308
+	handle /play/* {
+		# Hashed files never change; the page itself is checked on every load so a release shows at once.
+		@hashed path /play/assets/*
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+		header /play/*.html Cache-Control "no-cache"
+		header /play/ Cache-Control "no-cache"
+		file_server
+	}
+
+	# Everything else: files in public/ as they are, the rest through Symfony's index.php.
+	handle {
+		php_server
+	}
+
+	log {
+		output stderr
+	}
+}
