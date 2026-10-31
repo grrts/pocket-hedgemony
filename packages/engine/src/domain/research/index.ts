@@ -475,11 +475,13 @@ export function emptySeats(p: Programme): number {
 
 /**
  * Fills up to `n` seats from recruits, local recruits filling local seats
- * first, then the realm's (RSCH-004). Every seat filled is one man the army
- * cannot raise (RSCH-020). Returns how many enrolled.
+ * first, then the realm's (RSCH-004). Every seat filled takes
+ * `recruits_per_student` men the army cannot raise (RSCH-020); a seat the
+ * pool cannot pay for in full stays empty. Returns how many enrolled.
  */
 export function fillSeats(p: Programme, pool: RecruitPool, n: number, year: number): number {
-  let left = Math.min(n, emptySeats(p), pool.recruits);
+  const k = recruitsPerStudent();
+  let left = Math.min(n, emptySeats(p), Math.floor(pool.recruits / k));
   let enrolled = 0;
   for (const school of p.schools) {
     if (!school.open || left <= 0) continue;
@@ -487,15 +489,20 @@ export function fillSeats(p: Programme, pool: RecruitPool, n: number, year: numb
     const take = Math.min(free, left);
     if (take <= 0) continue;
     const local = pool.local?.[school.province] ?? 0;
-    const fromLocal = Math.min(local, take);
+    const fromLocal = Math.min(local, take * k);
     if (pool.local && fromLocal > 0) pool.local[school.province] = local - fromLocal;
-    pool.recruits -= take;
+    pool.recruits -= take * k;
     school.cohorts.push({ count: take, enrolledYear: year });
     left -= take;
     enrolled += take;
   }
   if (enrolled > 0) p.stopped = false;
   return enrolled;
+}
+
+/** Recruits each student takes from the pool when he enrols (RSCH-020, D-RSCH-25); called to arms, only the student himself comes back (RSCH-022). */
+export function recruitsPerStudent(): number {
+  return config.recruits_per_student;
 }
 
 /** Recruits the army can still raise. */

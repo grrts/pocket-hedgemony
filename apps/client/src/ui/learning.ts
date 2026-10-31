@@ -448,12 +448,14 @@ function jumps(r: Research, ui: LearningUi): string {
 
 function schoolsPart(rules: Ruleset, r: Research, gold: number, open: ReadonlySet<string>): string {
   const step = 5;
+  const k = r.recruitsPerStudent;
   const stepper = r.seats > 0
     ? `<div class="stepper" role="group" aria-label="Students to keep">
         <button class="paper" data-seats="${Math.max(0, r.seatsWanted - step)}" ${r.seatsWanted <= 0 ? "disabled" : ""} aria-label="Five fewer students">−${step}</button>
         <output><b>${fmt(r.students)}</b> of ${fmt(r.seats)} seats filled</output>
-        <button class="paper" data-seats="${Math.min(r.seats, r.seatsWanted + step)}" ${r.seatsWanted >= r.seats ? "disabled" : ""} aria-label="Five more students">+${step}</button>
-      </div>`
+        <button class="paper" data-seats="${Math.min(r.seats, r.seatsWanted + step)}" ${r.seatsWanted >= r.seats ? "disabled" : ""} aria-label="Five more students, ${fmt(step * k)} recruits">+${step}</button>
+      </div>
+      <p class="hint">${step} more students cost <b>${fmt(step * k)} recruits</b>.</p>`
     : `<p class="hint">You have no open school yet.</p>`;
   const schools = r.schools.map((x) => `<li><button class="paper" data-show-province="${x.province}">${esc(rules.provinces[x.province]?.name ?? "?")}</button><span>${esc(x.type)} · ${fmt(x.students)} of ${fmt(x.seats)} students${x.open ? "" : " · closed"}</span></li>`);
   const founding = r.founding.map((x) => `<li><button class="paper" data-show-province="${x.province}">${esc(rules.provinces[x.province]?.name ?? "?")}</button><span>${esc(x.type)} · opens in ${x.monthsLeft} month${x.monthsLeft === 1 ? "" : "s"}</span></li>`);
@@ -469,12 +471,12 @@ function schoolsPart(rules: Ruleset, r: Research, gold: number, open: ReadonlySe
           .join("")}</div>` : `<p class="hint">Every town of yours has a school or one being built.</p>`}
       </details>`;
   return `<h3 class="sub">Students</h3>
-    <p class="hint">Students come from your recruits: each is a man the army can't raise. After 5 years they graduate as scholars. ${fmt(r.recruits)} recruits are left.</p>
+    <p class="hint">Each student costs <b>${fmt(k)} recruits</b> the army can't raise${r.students ? `: your ${fmt(r.students)} took ${fmt(r.students * k)}` : ""}. After 5 years they graduate as scholars. ${fmt(r.recruits)} recruits are left.</p>
     ${r.stopped ? `<p class="warn">Research has stopped: the students were called to arms. Fill seats again to start it.</p>` : ""}
     ${stepper}
     ${r.students ? `<details class="found-school arms" data-keep="arms"${open.has("arms") ? " open" : ""}>
         <summary>${icon("swords", 1)}In need of soldiers?</summary>
-        <p class="hint">Calling the students to arms sends ${fmt(r.students)} men back to the recruits at once. Research stops, and they never become scholars.</p>
+        <p class="hint">Calling the students to arms sends ${fmt(r.students)} men back to the recruits at once: only the students come back, not all ${fmt(r.students * k)} recruits they cost. Research stops, and they never become scholars.</p>
         <button class="paper" data-call-students>${icon("swords", 1)}Call students to arms</button>
       </details>` : ""}
     <h3 class="sub">Schools · ${r.schools.length}${r.upkeep ? ` · ${r.upkeep.toFixed(1)} gold a year` : ""}</h3>

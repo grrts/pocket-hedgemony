@@ -15,6 +15,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `spread_cap_pct` (provisional) | 60 |
 | `scholar_rate` (provisional) | 1 |
 | `student_rate` (provisional) | 0.2 |
+| `recruits_per_student` (provisional) | 10 |
 | `graduation_years` (provisional) | 5 |
 | `schoolmaster_years_sooner` | 1 |
 | `studies_with_academy` | 2 |
