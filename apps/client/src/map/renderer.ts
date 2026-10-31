@@ -398,7 +398,8 @@ vec3 livingRoad(vec3 c, ivec2 a, ivec2 q, int links, int grade) {
 #if LITE >= 2
   return c;
 #endif
-  const float H = ${TOWN_TILE / 2}.0;
+  // Half the ground's art pixels per map pixel (the road is drawn in q, the ground's art pixel), not the finer town atlas's.
+  const float H = ${TILE / 4}.0;
   vec2 f = vec2(q) + 0.5;
   vec2 side[4] = vec2[4](vec2(H, 0.0), vec2(2.0 * H, H), vec2(H, 2.0 * H), vec2(0.0, H));
   float d = 1e3;
@@ -432,7 +433,7 @@ vec3 livingTown(vec3 c, ivec2 p, ivec2 a, int id, int terrain, vec3 realm) {
   if (b == 0) return c;
   int kind = b & 15;
   int links = b >> 4;
-  ivec2 q = a & 7; // the ground's art pixel within the map pixel, for the roads
+  ivec2 q = a & ${TILE / 2 - 1}; // the ground's art pixel within the map pixel, for the roads
   ivec2 fine = ivec2(floor(vMap * ${TOWN_TILE}.0)); // the town atlas's finer art pixel
   ivec2 fq = fine & ${TOWN_TILE - 1};
   vec4 ti = townInfo(id);
