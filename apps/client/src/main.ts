@@ -2115,12 +2115,16 @@ interface LivingPiece {
   seed: number;
 }
 
-/** The way army slot k marches, (dx, dy) in tiles: toward the next tile of its path, or the way it last stepped. */
+/** Path tiles ahead an army looks for its heading, so a first step that zigzags off the line doesn't swing the column across it. */
+const HEADING_LOOKAHEAD = 6;
+
+/** The way army slot k marches, (dx, dy) in tiles: toward a tile a few steps along its path, or the way it last stepped. */
 function armyHeading(k: number, dir: 1 | -1): readonly [number, number] {
   const s = snapshot!;
   const w = s.tileWidth;
   const at = s.armies.tile[k]!;
-  const next = s.armies.path[k]![0] ?? -1;
+  const path = s.armies.path[k]!;
+  const next = path.length ? path[Math.min(HEADING_LOOKAHEAD, path.length) - 1]! : -1;
   const trail = s.armies.trail[k]!;
   const [a, b] = next >= 0 ? [at, next] : [trail.length > 1 ? trail.at(-2)! : -1, at];
   if (a < 0 || a === b) return [dir, 0];
