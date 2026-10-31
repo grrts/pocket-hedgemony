@@ -69,3 +69,7 @@ What simultaneous costs: an order you give while planning acts at once on your o
 ## What is needed to go live
 
 The server work is done and tested locally, on SQLite and on PostgreSQL 16 (the migration `server/migrations/Version20261031181935.php` makes the three tables). To try it on a test server, follow [A test server on one VPS](deploy.md#a-test-server-on-one-vps): one Docker compose with PostgreSQL 16 and HTTPS serves the server and the web game at `/play/` from one address, runs the migrations on start, and the game built there plays online with nothing else to set up. Two people sign up from the Play page's Account card, one hosts, the other joins by the code.
+
+## Testing a deployed server
+
+`apps/client/scripts/multiplayer-deploy-check.mjs` plays three accounts on two phones and a tablet against a server serving the web game at `/play/` (the Docker deploy, or a local stack like it): the five-minute turn limit running out on a player, out of step, coming back in a fresh page, the host handing their realm to the AI and the host's part passing on, the new host handing another realm over, and the game ending when nobody is left. Run it with `URL=https://<address> node scripts/multiplayer-deploy-check.mjs <outDir>`; for a local stack with its own certificate, add `NODE_EXTRA_CA_CERTS=<its root certificate>`.
