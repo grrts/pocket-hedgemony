@@ -75,7 +75,7 @@ async function device(name, tokens) {
   });
   // A build that can send reports asks first (SHELL-014): nothing is sent from these runs.
   const none = page.locator("[data-start=consent][data-choice=none]");
-  if (await none.count()) await none.click();
+  if (await none.count()) await none.click({ timeout: 300000 });
   return page;
 }
 
