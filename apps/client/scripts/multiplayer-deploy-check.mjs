@@ -187,8 +187,15 @@ async function play() {
   const b2 = await frozen([a, c], () => open(b.context(), "iPhone 13 landscape"));
   await b2.click("[data-start=multiplayer]");
   await b2.waitForSelector(`[data-mp-rejoin="${code}"]`, LONG);
-  await b2.click(`[data-mp-rejoin="${code}"]`);
-  await turnIs(b2, 2);
+  // The others wait frozen while the device plays the weeks it missed again: the replay shares this machine with them.
+  await frozen([a, c], async () => {
+    await b2.click(`[data-mp-rejoin="${code}"]`);
+    await turnIs(b2, 2).catch(async (e) => {
+      console.log("coming back:", JSON.stringify(await mpState(b2).catch(() => null)), JSON.stringify(await seen(b2)).slice(-600));
+      await b2.screenshot({ path: `${out}/stuck-rejoin.png` });
+      throw e;
+    });
+  });
   check((await mpState(b2)).hash === (await mpState(a)).hash, "a player coming back in a fresh page catches up to the same world");
 
   // Leroy hands his own realm to the AI: Ana, who sat down first after him, becomes the host (MP-081, MP-082).
