@@ -240,7 +240,10 @@ async function play() {
   await b2.waitForSelector('.mp-leave [data-mp-drop="france"].wax');
   await tap(b2, '.mp-leave [data-mp-drop="france"]');
   await b2.waitForSelector(".mp-menu [role=alert]", LONG);
-  check((await api("GET", `/api/games/${code}?since=0`, null, boApi)).status === 404, "with nobody left the game has ended");
+  // Access tokens last 15 minutes and this run takes longer: Bo signs in again, as a device would.
+  const boLater = (await api("POST", "/api/sessions/refresh", { deviceToken: (await bo("script-end")).deviceToken })).body.accessToken;
+  const after = await api("GET", `/api/games/${code}?since=0`, null, boLater);
+  check(after.status === 404, `with nobody left the game has ended (${after.status})`);
 }
 
 try {
