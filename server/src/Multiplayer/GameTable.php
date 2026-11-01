@@ -62,7 +62,8 @@ final class GameTable
     /**
      * When the week's time has run out, the realms that sent nothing play it on no orders, and the next
      * week opens (MP-080). Only one call closes a week: the week's opening time is claimed in the
-     * database first, so two devices asking at once never both write the empty orders.
+     * database first, so two devices asking at once never both write the empty orders. A week nobody
+     * sent anything for stays open: the time waits for the slow players, not for a table everyone left.
      */
     public function closeIfLate(MpGame $game): bool
     {
@@ -73,7 +74,7 @@ final class GameTable
             return false;
         }
         [$week, $waiting] = $this->week($game);
-        if ([] === $waiting) {
+        if ([] === $waiting || \count($waiting) === \count($game->activeIn($week))) {
             return false;
         }
         $claimed = $this->em->createQuery('UPDATE '.MpGame::class.' g SET g.weekOpenedAt = :now WHERE g.id = :id AND g.weekOpenedAt = :opened')
@@ -92,6 +93,23 @@ final class GameTable
         $this->games->bump($game);
 
         return true;
+    }
+
+    /**
+     * Before a week's first orders: when its time ran out with nobody's in, it starts again now, so the
+     * others get the whole time once someone plays (MP-080).
+     */
+    public function firstOrders(MpGame $game, int $week): void
+    {
+        $limit = $game->getTurnLimit();
+        $opened = $game->getWeekOpenedAt();
+        $now = $this->clock->now();
+        if (null === $limit || null === $opened || $opened->modify("+$limit seconds") > $now) {
+            return;
+        }
+        if (null === $this->weeks->findOneBy(['game' => $game, 'week' => $week])) {
+            $game->reopenWeek($now);
+        }
     }
 
     /** After a week's orders, or a realm handed to the AI: a week now complete opens the next (MP-080). */

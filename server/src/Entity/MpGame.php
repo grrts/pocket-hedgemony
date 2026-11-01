@@ -122,6 +122,12 @@ class MpGame
         return $this->turnLimit;
     }
 
+    /** The week's time starts again: its first orders came after it ran out with nobody's in (MP-080). */
+    public function reopenWeek(\DateTimeImmutable $now): void
+    {
+        $this->weekOpenedAt = $now;
+    }
+
     public function getWeekOpenedAt(): ?\DateTimeImmutable
     {
         return $this->weekOpenedAt;

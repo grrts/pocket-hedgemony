@@ -321,6 +321,23 @@ final class GamesTest extends WebTestCase
         self::assertCount(1, $this->call('GET', "/api/games/$code?since=1", $this->leroy)['weeks']);
     }
 
+    public function testAWeekNobodyPlaysWaitsForItsFirstOrders(): void
+    {
+        $code = $this->call('POST', '/api/games', $this->leroy, ['realm' => 'castile'])['game']['code'];
+        $this->call('PUT', "/api/games/$code/seats/portugal", $this->ana);
+        $this->call('POST', "/api/games/$code/start", $this->leroy, ['turnLimit' => 300]);
+        // Everyone is away past the time: the week does not play on nobody's orders.
+        $this->clock->sleep(400);
+        self::assertSame([], $this->call('GET', "/api/games/$code", $this->leroy)['weeks']);
+        // Leroy is back first: the others get the whole five minutes from now.
+        $this->send($code, $this->leroy, 'castile', 0);
+        self::assertResponseStatusCodeSame(201);
+        $this->clock->sleep(299);
+        self::assertCount(1, $this->call('GET', "/api/games/$code", $this->ana)['weeks'], 'still open for Ana');
+        $this->clock->sleep(1);
+        self::assertCount(2, $this->call('GET', "/api/games/$code", $this->ana)['weeks'], 'closed without her');
+    }
+
     public function testTheHostHandsALatePlayersRealmToTheAI(): void
     {
         $code = $this->started();

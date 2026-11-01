@@ -330,6 +330,7 @@ final class GamesController
         if ($week !== $current) {
             return self::error('not_this_week', "The table is on week $current.", Response::HTTP_CONFLICT);
         }
+        $this->rules->firstOrders($game, $week);
         $now = $this->clock->now();
         foreach ($this->weeks->findBy(['game' => $game, 'week' => $week]) as $other) {
             if ('' !== $hash && '' !== $other->getHash() && $other->getHash() !== $hash) {
