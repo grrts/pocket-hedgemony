@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import campaign from "../../rules/data/domain/events-campaign.json" with { type: "json" };
 import bridge from "../../rules/data/domain/events-places.json" with { type: "json" };
 import rules from "../../rules/data/domain/events.json" with { type: "json" };
@@ -158,6 +159,26 @@ export function createGameEvents(world: World): GameEvents {
   evt.startCampaign(state, world.date.year);
   const knownAtStart = world.nationIds.map((_, n) => world.research[n]?.known.size ?? 0);
   const g: GameEvents = { state, rng: new Rng(world.weatherSeed ^ 0x5eed), treeId, nationOf, places, eventRelations: [], adjust: {}, stability: new Map(), knownAtStart, regions: realmRegions(world, treeId) };
+  bindConditions(world, g);
+  sync(world, g);
+  evt.yearlyAgeCheck(state, world.date.year);
+  evt.periodCheck(state, world.date.year);
+  // One dry look at every event while the campaign loads, so the first month of play is no slower than the rest.
+  const bound = { ...state.bound };
+  for (const ev of Object.values(state.events)) evt.eligible(state, ev);
+  state.bound = bound;
+  return g;
+}
+
+/**
+ * The tree's conditions and effects and the AI's lean read the game's world
+ * through closures; a copy of the world (cloneWorld, multiplayer) binds them anew.
+ */
+export function bindConditions(world: World, g: GameEvents): void {
+  const state = g.state;
+  state.conditions = {};
+  state.effects = { stat: treeStat };
+  leanByTraits(world, state, g.nationOf);
   state.conditions.stat = (p, w, ctx) => evt.resolve(p.who, ctx).some((id) => evt.compare(statOf(world, g, id, String(p.stat)), String(p.op), p.value as number | string));
   // Opinion is the standing one court holds of another (D-EVT-4, diplomacy's ledger), read only when asked.
   state.conditions.opinion = (p, _w, ctx) =>
@@ -173,14 +194,6 @@ export function createGameEvents(world: World): GameEvents {
       const h = world.heritage?.realms[g.nationOf.get(id) ?? -1];
       return !!h && heritageStates(h, String(p.id)).includes(String(p.state));
     });
-  sync(world, g);
-  evt.yearlyAgeCheck(state, world.date.year);
-  evt.periodCheck(state, world.date.year);
-  // One dry look at every event while the campaign loads, so the first month of play is no slower than the rest.
-  const bound = { ...state.bound };
-  for (const ev of Object.values(state.events)) evt.eligible(state, ev);
-  state.bound = bound;
-  return g;
 }
 
 /**
@@ -350,7 +363,7 @@ function sync(world: World, g: GameEvents): void {
     c.exists = !world.nationGone[n];
     const region = regionOf(world, g, n);
     if (region) c.region = region;
-    c.human = n === world.player;
+    c.human = isHuman(world, n);
     c.enemies = [];
     c.relations = g.eventRelations.filter((r) => r.who === id).map((r) => ({ other: r.other, type: r.type }));
     c.borders = dip.neighbours(d, world.nationIds[n]!).map((x) => g.treeId[world.nationIndex.get(x) ?? -1] ?? x);

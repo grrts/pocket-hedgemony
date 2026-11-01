@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { difficultyEffects, difficultyOf, type Difficulty } from "./domain/scenario-setup/campaign.ts";
 
@@ -14,13 +15,13 @@ export function aiWarChanceFactor(world: World): number {
 
 /** Gold a realm's monthly income pays in: an AI realm's income times the difficulty's factor; the player's, and any deficit, as it is (SETUP-102). */
 export function incomePaidIn(world: World, n: number, income: number): number {
-  if (n === world.player || income <= 0) return income;
+  if (isHuman(world, n) || income <= 0) return income;
   return income * difficultyEffects(world.campaign.difficulty).ai_income;
 }
 
 /** A plotting province's monthly chance to rise, with the difficulty's factor where the player owns it (SETUP-103). */
 export function risingChanceByDifficulty(world: World, p: number, chance: number): number {
-  if (chance <= 0 || world.player < 0 || world.provinceOwner[p] !== world.player) return chance;
+  if (chance <= 0 || world.provinceOwner[p]! < 0 || !isHuman(world, world.provinceOwner[p]!)) return chance;
   const f = difficultyEffects(world.campaign.difficulty).player_rising_chance;
   return f === 1 ? chance : Math.min(1, chance * f);
 }

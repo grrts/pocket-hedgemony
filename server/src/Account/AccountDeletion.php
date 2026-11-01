@@ -9,6 +9,7 @@ use App\Entity\Entitlement;
 use App\Entity\Identity;
 use App\Entity\IronmanHead;
 use App\Entity\MetricEvent;
+use App\Entity\MpSeat;
 use App\Entity\Post;
 use App\Entity\PostReport;
 use App\Entity\SaveChange;
@@ -17,6 +18,7 @@ use App\Entity\Topic;
 use App\Repository\AccountRepository;
 use App\Repository\CloudSaveRepository;
 use App\Repository\SharedSaveRepository;
+use App\Multiplayer\GameTable;
 use App\Saves\SaveObjects;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
@@ -36,6 +38,7 @@ final class AccountDeletion
         private readonly SharedSaveRepository $shared,
         private readonly SaveObjects $objects,
         private readonly AppleTokens $apple,
+        private readonly GameTable $games,
     ) {
     }
 
@@ -83,6 +86,9 @@ final class AccountDeletion
             }
         }
 
+        // Online games go on without the account: its realms to the AI, the host's part to another player (MP-041).
+        $this->games->forget($account);
+
         // What stays names no one: the purchase records lose the account, the posts go to "Deleted player".
         $this->update(Entitlement::class, 'account', null, $id);
         $this->em->createQuery('UPDATE '.MetricEvent::class.' m SET m.accountId = NULL WHERE m.accountId = :id')
@@ -92,7 +98,7 @@ final class AccountDeletion
             $this->update($entity, $field, $deleted->getId(), $id);
         }
 
-        foreach ([[PostReport::class, 'reporter'], [SaveChange::class, 'account'], [IronmanHead::class, 'account'], [CloudSave::class, 'account'], [SharedSave::class, 'account'], [Device::class, 'account'], [Identity::class, 'account']] as [$entity, $field]) {
+        foreach ([[PostReport::class, 'reporter'], [MpSeat::class, 'account'], [SaveChange::class, 'account'], [IronmanHead::class, 'account'], [CloudSave::class, 'account'], [SharedSave::class, 'account'], [Device::class, 'account'], [Identity::class, 'account']] as [$entity, $field]) {
             $this->em->createQuery("DELETE FROM {$entity} e WHERE e.{$field} = :id")->setParameter('id', $id, 'uuid')->execute();
         }
         // The bulk queries bypassed the loaded rows: clear first, then the account itself goes.

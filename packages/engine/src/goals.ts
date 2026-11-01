@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import { startGoals, type GoalAim, type GoalDef } from "@ph/rules";
 import config from "../../rules/data/domain/events.json" with { type: "json" };
 import * as dip from "./domain/diplomacy/index.ts";
@@ -156,7 +157,7 @@ export function monthlyGoals(world: World, endGoals = true): void {
       continue;
     }
     // The player's realm is never steered (EVT-107).
-    if (g.realm === world.player || !g.aim) continue;
+    if (isHuman(world, g.realm) || !g.aim) continue;
     const pull = pullOf(world, g);
     if (pull <= 0) continue;
     const at = (t: number) => {
@@ -177,7 +178,7 @@ export function goalPulls(world: World, n: number): ReadonlyMap<number, number> 
 /** Provinces t holds that n's live take goals name, strongest goal first (EVT-105). */
 export function goalPlacesHeldBy(world: World, n: number, t: number): number[] {
   const s = world.goals;
-  if (!s || n === world.player) return [];
+  if (!s || isHuman(world, n)) return [];
   return s.list
     .filter((g) => g.realm === n && isLive(g) && g.aim?.kind === "take")
     .sort((a, b) => pullOf(world, b) - pullOf(world, a))
@@ -187,7 +188,7 @@ export function goalPlacesHeldBy(world: World, n: number, t: number): number[] {
 /** The envoys n's live ally and subject goals call for, with each goal's pull (EVT-106). */
 export function goalAsks(world: World, n: number): { target: number; actions: string[]; pull: number }[] {
   const s = world.goals;
-  if (!s || n === world.player) return [];
+  if (!s || isHuman(world, n)) return [];
   return s.list.flatMap((g) => {
     if (g.realm !== n || !isLive(g) || (g.aim?.kind !== "ally" && g.aim?.kind !== "subject") || !exists(world, g.target)) return [];
     const pull = pullOf(world, g);

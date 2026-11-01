@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { strength, type News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -37,7 +38,7 @@ function live(world: World, id: string): number | undefined {
  */
 export function joinsLeague(world: World, c: string, x: string, members: number): boolean {
   const n = live(world, c);
-  if (n === undefined || n === world.player || live(world, x) === undefined) return false;
+  if (n === undefined || isHuman(world, n) || live(world, x) === undefined) return false;
   return dip.aiLeagueCount(world.diplomacy, c, x, members).yes;
 }
 
@@ -62,7 +63,7 @@ export function monthlyConquest(world: World, news: News[]): void {
   for (const [target] of before) {
     if (dip.leagueAgainst(d, target)) continue;
     const x = live(world, target);
-    if (x !== undefined && (x === world.player || before.get(target)!.has(world.nationIds[world.player] ?? ""))) news.push({ kind: "envoy", text: `The league against ${world.rules.nations[x]!.name} breaks up.`, nations: [x] });
+    if (x !== undefined && (isHuman(world, x) || before.get(target)!.has(world.nationIds[world.player] ?? ""))) news.push({ kind: "envoy", text: `The league against ${world.rules.nations[x]!.name} breaks up.`, nations: [x] });
   }
   dip.yearlyLeagueCheck(d, (c, x, members) => joinsLeague(world, c, x, members));
   for (const l of d.leagues) {

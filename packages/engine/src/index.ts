@@ -9,6 +9,7 @@ export { settlementTable, settlementsView, type SettlementView } from "./settlem
 export { answerCall, atWar, cedeProvince, controller, declareWar, engageRange, offerPeace, relationState, syncDate, wallsOf, warBetween, SIEGE_MONTH_DAYS, type Battle, type DeclareOptions, type News, type PeaceTerms } from "./war.ts";
 export { cededProvinces, fittingAim, longWar, lordTraits, lordWant, maxCeded, peaceShare, peaceVoices, refusingPeace, warPeaceView, type GameWar, type PeaceVoices, type WarPeaceView } from "./peace.ts";
 export { hashWorld } from "./hash.ts";
+export { applyAll, cloneWorld, resolutionOrder, type PlayerOrders } from "./multiplayer.ts";
 export { cultureOf, officialName, personName, rankedName } from "./names.ts";
 export { autoFillReserve, bestFit, hireGold, newLands, officialEffect, OFFICIALS, yearsServed, type OfficialEffectView, type PostFit } from "./officials.ts";
 export { aiCollect, ARMS, COMMISSION_GOLD, commanderScreen, commissionOfficial, commissionSkills, isAdmiral, type CommanderScreen, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, LEVY_UNIT, garrisonTroops, garrisonView, gatherDays, idleCommanders, isHorseArm, menByArm, monthlyRecruits, recruit, recruitRefusal, trainingGround, type GarrisonView } from "./recruit.ts";

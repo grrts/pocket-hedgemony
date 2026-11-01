@@ -1,0 +1,152 @@
+import { icon } from "../art/ui.ts";
+import { limitName, timeLeft, type MyGame, type OnlineGame, type Seat } from "./lobby.ts";
+
+/** What the screens need to name and draw a realm. */
+export interface RealmLook {
+  name: (id: string) => string;
+  pennant: (id: string, scale?: number) => string;
+}
+
+const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+
+/**
+ * The Multiplayer dialog over the start screen: Pass and play on this device,
+ * or an online game to host, join by its code, or come back to. No list of
+ * every game: there may be thousands, and a friend's game is found by its code.
+ */
+export function menuHtml(
+  look: RealmLook,
+  o: { reach: "online" | "this browser" | null; canWrite: boolean | null; signIn: boolean; mine: MyGame[]; typed: string; message: string | null; busy: boolean },
+): string {
+  const online = o.signIn
+    ? `<p class="mp-note">Online games are kept with your account, so you can play them from any of your devices.</p>
+    <button class="wax" data-shell="settings" data-settings-section="account">${icon("crown", 2)}<span><b>Sign in to play online</b><small>then host a game or join one by its code</small></span></button>`
+    : o.reach === null
+      ? `<p class="mp-note">Looking for the shared table…</p>`
+      : o.canWrite === false
+        ? `<p class="mp-note mp-bad">You can open this page but not write to it, so you cannot sit at an online game. The page's owner can invite you by email as an Editor (the page must not also be shared by a public link).</p>`
+        : `<p class="mp-note">${o.reach === "online" ? "Host a game and share its code, or type a friend's code." : "No shared table here: games reach only other tabs of this browser. Open the published game to play across devices."}</p>
+    <button class="paper" data-mp="host" ${o.busy ? "disabled" : ""}>${icon("castle", 2)}<span><b>Host a game</b><small>choose your realm, then share the code</small></span></button>
+    <form class="mp-join" data-mp-join-form>
+      <label for="mp-code-input">Join a game</label>
+      <input id="mp-code-input" name="code" class="paper" placeholder="CODE" value="${esc(o.typed)}" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go" required ${o.busy ? "disabled" : ""}>
+      <button class="wax" type="submit" ${o.busy ? "disabled" : ""}>Join</button>
+    </form>
+    ${
+      o.mine.length
+        ? `<h3>Your games</h3><div class="mp-games">${o.mine
+            .map(
+              (g) =>
+                `<button class="paper mp-game" data-mp-rejoin="${esc(g.code)}" data-realm="${esc(g.realm)}" ${o.busy ? "disabled" : ""}><span class="mp-code">${esc(g.code)}</span>${look.pennant(g.realm)}<span>${esc(look.name(g.realm))}<small>${g.yourMove ? "<b>waiting for your orders</b>" : g.started === false ? "in the lobby" : "tap to continue"}</small></span></button>`,
+            )
+            .join("")}</div>`
+        : ""
+    }`;
+  return `<div class="start-more mp-menu framed" role="dialog" aria-label="Multiplayer">
+    <header><h2 class="ribbon">Multiplayer</h2><span class="panel-buttons"><button class="close" data-mp="close" aria-label="Close">${icon("close", 2)}</button></span></header>
+    <p class="mp-note">Everyone plans the same week at once; when all are ready, the orders are carried out together and the week plays.</p>
+    <button class="wax" data-mp="hotseat">${icon("crown", 2)}<span><b>Pass and play</b><small>2 to 4 realms on this device</small></span></button>
+    <h3>Online</h3>
+    ${o.message ? `<p class="mp-note mp-bad" role="alert">${esc(o.message)}</p>` : ""}
+    ${online}
+  </div>`;
+}
+
+/** The host's turn limit picker in the lobby: how long each week stays open for orders (MP-080). */
+function limitPickerHtml(choices: readonly number[], picked: number): string {
+  return `<fieldset class="mp-limits"><legend>Time for each week's orders</legend>${choices
+    .map((c) => `<button class="${c === picked ? "wax" : "paper"}" data-mp-limit="${c}" aria-pressed="${c === picked}">${limitName(c)}</button>`)
+    .join("")}</fieldset>
+    <p class="mp-note">${picked ? `A realm whose orders are not in when the time runs out does nothing that week.` : "The week plays when everyone is ready, however long that takes."}</p>`;
+}
+
+/** The lobby card: the game's code, who sits where, the turn limit and Start for the host. */
+export function lobbyHtml(look: RealmLook, game: OnlineGame, seats: Seat[], me: string, closeButtons: string, limits?: { choices: readonly number[]; picked: number }): string {
+  const host = game.host === me;
+  return `<header><h2 class="ribbon">Game ${esc(game.code)}</h2>${closeButtons}</header>
+    <p class="mp-note">Share the code <b class="mp-code">${esc(game.code)}</b>: others open Multiplayer, type it under Join a game and choose a realm.</p>
+    <ul class="mp-players">${seats
+      .map((s) => `<li>${look.pennant(s.realm)}<b>${esc(look.name(s.realm))}</b><small>${s.player ? `${esc(s.player)} · ` : ""}${s.realm === me ? "you" : s.realm === game.host ? "host" : "ready to start"}</small></li>`)
+      .join("")}</ul>
+    ${host && limits ? limitPickerHtml(limits.choices, limits.picked) : ""}
+    ${
+      host
+        ? `<button class="wax play" data-mp-start ${seats.length < 2 ? "disabled" : ""}>${icon("crown", 2)}${seats.length < 2 ? "Waiting for a second realm" : `Start with ${seats.length} realms`}</button>`
+        : `<p class="mp-note">${icon("hourglass", 1)} Waiting for ${esc(look.name(game.host))} to start the game.</p>`
+    }`;
+}
+
+/** Choosing the realms for Pass and play: the chosen ones in order, and Start. */
+export function hotseatPickHtml(look: RealmLook, chosen: string[]): string {
+  return `<div class="mp-chosen">${chosen.length ? chosen.map((r, k) => `<button class="paper" data-mp-unpick="${esc(r)}" title="Take ${esc(look.name(r))} out">${k + 1}. ${look.pennant(r)}${esc(look.name(r))}</button>`).join("") : `<p class="mp-note">Tap 2 to 4 realms below or on the map.</p>`}</div>
+    <button class="wax play" data-mp-go ${chosen.length < 2 ? "disabled" : ""}>${icon("crown", 2)}${chosen.length < 2 ? "Choose at least two realms" : `Start with ${chosen.length} realms`}</button>`;
+}
+
+export interface PlayerRow {
+  realm: string;
+  /** `ai`: handed to the AI (MP-081). */
+  state: "planning" | "ready" | "waiting" | "you" | "done" | "ai";
+  hash?: string;
+}
+
+/** A clock that counts down to `due` (ms); main.ts sets its text every second. */
+export const clockHtml = (due: number, now = Date.now()): string => `<b data-mp-clock="${due}">${timeLeft(due - now)}</b>`;
+
+/**
+ * The Players card: who plays, who is ready, the time left, whether the devices
+ * agree, the order orders go in; for the host, handing a player's realm to the
+ * AI, and for everyone, their own (MP-081). A hand-over takes a second tap.
+ */
+export function playersHtml(
+  look: RealmLook,
+  o: {
+    mode: "hotseat" | "online";
+    code?: string;
+    week: number;
+    rows: PlayerRow[];
+    order: string[];
+    outOfStep: string | null;
+    reach?: string;
+    /** When the week's time runs out (ms), or null with no limit. */
+    due?: number | null;
+    /** The host's realm, and this device's, online. */
+    host?: string;
+    me?: string;
+    /** The table can hand a realm to the AI. */
+    canDrop?: boolean;
+    /** The realm whose hand-over waits on its second tap. */
+    confirm?: string | null;
+  },
+  closeButtons: string,
+): string {
+  const word: Record<PlayerRow["state"], string> = { planning: "planning", ready: "ready", waiting: "still planning", you: "you: planning", done: "orders in", ai: "played by the AI" };
+  const isHost = !!o.me && o.host === o.me;
+  const dropButton = (r: PlayerRow) =>
+    o.canDrop && isHost && r.realm !== o.me && r.state !== "ai"
+      ? `<button class="${o.confirm === r.realm ? "wax" : "paper"} mp-drop" data-mp-drop="${esc(r.realm)}">${o.confirm === r.realm ? "Tap again" : "To the AI"}</button>`
+      : "";
+  const online = o.mode === "online";
+  const time = !online ? "" : o.due ? `<p class="mp-note">${clockHtml(o.due)} left for this week's orders; a realm without orders then does nothing this week.</p>` : `<p class="mp-note">No turn limit: the week plays when everyone is ready.</p>`;
+  const mine = o.me && o.rows.some((r) => r.realm === o.me && r.state !== "ai");
+  return `<header><h2 class="ribbon">Players</h2>${closeButtons}</header>
+    <p class="mp-note">${o.mode === "hotseat" ? "Pass and play on this device." : `Online game <b>${esc(o.code ?? "")}</b>${o.reach === "this browser" ? " (this browser's tabs only)" : ""}.`} Week ${o.week + 1}.</p>
+    ${time}
+    <ul class="mp-players">${o.rows
+      .map(
+        (r) =>
+          `<li>${look.pennant(r.realm)}<b>${esc(look.name(r.realm))}</b><small class="mp-${r.state}">${online && r.realm === o.host ? "host · " : ""}${word[r.state]}</small>${dropButton(r)}</li>`,
+      )
+      .join("")}</ul>
+    ${o.confirm && o.confirm !== o.me ? `<p class="mp-note mp-bad" role="alert">Tap again to hand ${esc(look.name(o.confirm))} to the AI for the rest of the game. Its player cannot come back to it.</p>` : ""}
+    <p class="mp-note">This week's orders are carried out in this order: ${o.order.map((r) => esc(look.name(r))).join(", then ")}. It turns each week.</p>
+    <p class="mp-note ${o.outOfStep ? "mp-bad" : ""}">${o.outOfStep ? esc(o.outOfStep) : "All devices agree on the world."}</p>
+    <div class="mp-leave">
+      <button class="paper" data-mp-leave>${icon("back", 2)}${online ? "Leave for now" : "Leave the game"}</button>
+      ${
+        online && o.canDrop && mine
+          ? `<button class="${o.confirm === o.me ? "wax" : "paper"}" data-mp-drop="${esc(o.me!)}">${o.confirm === o.me ? "Tap again to give up your realm" : "Hand my realm to the AI"}</button>`
+          : ""
+      }
+    </div>
+    ${online ? `<p class="mp-note">${o.confirm === o.me ? "The AI plays your realm from this week and you leave the game for good." : "Leave for now and come back from Your games; or hand your realm to the AI to leave for good."}</p>` : ""}`;
+}

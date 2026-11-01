@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -113,7 +114,7 @@ export function warRaise(world: World, n: number): number {
 export function aiRecruits(world: World, news: News[], atWarNow: (n: number) => boolean): void {
   const a = world.armies;
   const N = world.nationCount;
-  const ai = (n: number) => n !== world.player && !world.nationGone[n];
+  const ai = (n: number) => !isHuman(world, n) && !world.nationGone[n];
   const atWar = Uint8Array.from({ length: N }, (_, n) => (ai(n) && atWarNow(n) ? 1 : 0));
   const near = neighbourRealms(world);
   const target = new Float64Array(N);

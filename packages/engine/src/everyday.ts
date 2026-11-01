@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import data from "../../rules/data/domain/events-everyday.json" with { type: "json" };
 import geography from "../../rules/data/domain/exploration-regions.json" with { type: "json" };
 import type { World } from "./world.ts";
@@ -275,7 +276,7 @@ export function monthlyEveryday(world: World, news: News[]): void {
   let m: Month | null = null;
   for (let n = 0; n < world.nationCount; n++) {
     if (world.nationGone[n] || world.nationAsleep[n] || s.due[n]! > now) continue;
-    if (n === world.player && !playerFree(world, s)) {
+    if (isHuman(world, n) && !playerFree(world, s)) {
       s.due[n] = now + 1;
       continue;
     }
@@ -285,7 +286,7 @@ export function monthlyEveryday(world: World, news: News[]): void {
     // about is set aside and the draw is made again among the rest, which picks with the same
     // odds as weighing only those that could come, while binding just the one or two drawn.
     // Only events of the realm's region and era; the player's realm sees none again within `rest_years` (EVT-133, EVT-134).
-    const rest = n === world.player ? now - data.rest_years * 12 : -Infinity;
+    const rest = isHuman(world, n) ? now - data.rest_years * 12 : -Infinity;
     const left = DRAWN.filter((d) => fits(world, DEFS[d]!, n) && !((s.last[d] ?? -Infinity) > rest));
     let total = left.reduce((a, d) => a + DEFS[d]!.weight, 0);
     while (left.length) {
@@ -314,10 +315,10 @@ export function fireEverydayNow(world: World, def: string, n: number, news: News
 
 function fire(world: World, s: EverydayState, ev: EverydayEvent, news: News[]): void {
   ev.id = `everyday:${++s.seq}`;
-  if (ev.nation === world.player) s.last[ev.def] = ev.at;
+  if (isHuman(world, ev.nation)) s.last[ev.def] = ev.at;
   // What happens whatever is chosen lands at once: the grain is gone.
   if (ev.province !== undefined && ev.loss) world.provinceStore[ev.province] = Math.max(0, world.provinceStore[ev.province]! - ev.loss);
-  if (ev.nation !== world.player) {
+  if (!isHuman(world, ev.nation)) {
     const options = openOptions(world, ev);
     let roll = s.rng.next() * options.reduce((a, o) => a + o.ai, 0);
     const o = options.find((x) => (roll -= x.ai) < 0) ?? options[options.length - 1]!;
@@ -335,7 +336,7 @@ function fire(world: World, s: EverydayState, ev: EverydayEvent, news: News[]): 
  */
 export function plagueReached(world: World, p: number): void {
   const n = world.provinceOwner[p]!;
-  if (n < 0 || n !== world.player) return;
+  if (n < 0 || !isHuman(world, n)) return;
   const s = stateOf(world);
   if (s.pending.some((e) => e.def === "plague_reaches")) return;
   const ev: EverydayEvent = { id: `everyday:${++s.seq}`, def: "plague_reaches", nation: n, at: monthIndex(world), province: p };
@@ -351,7 +352,7 @@ export function plagueReached(world: World, p: number): void {
  */
 function deathCard(world: World, d: PersonDeath, news: News[]): void {
   const n = d.nation;
-  if (n < 0 || n !== world.player) return;
+  if (n < 0 || !isHuman(world, n)) return;
   const s = stateOf(world);
   if (s.pending.some((e) => e.nation === n)) return;
   const at = monthIndex(world);
@@ -438,7 +439,7 @@ function targets(world: World, ev: EverydayEvent, e: Effect): number[] {
 
 function choose(world: World, s: EverydayState, ev: EverydayEvent, o: OptionDef, news: News[]): void {
   const n = ev.nation;
-  const mine = n === world.player;
+  const mine = isHuman(world, n);
   const told: string[] = [];
   for (const e of o.effects) {
     if (e.gold !== undefined) world.nationTreasury[n] = world.nationTreasury[n]! + e.gold;

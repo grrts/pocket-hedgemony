@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { quarantineTaxFactor } from "./plague.ts";
 import { controller, type News } from "./war.ts";
@@ -300,7 +301,7 @@ export function repayLoan(world: World, n: number, gold: number): string | null 
 export function aiTreasury(world: World, news: News[]): void {
   const ai = realmConfig.ai;
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n]) continue;
+    if (isHuman(world, n) || world.nationGone[n]) continue;
     const war = inAnyWar(world, n);
     const rate = TAX_RATES.indexOf((war ? ai.tax_at_war : ai.tax_at_peace) as TaxRateName);
     if (rate !== world.nationTaxDefault[n]) applyRate(world, n, -1, rate, news);
@@ -361,7 +362,7 @@ export function monthlyDebts(world: World, news: News[]): void {
     world.nationBrokeMonths[n] = Math.min(255, world.nationBrokeMonths[n]! + 1);
     const left = monthsToDefault(world, n);
     if (left > 0) {
-      if (n === world.player) news.push({ kind: "unrest", text: `The treasury is empty and lenders will give no more: unless gold comes in, the crown defaults on its debts in ${left === 1 ? "a month" : `${left} months`} (Treasury tab).`, nations: [n] });
+      if (isHuman(world, n)) news.push({ kind: "unrest", text: `The treasury is empty and lenders will give no more: unless gold comes in, the crown defaults on its debts in ${left === 1 ? "a month" : `${left} months`} (Treasury tab).`, nations: [n] });
       continue;
     }
     defaultOn(world, n, news);
@@ -386,7 +387,7 @@ export function defaultOn(world: World, n: number, news: News[]): void {
   });
   sumLedger(world, n);
   const name = world.rules.nations[n]!.name;
-  news.push({ kind: "unrest", text: n === world.player ? `The crown defaults on its debts. What it owed is gone, but the lords turn away, the realm is troubled until ${world.date.year + DEFAULT.troubled_years} and lenders refuse it until ${world.date.year + DEFAULT.lenders_refuse_years}.` : `${name} defaults on its debts.`, nations: [n] });
+  news.push({ kind: "unrest", text: isHuman(world, n) ? `The crown defaults on its debts. What it owed is gone, but the lords turn away, the realm is troubled until ${world.date.year + DEFAULT.troubled_years} and lenders refuse it until ${world.date.year + DEFAULT.lenders_refuse_years}.` : `${name} defaults on its debts.`, nations: [n] });
 }
 
 /** The player's road to default and after, for the Treasury tab (X-29). */

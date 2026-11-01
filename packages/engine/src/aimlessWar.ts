@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -51,7 +52,7 @@ export function aimlessWarDeclared(world: World, n: number, news: News[]): void 
   dip.eventNotoriety(world.diplomacy, world.nationIds[n]!, NO_AIM.notoriety);
   const unjust = 1 << GRIEVANCES.indexOf("Unjust war");
   for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p] === n) world.provinceGrievances[p]! |= unjust;
-  if (n !== world.player) return;
+  if (!isHuman(world, n)) return;
   const lords = turned ? `${turned} of your lord${turned === 1 ? "" : "s"} turn against the crown` : "your lords turn against the crown";
   news.push({ kind: "unrest", text: `A war with no aim: ${lords}, every realm that knows you counts it a Notorious deed, and your people call it an Unjust war until it ends.`, nations: [n] });
 }

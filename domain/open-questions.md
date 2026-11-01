@@ -16,6 +16,11 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **OQ-VIEW-12** (map-presentation): (default chosen) Footprint scale: `sqrt(town thousands) × 1.5`, capped at 30 cells, so Toledo's 119 thousand town people in 1444 make the design's 15 to 20 cells (at 1.0 it was 11); to be tuned so big cities read clearly without swallowing small provinces. [OQ-LIVE-2]
 - **OQ-VIEW-13** (map-presentation): (default chosen) Street level on the phone default: Medium has no street level, to spare the battery; High only. [OQ-LIVE-3]
 - **OQ-VIEW-14** (map-presentation): (default chosen) First landmarks: Toledo, Constantinople (Hagia Sophia), Rome, Paris, Venice, Cairo, Beijing (the Forbidden City) and Cuzco. [OQ-LIVE-4]
+- **OQ-MP-3** (multiplayer): Games that never start: how long the server keeps them before removing them.
+- **OQ-MP-4** (multiplayer): Out of step: the server marks it, but the only cure is replaying from the start. Should a device that disagrees fetch the agreed world instead?
+- **OQ-MP-5** (multiplayer): Diplomacy between players beyond war and peace (alliances, calls to arms, envoys' asks) and Imperial votes have not been played through.
+- **OQ-MP-6** (multiplayer): Is online multiplayer part of the paid game, the demo, or both (accounts §6)?
+- **OQ-MP-7** (multiplayer): Push notifications when a game waits on you (phones), instead of opening the game to see.
 - **OQ-RSCH-23** (research): Florence's head start in humanist learning (plan-1378 §3.2): L6 needs L5 or L2, which Florence lacks in 1378, so knowing it would break RSCH-099. A bridge event (Salutati) or a tree change is for Leroy to choose.
 - **OQ-REVO-7** (revolutions): (release task) The seven new sources in additions.yaml are `verified: false`; checking them is a source review, not code.
 - **OQ-SAVE-5** (saves): (release task) The server quota (300 saves / 200 MB) is set once real sizes are measured, and which social sign-ins ship at launch is a store decision.
@@ -271,6 +276,12 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-VIEW-7**: (was OQ-VIEW-7) New systems' zoom content: a system with no zoom table shows its lens at every zoom and its card at Local only. Simplest default with no new content.
 - **D-VIEW-9**: (was OQ-VIEW-9) Battery saver: it only lowers the frame rate, animation and music voices; the AI's budget is counted in work steps, the same on every device, and `engine.worker_budget` is dropped. X-15 settles it.
 - **D-VIEW-10**: (was OQ-VIEW-10) Map detail Low: Low keeps 4 × 4 art at every zoom, Local included, and that is a valid close-in view. It only lowers detail and changes nothing else.
+
+### Multiplayer (multiplayer)
+
+- **D-MP-1**: (was OQ-MP-1) A player who never presses Ready: the host picks a turn limit at the start, No limit by default (MP-080). When it runs out, the realms that sent nothing play the week on no orders, which is the simplest rule that keeps every device the same: an AI choosing for a realm still played by a person would break MP-007, and waiting forever lets one player stop the game. The server closes a late week lazily, on the next request about the game, claiming the week's opening time in the database first so it is closed once; no timer process is needed. A week nobody sent anything for stays open, and its first late orders start its time again: otherwise a table everyone left overnight would play a week every few minutes with nobody's orders, and the first player back would close the week on the others at once (found by the three-player test). A player who is away for good is handed to the AI (D-MP-2).
+- **D-MP-2**: (was OQ-MP-2) Dropping a player: the host may hand any realm to the AI and a player their own (MP-081), from the week the table is on, so every device switches it on the same week and stays in step; the engine's `resolve` takes the realms still played by people. It cannot be undone: coming back would need the AI's choices undone. Leaving for now (MP-051) stays the way to pause. Deleting or combining accounts uses the same rule (MP-041).
+- **D-MP-3**: (was part of OQ-MP-2) The host's part passes to the earliest seat still playing, before and after the start (MP-082), and the game ends only when nobody is left, so one player leaving no longer ends a game for the others.
 
 ### National strengths (national-strengths)
 

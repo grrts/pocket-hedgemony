@@ -36,6 +36,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | achievements | downstream | Customer–Supplier | Achievements screen content, toast, turn report line, pause-menu and new-game eligibility indicator, game-over switch warning |
 | game-shell | downstream | Customer–Supplier | Play on as another realm ends achievements; final result shows earned achievements; Achievements screen placement |
 
+## achievements ↔ multiplayer (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| multiplayer | upstream | Conformist | Off in multiplayer |
+
 ## achievements ↔ national-strengths (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |
@@ -833,6 +839,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | institutions | upstream | Published Language | `peace_of_augsburg`, `peace_of_westphalia`, `onin_war`, `perry_expedition`, `meiji_restoration` |
 
+## events ↔ multiplayer (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| multiplayer | upstream | Customer–Supplier | Events wait for the human realm's player |
+
 ## events ↔ national-strengths
 
 | Said by | Other side is | Pattern | What crosses |
@@ -1066,6 +1078,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | game-shell | upstream | Customer–Supplier | Map rendering, zoom levels, lenses, title background, camera moves (Show on map) |
 | map-presentation | downstream | Customer–Supplier | Layout by window shape, map as home, cards over the map |
+
+## game-shell ↔ multiplayer (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| multiplayer | downstream | Customer–Supplier | The Multiplayer button on the start screen, the Players plaque on the top bar |
 
 ## game-shell ↔ national-strengths (one-sided)
 
@@ -1433,6 +1451,24 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | map-presentation | upstream | Conformist | Id image, terrain image, depth, rivers, tile colours |
 | world-map | downstream | Published Language | Id image, terrain image, depth, rivers |
+
+## multiplayer ↔ saves (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| multiplayer | upstream | Conformist | Account, device, access token, sign-in card; account deletion |
+
+## multiplayer ↔ time-and-turns (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| multiplayer | upstream | Conformist | The week, its steps, playback by the day |
+
+## multiplayer ↔ warfare (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| multiplayer | upstream | Customer–Supplier | Peace offers between two human realms are answered by a person |
 
 ## national-strengths ↔ naval (one-sided)
 

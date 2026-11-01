@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { cedeProvince, relationState, type News } from "./war.ts";
 import { grabbedLand, nameAbroadView, type NameAbroadView } from "./conquest.ts";
@@ -52,7 +53,7 @@ export function syncCountries(world: World): void {
     c.provinces = Math.max(1, provinces[n]!);
     c.gold = world.nationTreasury[n]!;
     c.goldToSpare = world.nationTreasury[n]! > giftGold(world) * 2;
-    c.ai = n !== world.player;
+    c.ai = !isHuman(world, n);
     // Every ruling house has a son or daughter to marry until dynasties are simulated (DIPL-104).
     c.unmarriedChildren = 2;
     c.capital = world.rules.nations[n]!.capital;
@@ -460,7 +461,7 @@ function aiEnvoys(world: World): void {
   const turn = world.date.year * 12 + world.date.month;
   const near = neighbourRealms(world);
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n]) continue;
+    if (isHuman(world, n) || world.nationGone[n]) continue;
     const id = world.nationIds[n]!;
     // A Threatened realm weighs its envoys more often (DIPL-239).
     const fear = dip.fearLevel(dip.country(d, id).fears);

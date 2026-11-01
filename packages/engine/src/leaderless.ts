@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { controller, nearest } from "./war.ts";
@@ -61,12 +62,12 @@ export function leaderless(world: World, d: PersonDeath, news: News[]): void {
   // An army whose general falls in a battle leaves it by the battle's own rules (WAR-062).
   if (i >= 0 && a.alive[i] && a.commander[i]! < 0 && a.battle[i]! < 0) {
     const to = armyHome(world, i);
-    if (d.nation === world.player && to >= 0 && to !== a.location[i]) news.push({ kind: "raised", text: `${d.name}'s men march for ${provinceName(world, to)} without him, to stand as its garrison.`, nations: [d.nation], province: to });
+    if (isHuman(world, d.nation) && to >= 0 && to !== a.location[i]) news.push({ kind: "raised", text: `${d.name}'s men march for ${provinceName(world, to)} without him, to stand as its garrison.`, nations: [d.nation], province: to });
   }
   const f = d.led.fleet >= 0 ? world.navy.fleets.find((x) => x.id === d.led!.fleet) : undefined;
   if (f && f.admiral < 0 && f.battle < 0 && f.ships.length) {
     const to = fleetHome(world, f);
-    if (d.nation === world.player && to >= 0 && to !== f.at) news.push({ kind: "raised", text: `${d.name}'s ships sail for ${provinceName(world, to)} without him.`, nations: [d.nation], province: to });
+    if (isHuman(world, d.nation) && to >= 0 && to !== f.at) news.push({ kind: "raised", text: `${d.name}'s ships sail for ${provinceName(world, to)} without him.`, nations: [d.nation], province: to });
   }
 }
 

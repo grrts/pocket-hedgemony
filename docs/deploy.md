@@ -40,7 +40,7 @@ What to look for: PHP 8.3 with `pdo_pgsql` and `intl`, a managed PostgreSQL 16 w
 
 ## A test server on one VPS
 
-Everything on one machine with Docker: the website, the wiki, the forum, the JSON API and the web game at `https://<your domain>/play/`, with PostgreSQL 16 next to it and an HTTPS certificate that Caddy gets and renews by itself. The files are in [`deploy/`](../deploy/README.md). The web game is built to talk to the same address, so cloud saves, accounts and (once it is merged) online play work from the browser with nothing else to set up.
+Everything on one machine with Docker: the website, the wiki, the forum, the JSON API and the web game at `https://<your domain>/play/`, with PostgreSQL 16 next to it and an HTTPS certificate that Caddy gets and renews by itself. The files are in [`deploy/`](../deploy/README.md). The web game is built to talk to the same address, so cloud saves, accounts and online games work from the browser with nothing else to set up.
 
 ### 1. Rent the server and point a domain at it
 

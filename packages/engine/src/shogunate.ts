@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { cedeProvince, checkDestroyed, strength, type News } from "./war.ts";
 import { formOf, setForm } from "./government.ts";
@@ -88,7 +89,7 @@ function step(world: World, lord: number, by: 1 | -1, why: string, news: News[])
   const next = by > 0 ? Math.max(0, i - 1) : Math.min(LOYALTY.indexOf("Disloyal"), i + 1);
   if (next === i || l.loyalty === "In revolt") return;
   l.loyalty = LOYALTY[next]!;
-  if (l.nation === world.player) news.push({ kind: "unrest", text: `${l.name} is now ${l.loyalty.toLowerCase()}: ${why}`, nations: [l.nation] });
+  if (isHuman(world, l.nation)) news.push({ kind: "unrest", text: `${l.name} is now ${l.loyalty.toLowerCase()}: ${why}`, nations: [l.nation] });
 }
 
 // ---------------------------------------------------------------- the monthly step
@@ -144,7 +145,7 @@ function yearCount(world: World, news: News[]): void {
   };
   const before = s.hold;
   inst.countShogunYear(s, inst.shogunYearLines(s, facts));
-  if (n === world.player && inst.holdWord(before) !== inst.holdWord(s.hold)) news.push({ kind: "crown", text: `The shogun's hold is now ${inst.holdWord(s.hold)} (${s.hold}).`, nations: [n] });
+  if (isHuman(world, n) && inst.holdWord(before) !== inst.holdWord(s.hold)) news.push({ kind: "crown", text: `The shogun's hold is now ${inst.holdWord(s.hold)} (${s.hold}).`, nations: [n] });
 }
 
 /** INST-067: *Bring to heel* on every member that refused the oath, while it stands and the office is held. */
@@ -220,7 +221,7 @@ export function askTheCourt(world: World, n: number, news: News[]): string | nul
   inst.appoint(s, world.nationIds[n]!, date(world));
   news.push({ kind: "crown", text: `The Court appoints ${nameOf(world, n)} Shogun. Every warlord domain of Japan is asked to swear to the shogun.`, nations: [n, ...members], major: true });
   for (const m of members) {
-    if (m === world.player) s.oaths.push({ realm: world.nationIds[m]!, ends: dip.addMonths(date(world), S.oath.answer_months) });
+    if (isHuman(world, m)) s.oaths.push({ realm: world.nationIds[m]!, ends: dip.addMonths(date(world), S.oath.answer_months) });
     else swearOrRefuse(world, m, oathCount(world, m).yes, news);
   }
   return null;
@@ -362,13 +363,13 @@ export function restorationOpen(world: World): boolean {
 function aiShogunate(world: World, news: News[]): void {
   const s = world.shogunate!;
   const n = shogunOf(world);
-  if (n >= 0 && n !== world.player) {
+  if (n >= 0 && !isHuman(world, n)) {
     const houses = housesOf(world).sort((a, b) => LOYALTY.indexOf(world.lords[b]!.loyalty) - LOYALTY.indexOf(world.lords[a]!.loyalty) || a - b);
     for (const k of houses) if (world.lords[k]!.loyalty !== "Loyal" && !inst.whyNotSummon(s, k)) summonHouse(world, k);
     // Confirming costs hold: only while it leaves the office clear of Weak.
     for (const k of houses) if (world.lords[k]!.loyalty === "Wavering" && s.hold - S.confirm_cost >= 50) confirmHouse(world, k, news);
   }
-  if (!s.holder) for (const m of vacantMembers(world)) if (m !== world.player && !whyNotAskCourt(world, m)) return void askTheCourt(world, m, news);
+  if (!s.holder) for (const m of vacantMembers(world)) if (!isHuman(world, m) && !whyNotAskCourt(world, m)) return void askTheCourt(world, m, news);
 }
 
 // ---------------------------------------------------------------- orders and the card (INST-082)

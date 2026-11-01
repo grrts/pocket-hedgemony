@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import * as tr from "./domain/tribes/index.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as gov from "./domain/government/index.ts";
@@ -143,7 +144,7 @@ function pruneGrounds(world: World, news?: News[]): void {
     if (g < 0) continue;
     if (world.provinceOwner[p]! >= 0 || !isT(g)) {
       world.provinceHunt[p] = -1;
-      if (news && g === world.player && world.provinceOwner[p]! >= 0) news.push({ kind: "colony", text: `${provinceName(world, p)} is no longer our hunting ground: ${realmName(world, world.provinceOwner[p]!)} holds it now.`, nations: [g], province: p });
+      if (news && isHuman(world, g) && world.provinceOwner[p]! >= 0) news.push({ kind: "colony", text: `${provinceName(world, p)} is no longer our hunting ground: ${realmName(world, world.provinceOwner[p]!)} holds it now.`, nations: [g], province: p });
     }
   }
   world.tribes.claims = world.tribes.claims.filter((c) => isT(c.realm) && world.provinceOwner[c.province]! < 0);
@@ -238,7 +239,7 @@ export function claimGround(world: World, n: number, p: number, news: News[]): s
   if (why) return why;
   const ends = tr.claimEnds(nowMonth(world));
   world.tribes.claims.push({ realm: n, province: p, ends });
-  if (n === world.player) news.push({ kind: "colony", text: `Our hunters start walking ${provinceName(world, p)}: it is our hunting ground on ${tr.monthText(ends)}.`, nations: [n], province: p });
+  if (isHuman(world, n)) news.push({ kind: "colony", text: `Our hunters start walking ${provinceName(world, p)}: it is our hunting ground on ${tr.monthText(ends)}.`, nations: [n], province: p });
   return null;
 }
 
@@ -257,7 +258,7 @@ export function leaveGround(world: World, n: number, p: number, news: News[]): s
   const until = tr.reclaimFrom(nowMonth(world));
   world.tribes.barred = world.tribes.barred.filter((b) => !(b.realm === n && b.province === p));
   world.tribes.barred.push({ realm: n, province: p, until });
-  if (n === world.player) news.push({ kind: "colony", text: `Our hunters leave ${provinceName(world, p)}. We may walk it again from ${tr.monthText(until)}.`, nations: [n], province: p });
+  if (isHuman(world, n)) news.push({ kind: "colony", text: `Our hunters leave ${provinceName(world, p)}. We may walk it again from ${tr.monthText(until)}.`, nations: [n], province: p });
   return null;
 }
 
@@ -293,7 +294,7 @@ export function takeIn(world: World, n: number, p: number, news: News[]): string
   // Their own people run themselves: no post waits to be filled (GOV-023).
   if (own && selfRun(world, p)) world.provinceNewLand[p] = 0;
   addBorders(world, n);
-  if (n === world.player) news.push({ kind: "colony", text: `${provinceName(world, p)} is taken in: its people are ${realmName(world, n)}'s now${selfRun(world, p) ? ", and run themselves" : ", and it needs an official"}.`, nations: [n], province: p });
+  if (isHuman(world, n)) news.push({ kind: "colony", text: `${provinceName(world, p)} is taken in: its people are ${realmName(world, n)}'s now${selfRun(world, p) ? ", and run themselves" : ", and it needs an official"}.`, nations: [n], province: p });
   return null;
 }
 
@@ -320,8 +321,8 @@ export function colonyStarts(world: World, n: number, p: number, rolled: tr.Aggr
   dip.eventOpinion(d, tr.SETTLERS_WRONG, a, b, C.settlers_wrong.weight, C.settlers_wrong.fade_years);
   dip.grantAim(d, { holder: a, target: b, aim: "punish", until: dip.addMonths(dip.monthOf(d.date), C.settlers_punish_years * 12), source: tr.SETTLERS_WRONG });
   const where = `${realmName(world, n)} at ${provinceName(world, p)}`;
-  if (t === world.player) news.push({ kind: "tribe", text: `Settlers on our land: ${where}`, nations: [t, n], province: p });
-  else if (n === world.player) news.push({ kind: "colony", text: `${provinceName(world, p)} is a hunting ground of ${tribeName(world, t)}: settling here angers them.`, nations: [n, t], province: p });
+  if (isHuman(world, t)) news.push({ kind: "tribe", text: `Settlers on our land: ${where}`, nations: [t, n], province: p });
+  else if (isHuman(world, n)) news.push({ kind: "colony", text: `${provinceName(world, p)} is a hunting ground of ${tribeName(world, t)}: settling here angers them.`, nations: [n, t], province: p });
   return { aggression: tr.fiercer(rolled), consent: false };
 }
 
@@ -365,8 +366,8 @@ export function askForLand(world: World, n: number, p: number, gold: number, new
   const t = huntOf(world, p);
   ensureRoute(world, n, t);
   T.asks.push({ id: ++T.seq, asker: n, tribe: t, province: p, gold: Math.round(gold), answerOn: nowMonth(world) + C.ask.answer_months });
-  if (n === world.player) news.push({ kind: "envoy", text: `Our envoy asks ${tribeName(world, t)} for ${provinceName(world, p)}, offering ${Math.round(gold)} gold. They answer next month.`, nations: [n, t], province: p });
-  if (t === world.player) news.push({ kind: "tribe", text: `${realmName(world, n)} asks for our hunting ground ${provinceName(world, p)}, offering ${Math.round(gold)} gold.`, nations: [t, n], province: p });
+  if (isHuman(world, n)) news.push({ kind: "envoy", text: `Our envoy asks ${tribeName(world, t)} for ${provinceName(world, p)}, offering ${Math.round(gold)} gold. They answer next month.`, nations: [n, t], province: p });
+  if (isHuman(world, t)) news.push({ kind: "tribe", text: `${realmName(world, n)} asks for our hunting ground ${provinceName(world, p)}, offering ${Math.round(gold)} gold.`, nations: [t, n], province: p });
   return null;
 }
 
@@ -391,7 +392,7 @@ function settleAsk(world: World, ask: LandAsk, yes: boolean, news: News[]): void
   const text = done
     ? `${tribeName(world, tribe)} give up ${provinceName(world, p)} to ${realmName(world, asker)} for ${ask.gold} gold: a colony there is founded in peace.`
     : `${tribeName(world, tribe)} refuse to give up ${provinceName(world, p)} to ${realmName(world, asker)}.`;
-  if (asker === world.player || tribe === world.player) news.push({ kind: "envoy", text: text[0]!.toUpperCase() + text.slice(1), nations: [asker, tribe], province: p });
+  if (isHuman(world, asker) || isHuman(world, tribe)) news.push({ kind: "envoy", text: text[0]!.toUpperCase() + text.slice(1), nations: [asker, tribe], province: p });
 }
 
 /** The player's tribe answers an ask for its land. */
@@ -441,20 +442,20 @@ export function monthlyTribes(world: World, news: News[]): void {
     T.claims = T.claims.filter((x) => x !== c);
     if (world.provinceOwner[c.province]! >= 0 || huntOf(world, c.province) >= 0) continue;
     makeGround(world, c.realm, c.province, now);
-    if (c.realm === world.player) news.push({ kind: "colony", text: `${provinceName(world, c.province)} is our hunting ground now.`, nations: [c.realm], province: c.province });
+    if (isHuman(world, c.realm)) news.push({ kind: "colony", text: `${provinceName(world, c.province)} is our hunting ground now.`, nations: [c.realm], province: c.province });
   }
   for (const p of cutOff(world)) {
     const g = huntOf(world, p);
     world.provinceHunt[p] = -1;
-    if (g === world.player) news.push({ kind: "colony", text: `${provinceName(world, p)} is cut off from our land: our hunters can no longer walk it.`, nations: [g], province: p });
+    if (isHuman(world, g)) news.push({ kind: "colony", text: `${provinceName(world, p)} is cut off from our land: our hunters can no longer walk it.`, nations: [g], province: p });
   }
   T.barred = T.barred.filter((b) => b.until > now);
   T.answered = T.answered.filter((a) => now - a.on < C.ai.answered_years * 12);
   for (const a of [...T.asks]) {
     if (a.answerOn > now) continue;
     // The player's tribe answers itself; an ask it leaves a month past its answer lapses as a no.
-    if (a.tribe === world.player && a.answerOn + 1 > now) continue;
-    const yes = a.tribe === world.player ? false : landAskCount(world, a.asker, a.tribe, a.gold).yes;
+    if (isHuman(world, a.tribe) && a.answerOn + 1 > now) continue;
+    const yes = isHuman(world, a.tribe) ? false : landAskCount(world, a.asker, a.tribe, a.gold).yes;
     settleAsk(world, a, yes, news);
   }
   aiClaims(world, news);
@@ -465,7 +466,7 @@ export function monthlyTribes(world: World, news: News[]): void {
 function aiClaims(world: World, news: News[]): void {
   const counts = groundCounts(world);
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || claimOf(world, n) || !isTribal(world, n) || counts[n]! >= rangeOf(world, n)) continue;
+    if (isHuman(world, n) || claimOf(world, n) || !isTribal(world, n) || counts[n]! >= rangeOf(world, n)) continue;
     const seen = new Set<number>();
     const candidates: { province: number; people: number }[] = [];
     for (let p = 0; p < world.provinceCount; p++) {
@@ -494,7 +495,7 @@ function officialsRoom(world: World, n: number): number {
 /** TRIBE-032: each January a tribal AI realm takes in every ground it may, oldest first, while within its officials cap. */
 function aiTakeIn(world: World, news: News[]): void {
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || !isTribal(world, n)) continue;
+    if (isHuman(world, n) || !isTribal(world, n)) continue;
     for (const p of groundsOf(world, n)) {
       if (whyNotTakeIn(world, n, p)) continue;
       const needs = gov.needsOfficial(formOf(world, n), ownPeople(world, n, p));

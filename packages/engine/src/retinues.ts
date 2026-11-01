@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import type { GameWar } from "./peace.ts";
@@ -112,7 +113,7 @@ export function callLord(world: World, n: number, lord: number, news: News[]): s
   const pool = lands.reduce((t, p) => t + world.provinceRecruits[p]!, 0);
   for (const p of lands) world.provinceRecruits[p] = world.provinceRecruits[p]! * (1 - men / pool);
   l.call = { men, daysLeft: answer.days ?? L.loyal_days };
-  if (n === world.player) news.push({ kind: "raised", text: `${l.name} answers your call: ${fmt(men)} men gather at ${provinceName(world, lordSeat(world, lord))} in ${Math.round(l.call.daysLeft / 7)} weeks.`, nations: [n], province: lordSeat(world, lord) });
+  if (isHuman(world, n)) news.push({ kind: "raised", text: `${l.name} answers your call: ${fmt(men)} men gather at ${provinceName(world, lordSeat(world, lord))} in ${Math.round(l.call.daysLeft / 7)} weeks.`, nations: [n], province: lordSeat(world, lord) });
   return null;
 }
 
@@ -130,7 +131,7 @@ export function callLords(world: World, n: number, news: News[]): string | null 
     if (l.loyalty === "Disloyal" || l.loyalty === "In revolt") refused.push(l.name);
     else if (!callLord(world, n, k, news)) came++;
   });
-  if (n === world.player && refused.length) news.push({ kind: "refused", text: `${refused.join(", ")} refuse${refused.length === 1 ? "s" : ""} your call.`, nations: [n] });
+  if (isHuman(world, n) && refused.length) news.push({ kind: "refused", text: `${refused.join(", ")} refuse${refused.length === 1 ? "s" : ""} your call.`, nations: [n] });
   return came ? null : refused.length ? "every lord you could call refuses" : "no lord has men to send";
 }
 
@@ -159,7 +160,7 @@ export function weeklyRetinues(world: World, news: News[], days = 7): void {
     }
     const horse = Math.round(call.men * L.retinue_horse_share);
     spawnArmy(world, l.nation, seat, call.men, lordCommander(world, k), horse, { kind: KIND.retinue, home: seat, drill: rc.drillAndBreak("trained").drill, horseArm: L.retinue_horse_arm });
-    if (l.nation === world.player) news.push({ kind: "raised", text: `${l.name} takes the field at ${provinceName(world, seat)} with ${fmt(call.men)} men.`, nations: [l.nation], province: seat });
+    if (isHuman(world, l.nation)) news.push({ kind: "raised", text: `${l.name} takes the field at ${provinceName(world, seat)} with ${fmt(call.men)} men.`, nations: [l.nation], province: seat });
   });
   // The week's recount, which follows, counts the men sent home.
 }
@@ -186,7 +187,7 @@ export function monthlyRetinues(world: World, news: News[]): void {
             ? `goes home after ${L.wavering_stay_months} months: a wavering lord serves no longer`
             : null;
     if (!why) continue;
-    if (l && l.nation === world.player) news.push({ kind: "refused", text: `${l.name} ${why}, with ${fmt(a.men[s]!)} men.`, nations: [l.nation], province: a.location[s]! });
+    if (l && isHuman(world, l.nation)) news.push({ kind: "refused", text: `${l.name} ${why}, with ${fmt(a.men[s]!)} men.`, nations: [l.nation], province: a.location[s]! });
     lordSendHome(world, k, a.men[s]!);
     a.alive[s] = 0;
     halt(world, s);
@@ -198,7 +199,7 @@ export function monthlyRetinues(world: World, news: News[]): void {
   const atWar = new Map<number, boolean>();
   world.lords.forEach((l, k) => {
     const n = l.nation;
-    if (n === world.player || world.nationGone[n] || l.call || l.loyalty === "Disloyal" || l.loyalty === "In revolt" || (l.commander !== undefined && out.has(l.commander))) return;
+    if (isHuman(world, n) || world.nationGone[n] || l.call || l.loyalty === "Disloyal" || l.loyalty === "In revolt" || (l.commander !== undefined && out.has(l.commander))) return;
     if (!atWar.has(n)) atWar.set(n, inAnyWar(world, n));
     if (atWar.get(n) && !callRefusal(world, n, k) && !callLord(world, n, k, news)) changed = true;
   });

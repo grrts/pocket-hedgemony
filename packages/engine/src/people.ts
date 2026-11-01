@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import * as wf from "./domain/warfare/index.ts";
@@ -152,7 +153,7 @@ const how = (cause: DeathCause, age: number) => (cause === "old age" ? `dies at 
 /** The heir dies before his father (REALM-272): the ruler is heirless until a child is born. */
 function heirDies(world: World, n: number, d: Omit<PersonDeath, "who">, news: News[]): void {
   world.rulers[n]!.heir = null;
-  if (n === world.player) news.push({ kind: "ruler", text: `Your heir, ${d.name}, ${how(d.cause, d.age)}. ${rulerLabel(world.rulers[n]!)} has no heir now: should the ruler die, the lords will dispute the throne.`, nations: [n] });
+  if (isHuman(world, n)) news.push({ kind: "ruler", text: `Your heir, ${d.name}, ${how(d.cause, d.age)}. ${rulerLabel(world.rulers[n]!)} has no heir now: should the ruler die, the lords will dispute the throne.`, nations: [n] });
 }
 
 /**
@@ -164,7 +165,7 @@ function heirDies(world: World, n: number, d: Omit<PersonDeath, "who">, news: Ne
 function lordDies(world: World, k: number, d: Omit<PersonDeath, "who">, news: News[]): void {
   const l = world.lords[k]!;
   const n = l.nation;
-  const title = n === world.player ? realmTitles(world)[n]!.lord : "lord";
+  const title = isHuman(world, n) ? realmTitles(world)[n]!.lord : "lord";
   // With no son, a brother or cousin of the house may still take the lands (`people.kinds.lord.kinsman_share`).
   const son = l.heir;
   const heir = son ?? (dice(world) < K.lord.kinsman_share ? { name: houseMemberName(world.rules, n, mix(k + 1, world.day + 7), l.house), age: ageFrom(mix(k + 1, world.day), K.lord.kinsman_age) } : null);
@@ -175,7 +176,7 @@ function lordDies(world: World, k: number, d: Omit<PersonDeath, "who">, news: Ne
     l.upCredit = 0;
     delete l.traits;
     newHolder(l);
-    if (n === world.player) news.push({ kind: "ruler", text: `${d.name}, ${title} of the house of ${l.house}, ${how(d.cause, d.age)}. His ${heir === son ? "heir" : "kinsman"} ${l.name}, ${l.age}, holds his lands now.`, nations: [n] });
+    if (isHuman(world, n)) news.push({ kind: "ruler", text: `${d.name}, ${title} of the house of ${l.house}, ${how(d.cause, d.age)}. His ${heir === son ? "heir" : "kinsman"} ${l.name}, ${l.age}, holds his lands now.`, nations: [n] });
   } else {
     l.gone = true;
     l.heir = null;
@@ -190,8 +191,8 @@ function lordDies(world: World, k: number, d: Omit<PersonDeath, "who">, news: Ne
       world.provinceOfficialAge[p] = 0;
       lands.push(p);
     }
-    if (n !== world.player) for (const p of lands) refillPost(world, p);
-    if (n === world.player) news.push({ kind: "ruler", text: `${d.name}, ${title} of the house of ${l.house}, ${how(d.cause, d.age)}, the last of his line. ${lands.length ? `${lands.map((p) => placeName(world, p)).join(", ")} return${lands.length === 1 ? "s" : ""} to the crown as royal land, with ${lands.length === 1 ? "its post" : "their posts"} empty.` : "He held no land."}`, nations: [n], ...(lands.length ? { province: lands[0]! } : {}) });
+    if (!isHuman(world, n)) for (const p of lands) refillPost(world, p);
+    if (isHuman(world, n)) news.push({ kind: "ruler", text: `${d.name}, ${title} of the house of ${l.house}, ${how(d.cause, d.age)}, the last of his line. ${lands.length ? `${lands.map((p) => placeName(world, p)).join(", ")} return${lands.length === 1 ? "s" : ""} to the crown as royal land, with ${lands.length === 1 ? "its post" : "their posts"} empty.` : "He held no land."}`, nations: [n], ...(lands.length ? { province: lands[0]! } : {}) });
   }
   // His command (WAR-252): his heir leads his men on; with his line gone, the men have no lord and go home.
   const c = l.commander;
@@ -238,7 +239,7 @@ function officialDies(world: World, p: number, d: Omit<PersonDeath, "who">, news
   world.provinceOfficialSince[p] = world.day;
   world.provinceOfficialAge[p] = 0;
   const lords = world.provinceLord[p]! >= 0;
-  if (d.nation !== world.player || lords) return refillPost(world, p, type);
+  if (!isHuman(world, d.nation) || lords) return refillPost(world, p, type);
   const title = realmTitles(world)[d.nation]!.official;
   news.push({ kind: "raised", text: `${d.name}, ${OFFICIALS[type]!.toLowerCase()} of ${placeName(world, p)}, ${how(d.cause, d.age)}. The ${title}'s post stands empty: hire a new one on the province card.`, nations: [d.nation], province: p });
 }
@@ -250,14 +251,14 @@ function commanderDies(world: World, c: number, d: Omit<PersonDeath, "who">, new
   let led = "";
   for (let i = 0; i < a.count; i++) if (a.alive[i] && a.commander[i] === c) (a.commander[i] = -1), (led = "his army");
   for (const f of world.navy.fleets) if (f.admiral === c) (f.admiral = -1), (led = "his fleet");
-  if (d.nation === world.player) news.push({ kind: "raised", text: `${d.name} ${how(d.cause, d.age)}.${led ? ` ${led[0]!.toUpperCase()}${led.slice(1)} has no commander now.` : ""}`, nations: [d.nation] });
+  if (isHuman(world, d.nation)) news.push({ kind: "raised", text: `${d.name} ${how(d.cause, d.age)}.${led ? ` ${led[0]!.toUpperCase()}${led.slice(1)} has no commander now.` : ""}`, nations: [d.nation] });
 }
 
 /** A colonial governor dies (EXPL-028, D-EXPL-10): his slot frees, and a colony he was founding is lost with him. */
 function governorDies(world: World, id: number, d: Omit<PersonDeath, "who">, news: News[]): void {
   const e = world.explore;
   e.governors = e.governors.filter((g) => g.id !== id);
-  if (d.nation === world.player) news.push({ kind: "colony", text: `${d.name}, your colonial governor, ${how(d.cause, d.age)}.`, nations: [d.nation] });
+  if (isHuman(world, d.nation)) news.push({ kind: "colony", text: `${d.name}, your colonial governor, ${how(d.cause, d.age)}.`, nations: [d.nation] });
 }
 
 /**

@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import { inAnyWar, lordOfCommander, lordSendHome } from "./lords.ts";
 import { throneShare } from "./throne.ts";
 import { stabilityEffect } from "./stability.ts";
@@ -212,7 +213,7 @@ export function commissionOfficial(world: World, n: number, p: number, news: New
   world.commanderHome[c] = p;
   world.commanderSeed[c] = seed;
   world.provinceOfficial[p] = -1;
-  if (n === world.player) news.push({ kind: "raised", text: `${name}, ${OFFICIALS[type]!.toLowerCase()} of ${provinceName(world, p)}, takes a commission as ${sea ? "admiral" : "general"}. The post stands empty until he returns.`, nations: [n], province: p });
+  if (isHuman(world, n)) news.push({ kind: "raised", text: `${name}, ${OFFICIALS[type]!.toLowerCase()} of ${provinceName(world, p)}, takes a commission as ${sea ? "admiral" : "general"}. The post stands empty until he returns.`, nations: [n], province: p });
   return null;
 }
 
@@ -417,7 +418,7 @@ export function recruit(world: World, n: number, p: number, thousands: number, n
   // Many calls in a row (the AI's month) count the men gathering and recount once at the end.
   if (recountAfter) recount(world);
   else world.nationCapUsed[n] = world.nationCapUsed[n]! + men;
-  if (n === world.player) news.push({ kind: "raised", text: `${fmt(men)} men of ${provinceName(world, p)} are called up; they gather a thousand every ${days} days.`, nations: [n], province: p });
+  if (isHuman(world, n)) news.push({ kind: "raised", text: `${fmt(men)} men of ${provinceName(world, p)} are called up; they gather a thousand every ${days} days.`, nations: [n], province: p });
   return null;
 }
 
@@ -672,7 +673,7 @@ export function trainTroops(world: World, n: number, army: number, arm: string, 
   a.trainArm[army] = armIndex(arm);
   a.trainMen[army] = men;
   a.trainLeft[army] = Math.max(1, Math.ceil(cost.months));
-  if (n === world.player) news.push({ kind: "raised", text: `${fmt(men)} levy infantry begin training as ${armName(arm)}: ${Math.ceil(cost.months)} months, ${g.toFixed(1)} gold.`, nations: [n], province: a.location[army]! });
+  if (isHuman(world, n)) news.push({ kind: "raised", text: `${fmt(men)} levy infantry begin training as ${armName(arm)}: ${Math.ceil(cost.months)} months, ${g.toFixed(1)} gold.`, nations: [n], province: a.location[army]! });
   return null;
 }
 
@@ -834,7 +835,7 @@ export function hireCompany(world: World, n: number, id: number, news: News[]): 
   world.freeCompanies = world.freeCompanies.filter((x) => x !== c);
   world.mercs.push({ nation: n, company: c, weeksLeft: weeks });
   recount(world);
-  if (n === world.player) news.push({ kind: "raised", text: `${c.name} (${fmt(men)} men under ${c.captain}) is hired for ${cost.toFixed(1)} gold; it reaches ${provinceName(world, cap)} in ${weeks} weeks.`, nations: [n] });
+  if (isHuman(world, n)) news.push({ kind: "raised", text: `${c.name} (${fmt(men)} men under ${c.captain}) is hired for ${cost.toFixed(1)} gold; it reaches ${provinceName(world, cap)} in ${weeks} weeks.`, nations: [n] });
   return null;
 }
 
@@ -956,7 +957,7 @@ export function weeklyMusters(world: World, news: News[], days = 7): void {
   world.musters = world.musters.filter((m) => {
     if (controller(world, m.province) !== m.nation) {
       sendHome(world, m.nation, m.men);
-      if (m.nation === world.player) news.push({ kind: "refused", text: `${fmt(m.men)} men called up at ${provinceName(world, m.province)} scatter home as the enemy takes it.`, nations: [m.nation], province: m.province });
+      if (isHuman(world, m.nation)) news.push({ kind: "refused", text: `${fmt(m.men)} men called up at ${provinceName(world, m.province)} scatter home as the enemy takes it.`, nations: [m.nation], province: m.province });
       return false;
     }
     m.daysLeft -= days;
@@ -969,7 +970,7 @@ export function weeklyMusters(world: World, news: News[], days = 7): void {
       m.daysLeft += gatherDays(world, m.nation);
       gathered += men;
     }
-    if (gathered && m.nation === world.player) news.push({ kind: "raised", text: `${fmt(gathered)} men have gathered at ${provinceName(world, m.province)} and wait for a commander.`, nations: [m.nation], province: m.province });
+    if (gathered && isHuman(world, m.nation)) news.push({ kind: "raised", text: `${fmt(gathered)} men have gathered at ${provinceName(world, m.province)} and wait for a commander.`, nations: [m.nation], province: m.province });
     return m.men >= 1;
   });
   world.mercs = world.mercs.filter((m) => {
@@ -983,7 +984,7 @@ export function weeklyMusters(world: World, news: News[], days = 7): void {
     const captain = newCaptain(world, m.nation, c.captain || undefined);
     const slot = spawnArmy(world, m.nation, at, companyMen(c), captain, 0, { kind: KIND.hired, drill: rc.drillAndBreak("trained").drill });
     setByArm(world, slot, c.byArm);
-    if (m.nation === world.player) news.push({ kind: "raised", text: `${world.commanders[captain]!.name} arrives at ${provinceName(world, at)} with ${c.name}, ${fmt(companyMen(c))} men.`, nations: [m.nation], province: at });
+    if (isHuman(world, m.nation)) news.push({ kind: "raised", text: `${world.commanders[captain]!.name} arrives at ${provinceName(world, at)} with ${c.name}, ${fmt(companyMen(c))} men.`, nations: [m.nation], province: at });
     return false;
   });
 }
@@ -1065,7 +1066,7 @@ function trainMonth(world: World, i: number, news: News[]): void {
   a.trainArm[i] = -1;
   a.trainMen[i] = 0;
   noteRegiment(world, a.owner[i]!);
-  if (a.owner[i] === world.player) {
+  if (isHuman(world, a.owner[i])) {
     const c = a.commander[i]!;
     news.push({ kind: "raised", text: `${fmt(men)} men of ${c >= 0 ? world.commanders[c]!.name : "an army"}'s army finish their training as ${armName(arm)}.`, nations: [a.owner[i]!], province: p });
   }
@@ -1120,7 +1121,7 @@ export function aiCollect(world: World, news: News[]): void {
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i] || a.commander[i]! >= 0) continue;
     const n = a.owner[i]!;
-    if (n === world.player || world.nationGone[n]) continue;
+    if (isHuman(world, n) || world.nationGone[n]) continue;
     const k = key(n, a.location[i]!, a.kind[i]!);
     const here = led.get(k);
     if (here !== undefined && a.alive[here] && a.commander[here]! >= 0) {

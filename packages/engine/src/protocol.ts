@@ -60,6 +60,8 @@ import { lordAge, officialAge } from "./people.ts";
 import { autoFillReserve, autoFills, fillAllCost, fitHires, newLands, officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, daysToGather, gatherDays, garrisonViews, trainingGrounds, type GarrisonView } from "./recruit.ts";
 import { lordTraits, warPeaceView, type WarPeaceView } from "./peace.ts";
+import { DAYS_PER_TURN } from "./calendar.ts";
+import { applyAll, applyRecorded, cloneWorld, type PlayerOrders } from "./multiplayer.ts";
 import { subjectTies } from "./subjects.ts";
 
 /** A free company as the UI shows it: men by arm, only the arms it has. */
@@ -86,7 +88,7 @@ export type EngineRequest =
    * `difficulty` is the campaign's difficulty, as the save library's options name it; normal when not given (SETUP-099).
    * `choices` are the options step's other campaign rules (SETUP-054); without them the world plays as before (the probes, tests).
    */
-  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles; endDate?: string; chapterYears?: number; goals?: GoalDef[]; difficulty?: string; choices?: Partial<NewGameChoices> }
+  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles; endDate?: string; chapterYears?: number; goals?: GoalDef[]; difficulty?: string; choices?: Partial<NewGameChoices>; humans?: string[] }
   /** Plays a whole week at once (the start-up probe and the benchmarks). */
   | { id: number; type: "endTurn"; orders: Order[] }
   /** Plays the clock on by some 4-hour steps (six a day). */
@@ -100,7 +102,14 @@ export type EngineRequest =
    */
   | { id: number; type: "save"; kind: SaveKind; campaign: Campaign; listing: readonly SaveListing[]; device: string; platform: SavePlatform; gameVersion: string; now: number; name?: string; replace?: string; keep?: number }
   /** Opens a save in place of the game in progress; `map` as for newGame, needed once per engine. */
-  | { id: number; type: "load"; bytes: Uint8Array; map?: MapTiles; acceptModified?: boolean };
+  | { id: number; type: "load"; bytes: Uint8Array; map?: MapTiles; acceptModified?: boolean }
+  /** Multiplayer: plan the week as realm `nation`, from the week's start (another player on this device, or this device's own). */
+  | { id: number; type: "plan"; nation: number }
+  /** Multiplayer: the orders the realm on screen has given this week, to send to the other players. */
+  | { id: number; type: "planned" }
+  /** Multiplayer: back to the week's start, then every player's orders in turn; the week is then played with advance. */
+  /** `humans`: the realms still played by people from this week on (a dropped player's realm goes to the AI, MP-081); unchanged when not given. */
+  | { id: number; type: "resolve"; all: PlayerOrders[]; humans?: string[] };
 
 /** A save already kept: its path and its header's bytes. */
 export interface SaveListing {
@@ -123,7 +132,8 @@ export type EngineResponse =
   | { id: number; type: "saved"; path: string; header: SaveHeader; bytes: Uint8Array; removed: string[]; ironmanHead?: string }
   /** A save that did not open, and why, in the player's words; `canAccept` when opening anyway is allowed. */
   | { id: number; type: "refused"; message: string; canAccept: boolean }
-  | { id: number; type: "error"; message: string; stack?: string };
+  | { id: number; type: "error"; message: string; stack?: string }
+  | { id: number; type: "planned"; orders: PlayerOrders };
 
 /**
  * Read-only copy of the state the UI draws from. Arrays are fresh copies so
@@ -444,6 +454,19 @@ export interface HostReply {
 export function createEngineHost(loadRules: () => Ruleset, now: () => number = () => performance.now()) {
   let world: World | null = null;
   let player = -1;
+  /** Multiplayer: the world at the week's start, and the orders each realm planned on this device this week. */
+  let base: World | null = null;
+  const planned = new Map<number, PlayerOrders>();
+  const plannedBy = (n: number): PlayerOrders => {
+    let p = planned.get(n);
+    if (!p) planned.set(n, (p = { nation: n, orders: [], created: [] }));
+    return p;
+  };
+  /** A new week begins: keep its start to go back to. */
+  const weekStarts = () => {
+    base = cloneWorld(world!);
+    planned.clear();
+  };
   /** The map's tiles from the last newGame or load, for loading saves onto. */
   let grid: TileGrid | undefined;
 
@@ -487,7 +510,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       achievements: achievementsView(w),
       news: news.filter((x) => x.nations.some((n) => close.has(n)) || x.kind === "war" || x.kind === "destroyed" || x.major),
       wars,
-      peaceOffers: w.peaceOffers.map((o) => ({ ...o })),
+      peaceOffers: w.peaceOffers.filter((o) => o.to === player).map(({ to: _to, ...o }) => ({ ...o })),
       settlements: settlementsView(w),
       calls: w.diplomacy.calls
         .filter((c) => !c.answer && c.called === w.nationIds[player])
@@ -768,8 +791,19 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
             world.goals = createGoals(world, req.goals);
             monthlyGoals(world, false);
           }
-          // Only an ironman campaign earns achievements (ACH-034).
-          startAchievements(world, choices ? { ironman: choices.ironman } : {});
+          base = null;
+          planned.clear();
+          if (req.humans?.length) {
+            // Multiplayer: the AI leaves every player's realm alone; achievements are for games of one.
+            world.humans = req.humans.map((h) => world!.nationIndex.get(h) ?? -1).filter((n) => n >= 0).sort((a, b) => a - b);
+            // The campaign's own record follows the first player on every device alike; world.player is only what this one shows.
+            setPlayer(world, world.humans[0]!);
+            world.player = idx;
+            weekStarts();
+          } else {
+            // Only an ironman campaign earns achievements (ACH-034).
+            startAchievements(world, choices ? { ironman: choices.ironman } : {});
+          }
           return snapshot(req.id, started, []);
         }
         case "endTurn": {
@@ -783,10 +817,22 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           if (!world) throw new Error("no game in progress");
           const news = advance(world, Math.max(1, Math.min(req.steps, 42)));
           player = world.player;
-          return snapshot(req.id, started, [], news, false);
+          // Multiplayer: the week's end is the next week's start, and its hash shows the devices agree.
+          const weekEnd = !!world.humans && world.step === 0 && world.day % DAYS_PER_TURN === 0;
+          if (weekEnd) weekStarts();
+          return snapshot(req.id, started, [], news, weekEnd);
         }
         case "act": {
           if (!world) throw new Error("no game in progress");
+          if (world.humans) {
+            const r = applyRecorded(world, req.order, player);
+            if (!r.rejected) {
+              const p = plannedBy(player);
+              p.orders.push(req.order);
+              p.created.push(r.created);
+            }
+            return snapshot(req.id, started, r.rejected ? [{ order: req.order, reason: r.rejected }] : [], r.news);
+          }
           const report = applyNow(world, req.order, player);
           // Playing on as another realm changes who the player is (SHELL-096).
           player = world.player;
@@ -802,6 +848,30 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           const reply: EngineResponse = { id: req.id, type: "saved", path: w.path, header: w.header, bytes: w.bytes, removed: w.removed, ...(campaign.ironmanHead ? { ironmanHead: campaign.ironmanHead } : {}) };
           return { response: reply, transfer: [w.bytes.buffer as ArrayBuffer] };
         }
+        case "plan": {
+          if (!world || !base) throw new Error("no multiplayer game in progress");
+          world = cloneWorld(base);
+          player = req.nation;
+          world.player = req.nation;
+          planned.delete(req.nation);
+          return snapshot(req.id, started, []);
+        }
+        case "planned": {
+          if (!world || !base) throw new Error("no multiplayer game in progress");
+          const p = plannedBy(player);
+          return { response: { id: req.id, type: "planned", orders: { nation: p.nation, orders: [...p.orders], created: p.created.map((c) => ({ ...c })) } }, transfer: [] };
+        }
+        case "resolve": {
+          if (!world || !base) throw new Error("no multiplayer game in progress");
+          if (req.humans) {
+            // Set on the week's start too, so planning the week again (pass and play) sees it.
+            base.humans = req.humans.map((h) => base!.nationIndex.get(h) ?? -1).filter((n) => n >= 0).sort((a, b) => a - b);
+          }
+          world = cloneWorld(base);
+          world.player = player;
+          const r = applyAll(world, req.all);
+          return snapshot(req.id, started, r.rejected.filter((x) => x.nation === player).map(({ order, reason }) => ({ order, reason })), r.news, false);
+        }
         case "load": {
           const rules = loadRules();
           if (req.map) grid = tileGridFromImages(rules, req.map.width, req.map.height, req.map.province, req.map.terrain);
@@ -812,6 +882,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           world = r.world;
           player = idx;
           world.player = idx;
+          base = null;
+          planned.clear();
           return snapshot(req.id, started, []);
         }
       }

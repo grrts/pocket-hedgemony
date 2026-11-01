@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { Rng } from "./rng.ts";
@@ -146,7 +147,7 @@ function catchPlague(world: World, p: number, news: News[], from: number, how: "
   world.provincePlagueDead[p] = 0;
   addSick(world, p);
   const owner = world.provinceOwner[p]!;
-  if (owner >= 0 && owner === world.player) {
+  if (owner >= 0 && isHuman(world, owner)) {
     const way = how === "here" ? "has broken out in its crowded streets" : how === "army" ? "has come with an army" : how === "sea" ? `has come by ship from ${nameOf(world, from)}` : `has come ${how === "river" ? "down the river" : "along the road"} from ${nameOf(world, from)}`;
     news.push({ kind: "plague", text: `Plague in ${nameOf(world, p)}: the sickness ${way}. Its townsfolk die first. You can close the province to slow it, at a cost to its trade and tax.`, nations: [owner], province: p });
     // A card asks what to do about it (EVT-130).
@@ -178,7 +179,7 @@ export function setQuarantine(world: World, n: number, p: number, on: boolean, n
   world.provinceQuarantine[p] = on ? 1 : 0;
   // Trade stops at once: no trader trades in a closed province (TRADE-040).
   if (on) world.provinceTradeRatio[p] = 0;
-  if (n === world.player) news.push({ kind: "plague", text: on ? `${nameOf(world, p)} is closed: its trade stops and its tax falls by half until you lift the quarantine.` : `The quarantine on ${nameOf(world, p)} is lifted: traders come back, slowly.`, nations: [n], province: p });
+  if (isHuman(world, n)) news.push({ kind: "plague", text: on ? `${nameOf(world, p)} is closed: its trade stops and its tax falls by half until you lift the quarantine.` : `The quarantine on ${nameOf(world, p)} is lifted: traders come back, slowly.`, nations: [n], province: p });
   return null;
 }
 
@@ -238,7 +239,7 @@ export function plagueDeaths(world: World, p: number): number {
  */
 function aiQuarantine(world: World, p: number, on: boolean): void {
   const owner = world.provinceOwner[p]!;
-  if (owner < 0 || owner === world.player || !!world.provinceQuarantine[p] === on) return;
+  if (owner < 0 || isHuman(world, owner) || !!world.provinceQuarantine[p] === on) return;
   if (on && crowding(world, p) < 1) return;
   setQuarantine(world, owner, p, on, []);
 }
@@ -272,7 +273,7 @@ function weekOf(world: World, p: number, news: News[]): boolean {
   world.provincePlagueEnded[p] = world.day;
   aiQuarantine(world, p, false);
   const owner = world.provinceOwner[p]!;
-  if (owner >= 0 && owner === world.player) {
+  if (owner >= 0 && isHuman(world, owner)) {
     const dead = Math.round(world.provincePlagueDead[p]! * 1000);
     news.push({ kind: "plague", text: `The plague in ${nameOf(world, p)} has burned out. ${dead.toLocaleString("en-GB")} died of it.${world.provinceQuarantine[p] ? " The province stays closed until you lift the quarantine." : ""}`, nations: [owner], province: p });
   }

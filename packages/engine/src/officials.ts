@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { officialPace } from "./belief.ts";
 import type { News } from "./war.ts";
@@ -150,7 +151,7 @@ export function swapOfficials(world: World, n: number, a: number, b: number, new
   world.provinceOfficialAge[a] = world.provinceOfficialAge[b]!;
   world.provinceOfficialAge[b] = ga;
   world.provinceOfficialSince[a] = world.provinceOfficialSince[b] = world.day;
-  if (n === world.player) {
+  if (isHuman(world, n)) {
     const pa = world.rules.provinces[a]!.name;
     const pb = world.rules.provinces[b]!.name;
     const moved = (who: string, type: number, from: string, to: string) => `${who}, ${OFFICIALS[type]!.toLowerCase()}, moves from ${from} to ${to}`;
@@ -213,7 +214,7 @@ export function hireOfficial(world: World, n: number, p: number, type: number, f
   const gold = hireGold(foreign);
   if (world.nationTreasury[n]! < gold) return "not enough gold";
   seat(world, n, p, type, foreign, gold);
-  if (n === world.player) {
+  if (isHuman(world, n)) {
     const from = foreign ? ` from ${world.rules.nations[world.provinceOfficialFrom[p]!]!.name}` : "";
     news.push({ kind: "raised", text: `${officialAt(world, p)}, a ${OFFICIALS[type]!.toLowerCase()}${from}, takes up the post at ${place} for ${gold} gold. A new post starts him at half his effect.`, nations: [n], province: p });
   }
@@ -234,14 +235,14 @@ export function provinceTaken(world: World, p: number, news: News[] = []): void 
   const n = world.provinceOwner[p]!;
   const auto = n >= 0 && autoFills(world, n);
   // A realm that fills its own posts fills this one at once if its gold allows, and does not wait on the player (PROV-344).
-  world.provinceNewLand[p] = n === world.player && !auto ? 1 : 0;
+  world.provinceNewLand[p] = isHuman(world, n) && !auto ? 1 : 0;
   const occupier = world.provinceOccupier[p]!;
   if (!auto || world.provinceLord[p]! >= 0 || (occupier >= 0 && occupier !== n) || !ungoverned(world, p)) return;
   const r = postsOf(world, n);
   if (roomOf(world, n, r) <= 0) return;
   const hired: string[] = [];
   const before = world.nationTreasury[n]!;
-  if (fillPost(world, n, p, autoFillReserve(), r, hired) && n === world.player) news.push({ kind: "raised", text: fillNews(hired, before - world.nationTreasury[n]!), nations: [n], province: p });
+  if (fillPost(world, n, p, autoFillReserve(), r, hired) && isHuman(world, n)) news.push({ kind: "raised", text: fillNews(hired, before - world.nationTreasury[n]!), nations: [n], province: p });
 }
 
 /** The realm's new land still waiting for a decision (PROV-340): its post empty and no lord granted it. */
@@ -268,7 +269,7 @@ export const autoFillReserve = (): number => autoCfg().reserve_gold;
 
 /** Whether realm n fills its own empty posts each month: every AI realm, and the player's while Auto-fill posts is on (PROV-342). */
 export function autoFills(world: World, n: number): boolean {
-  return n !== world.player || !world.nationManualPosts[n];
+  return !isHuman(world, n) || !world.nationManualPosts[n];
 }
 
 /** The best fit for a province's post and why, in a few words (PROV-343). */
@@ -409,7 +410,7 @@ export function monthlyPosts(world: World, news: News[]): void {
     const r = all[n];
     if (!r?.empty.length || world.nationGone[n] || !autoFills(world, n)) continue;
     const { hired, short, gold } = fillPosts(world, n, autoFillReserve(), r);
-    if (n !== world.player) continue;
+    if (!isHuman(world, n)) continue;
     if (hired.length) news.push({ kind: "raised", text: fillNews(hired, gold), nations: [n] });
     // A post left empty for want of gold is said once a year, in January (PROV-347).
     if (short && world.date.month === 1) news.push({ kind: "raised", text: `Auto-fill keeps ${autoFillReserve()} gold back: ${emptyPosts(world, n).length} posts stand empty until the treasury allows.`, nations: [n] });
@@ -423,7 +424,7 @@ export function fillAllPosts(world: World, n: number, news: News[]): string | nu
   if (roomOf(world, n, r) <= 0) return "the realm holds as many officials as its government allows";
   const { hired, gold } = fillPosts(world, n, 0, r);
   if (!hired.length) return "not enough gold";
-  if (n === world.player) news.push({ kind: "raised", text: `${hired.join("; ")} take up their posts for ${Math.round(gold)} gold. A new post starts each at half his effect.`, nations: [n] });
+  if (isHuman(world, n)) news.push({ kind: "raised", text: `${hired.join("; ")} take up their posts for ${Math.round(gold)} gold. A new post starts each at half his effect.`, nations: [n] });
   return null;
 }
 
@@ -456,6 +457,6 @@ export function dismissOfficial(world: World, n: number, p: number, hire: { type
   world.provinceOfficial[p] = -1;
   world.provinceOfficialFrom[p] = -1;
   world.provinceOfficialSince[p] = world.day;
-  if (n === world.player) news.push({ kind: "raised", text: `${name}, ${OFFICIALS[type]!.toLowerCase()} of ${place}, is dismissed and leaves your service.${hire ? "" : " The post stands empty: half tax and recruits until it is filled."}`, nations: [n], province: p });
+  if (isHuman(world, n)) news.push({ kind: "raised", text: `${name}, ${OFFICIALS[type]!.toLowerCase()} of ${place}, is dismissed and leaves your service.${hire ? "" : " The post stands empty: half tax and recruits until it is filled."}`, nations: [n], province: p });
   return hire ? hireOfficial(world, n, p, hire.type, hire.foreign, news) : null;
 }
