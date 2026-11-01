@@ -28,13 +28,25 @@ const mpState = (page) => page.evaluate(() => globalThis.__phMp());
 const turnIs = (page, turn) => page.waitForFunction((t) => globalThis.__phMp()?.turn === t && !globalThis.__phMp()?.waiting, turn, LONG);
 const seen = (page) => page.evaluate(() => globalThis.__seen ?? []);
 
-async function pressReady(page) {
+/** Answers the week's event cards, which open over everything as a player would see them. */
+async function answerEvents(page) {
   for (let k = 0; k < 6; k++) {
     const opt = page.locator("#event-card:not([hidden]) [data-event-option]");
     if (!(await opt.count())) break;
     await opt.first().click().catch(() => {});
     await page.waitForTimeout(300);
   }
+}
+
+/** Taps a button the way a player would: after answering any event card in the way. */
+async function tap(page, selector) {
+  await answerEvents(page);
+  if (selector.startsWith("#panel") && !(await page.locator("#panel .mp-players").count())) await openPlayers(page);
+  await page.click(selector);
+}
+
+async function pressReady(page) {
+  await answerEvents(page);
   await page.click(".end-turn", LONG);
 }
 
@@ -101,6 +113,7 @@ async function layout(page, card, what) {
 }
 
 async function openPlayers(page) {
+  await answerEvents(page);
   if (!(await page.locator("#panel .mp-players").count())) await page.click(".mp-plaque");
   await page.waitForSelector("#panel .mp-players");
 }
@@ -200,9 +213,9 @@ async function play() {
 
   // Leroy hands his own realm to the AI: Ana, who sat down first after him, becomes the host (MP-081, MP-082).
   await openPlayers(a);
-  await a.click('.mp-leave [data-mp-drop="castile"]');
+  await tap(a, '.mp-leave [data-mp-drop="castile"]');
   await a.waitForSelector('.mp-leave [data-mp-drop="castile"].wax');
-  await a.click('.mp-leave [data-mp-drop="castile"]');
+  await tap(a, '.mp-leave [data-mp-drop="castile"]');
   await a.waitForSelector(".mp-menu [role=alert]", LONG);
   check((await a.textContent(".mp-menu [role=alert]")).includes("You handed Castile to the AI"), "Leroy leaves for good, told why");
   await layout(a, ".mp-menu", "Multiplayer dialog with the reason, Pixel 7");
@@ -212,10 +225,10 @@ async function play() {
   check((await b2.textContent("#panel")).includes("played by the AI"), "Castile is played by the AI");
 
   // Ana hands Bo's realm to the AI, plays on alone, then hands her own: the game ends (MP-081, MP-082).
-  await b2.click('#panel [data-mp-drop="england"]');
+  await tap(b2, '#panel [data-mp-drop="england"]');
   await b2.waitForSelector("#panel [role=alert]");
   await b2.screenshot({ path: `${out}/5-new-host-confirm-iphone.png` });
-  await b2.click('#panel [data-mp-drop="england"]');
+  await tap(b2, '#panel [data-mp-drop="england"]');
   await c.waitForSelector(".mp-menu [role=alert]", LONG);
   check((await c.textContent(".mp-menu [role=alert]")).includes("handed to the AI"), "Bo is told his realm went to the AI");
   await c.screenshot({ path: `${out}/6-handed-to-the-ai-ipad.png` });
@@ -223,9 +236,9 @@ async function play() {
   await turnIs(b2, 3);
   check(true, "Ana plays the next week alone against the AI");
   await openPlayers(b2);
-  await b2.click('.mp-leave [data-mp-drop="france"]');
+  await tap(b2, '.mp-leave [data-mp-drop="france"]');
   await b2.waitForSelector('.mp-leave [data-mp-drop="france"].wax');
-  await b2.click('.mp-leave [data-mp-drop="france"]');
+  await tap(b2, '.mp-leave [data-mp-drop="france"]');
   await b2.waitForSelector(".mp-menu [role=alert]", LONG);
   check((await api("GET", `/api/games/${code}?since=0`, null, boApi)).status === 404, "with nobody left the game has ended");
 }
