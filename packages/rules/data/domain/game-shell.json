@@ -363,6 +363,25 @@
       "Research"
     ]
   },
+  "comingUp": {
+    "$comment": "The Overview's Coming up strip (SHELL-188, F-154): months ahead shown, items at most, the age a ruler or heir rules alone (realm.json rulers.child_under), and the order of kinds due in the same month. Provisional.",
+    "horizon_months": 6,
+    "max": 4,
+    "of_age": 16,
+    "order": [
+      "lord",
+      "truce",
+      "work",
+      "study",
+      "ambition",
+      "regency",
+      "heir"
+    ]
+  },
+  "autoTurns": {
+    "$comment": "Auto turns (SHELL-190, F-156): how many times faster a quiet week's days play than Turn playback speed asks. Provisional.",
+    "quiet_speed": 3
+  },
   "attention": {
     "famine in a province within two months": {
       "group": "Warnings",

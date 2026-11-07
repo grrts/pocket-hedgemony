@@ -7782,6 +7782,38 @@ button.realm-link.hunt-line {
 .overview-tiles .tile.needs {
   box-shadow: inset 4px 0 0 var(--cloth);
 }
+/* Realm's Overview, Coming up (SHELL-188): what happens soon, soonest first; chips wrap, never scroll sideways (SHELL-167). */
+.coming-up {
+  margin: 4px 0 6px;
+}
+.coming-up h3.sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0;
+}
+.coming {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.coming .coming-item {
+  min-height: 44px;
+  padding: 4px 10px;
+  gap: 6px;
+  font-size: 16px;
+  line-height: 1.1;
+  text-align: left;
+  font-weight: 400;
+  flex: 0 1 auto;
+  max-width: 100%;
+}
+.coming .coming-item > span {
+  overflow-wrap: anywhere;
+}
+.coming .coming-item.risk {
+  box-shadow: inset 4px 0 0 var(--cloth);
+}
 .overview-head {
   margin: 2px 0 4px;
 }

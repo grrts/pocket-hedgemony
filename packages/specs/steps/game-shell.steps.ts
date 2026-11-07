@@ -224,6 +224,9 @@ import {
   watchRound,
   watchedBattleEnds,
   type Tracked,
+  comingUp,
+  type ComingInput,
+  type ComingItem,
 } from "@ph/engine/domain/game-shell";
 import { steps, type Scenario, type Table } from "../src/registry.ts";
 
@@ -3680,8 +3683,59 @@ Given("the realm stands as:", (s, table: Table) => {
 });
 
 When("the player opens the Realm book's Overview", (s) => {
-  s.tiles = realmOverview(s.overviewInput as OverviewInput);
+  if (s.overviewInput) s.tiles = realmOverview(s.overviewInput as OverviewInput);
+  if (s.comingInput) s.coming = comingUp(s.comingInput as ComingInput);
 });
+
+// Coming up (SHELL-188, SHELL-189)
+
+Given("what is coming for the realm:", (s, table: Table) => {
+  const v: ComingInput = { truces: [], works: [], study: null, heir: null, ruler: null, ambitions: [], lords: [] };
+  for (const [kind, what, months] of table.slice(1)) {
+    const m = Number(months);
+    if (kind === "lord") v.lords.push({ name: what!, lord: v.lords.length, loyalty: months || "Disloyal" });
+    else if (kind === "truce") v.truces.push({ realm: what!, nation: 7, months: m });
+    else if (kind === "work") {
+      const [work, province] = what!.split(",").map((x) => x.trim());
+      v.works.push({ work: work!, province: province!, provinceIndex: 3, months: m });
+    } else if (kind === "study") v.study = { name: what!, months: m };
+    else if (kind === "ambition") v.ambitions.push({ name: what!, near: true });
+    else if (kind === "heir") {
+      const [name, age] = what!.split(",").map((x) => x.trim());
+      v.heir = { name: name!, age: Number(age) };
+    } else if (kind === "regency") v.ruler = { age: Number(what), regent: true };
+    else throw new Error(`No kind ${kind}`);
+  }
+  s.comingInput = v;
+});
+
+Then("Coming up reads:", (s, table: Table) => {
+  expect((s.coming as ComingItem[]).map((c) => c.text)).toEqual(table.map((r) => r[0]));
+});
+
+Then("Coming up is left out", (s) => {
+  expect(s.coming).toEqual([]);
+});
+
+Then("the Coming up item {string} opens the lord's screen", (s, text: string) => {
+  expect(comingItem(s, text).open).toEqual({ lord: 0 });
+});
+Then("the Coming up item {string} opens the realm's card on Diplomacy", (s, text: string) => {
+  expect(comingItem(s, text).open).toEqual({ realm: 7 });
+});
+Then("the Coming up item {string} opens the province card on Build", (s, text: string) => {
+  expect(comingItem(s, text).open).toEqual({ build: 3 });
+});
+Then("the Coming up item {string} opens the page {string}", (s, text: string, page: string) => {
+  expect(comingItem(s, text).open).toEqual({ page });
+  expect(sectionOf(page)).toBeDefined();
+});
+
+const comingItem = (s: Scenario, text: string): ComingItem => {
+  const c = (s.coming as ComingItem[]).find((x) => x.text === text);
+  expect(c, text).toBeDefined();
+  return c!;
+};
 
 const overviewTile = (s: Scenario, section: string): OverviewTile => {
   const t = (s.tiles as OverviewTile[]).find((x) => x.section === section);

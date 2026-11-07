@@ -1,5 +1,5 @@
 import { expect } from "vitest";
-import { autoTurnsOffered, endTurnLabel, newAutoTurns, stopAuto, switchAuto, weekPlayed, type AutoStop } from "@ph/engine/domain/game-shell";
+import { autoDayMs, autoLabel, autoTurnsOffered, endTurnLabel, newAutoTurns, stopAuto, switchAuto, weekPlayed, type AutoStop, type Nearness } from "@ph/engine/domain/game-shell";
 import { steps, type Scenario } from "../src/registry.ts";
 
 // Auto turns (SHELL-159..161): the scenario plays the client's week loop
@@ -116,4 +116,34 @@ Then("the week plays on to its end unless it already waits for the player", (s) 
 
 Given("land just taken waits for a decision", (s) => {
   s.blocked = "new lands";
+});
+
+// Quiet weeks play faster (SHELL-190)
+
+const calm = (): Nearness => ({ fighting: false, enemyNear: false, dueThisMonth: false });
+
+Given("Turn playback speed gives a day {int} ms", (s, ms: number) => {
+  s.dayMs = ms;
+  s.near = calm();
+});
+Given("nothing is near the realm", (s) => {
+  s.near = calm();
+});
+Given("a battle of the player's is under way", (s) => {
+  s.near = { ...calm(), fighting: true };
+});
+Given("an enemy army stands beside the player's land", (s) => {
+  s.near = { ...calm(), enemyNear: true };
+});
+Given("a truce on Coming up ends this month", (s) => {
+  s.near = { ...calm(), dueThisMonth: true };
+});
+When("a day of the week plays", (s) => {
+  s.shownMs = autoDayMs(s.auto, s.dayMs, s.near);
+});
+Then("the day takes {int} ms on screen", (s, ms: number) => {
+  expect(s.shownMs).toBe(ms);
+});
+Then("the Auto button reads {string}", (s, label: string) => {
+  expect(autoLabel(s.auto, s.near)).toBe(label);
 });

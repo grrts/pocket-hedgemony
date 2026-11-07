@@ -6,6 +6,8 @@
  * does (X-15).
  */
 
+import { SHELL } from "./stack.ts";
+
 export type AutoState = "off" | "on" | "stopping";
 
 /** Why Auto turns stop at the end of the week (SHELL-161); "player" when the player stopped them. */
@@ -84,3 +86,29 @@ export const AUTO_STOPPING = "Stops at the end of this week";
 
 /** What End turn says because of Auto turns, or null when it says what it always does. */
 export const endTurnLabel = (a: AutoTurns): string | null => (a.state === "stopping" ? AUTO_STOPPING : null);
+
+/** What is near the player's realm on the day about to play (SHELL-190, F-156). */
+export interface Nearness {
+  /** One of the player's battles or sieges is under way. */
+  fighting: boolean;
+  /** An army of a realm at war with the player stands in or beside the player's land. */
+  enemyNear: boolean;
+  /** Something on the Overview's Coming up is due this month (SHELL-188). */
+  dueThisMonth: boolean;
+}
+
+/** Whether a week on Auto is quiet: nothing near (SHELL-190). */
+export const quiet = (n: Nearness): boolean => !n.fighting && !n.enemyNear && !n.dueThisMonth;
+
+/**
+ * How long a day of a week takes on screen (SHELL-190): with Auto turns on and
+ * nothing near, a day plays `autoTurns.quiet_speed` times as fast as Turn
+ * playback speed asks; as soon as something is near it plays at that speed
+ * again. Never what the day does (X-15).
+ */
+export function autoDayMs(a: AutoTurns, dayMs: number, n: Nearness): number {
+  return a.state === "on" && quiet(n) ? dayMs / SHELL.autoTurns.quiet_speed : dayMs;
+}
+
+/** The Auto button's word: "Auto ×3" while a week on Auto plays fast, else "Auto" (SHELL-190). */
+export const autoLabel = (a: AutoTurns, n: Nearness | null): string => (a.state === "on" && n && quiet(n) ? `Auto ×${SHELL.autoTurns.quiet_speed}` : "Auto");
