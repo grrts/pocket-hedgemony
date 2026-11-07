@@ -40,8 +40,10 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   while ((await page.evaluate(() => window.__phTurn())) < turns) {
     const t = await page.evaluate(() => window.__phTurn());
     await page.evaluate(() => document.querySelectorAll(".alert .dismiss").forEach((b) => b.click()));
+    // An event card holds the week until it is answered: take its first option.
+    await page.evaluate(() => document.querySelector("#event-card:not([hidden]) [data-event-option]")?.click());
     await page.evaluate(() => document.querySelector(".end-turn")?.click());
-    await page.waitForFunction((n) => window.__phTurn() > n, t, { timeout: 30000 }).catch(() => console.log(name, "stuck at turn", t));
+    await page.waitForFunction((n) => window.__phTurn() > n, t, { timeout: 30000 }).catch(() => page.screenshot({ path: `${out}/${name}-stuck-${t}.png` }));
   }
   await page.evaluate(() => document.querySelectorAll(".alert .dismiss").forEach((b) => b.click()));
   await page.waitForTimeout(500);

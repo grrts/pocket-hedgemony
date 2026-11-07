@@ -223,7 +223,8 @@ export function tradeGrainLine(s: Snapshot, held: number[]): string {
   for (const p of held) (inn += grainIn(s, p)), (out += grainOut(s, p));
   const gold = s.ledger.find((l) => l.line === "grain")?.gold ?? 0;
   if (inn < 0.0005 && out < 0.0005) return "Last month traders carried no grain in or out of your land.";
-  return `Last month traders brought grain for <b>${peopleFed(inn)}</b> into your land and took grain for <b>${peopleFed(out)}</b> out${Math.abs(gold) >= 0.05 ? ` (Grain line ${gold > 0 ? "+" : ""}${gold.toFixed(1)} gold)` : ""}.`;
+  const parts = [inn >= 0.0005 ? `brought grain for <b>${peopleFed(inn)}</b> into your land` : "", out >= 0.0005 ? `took grain for <b>${peopleFed(out)}</b> out${inn >= 0.0005 ? "" : " of your land"}` : ""].filter(Boolean).join(" and ");
+  return `Last month traders ${parts}${Math.abs(gold) >= 0.05 ? ` (Grain line ${gold > 0 ? "+" : ""}${gold.toFixed(1)} gold)` : ""}.`;
 }
 
 /** The province Overview's Grain by trade line, when traders sold or bought there last month (TRADE-169). */
