@@ -68,7 +68,7 @@ import { declareSheetHtml, nameAbroadHtml, warCardHtml, warPlaqueBars } from "./
 import { closeUpPoint, firstShown, jumpTarget, learningTab, newLearningUi, nodeAt, realmLearningLine, startStanding, studyNow } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
-import { castleFoodLine, castleFoodSettings, foodCounts, foodTab, landShare as landShareOf } from "./ui/food.ts";
+import { castleFoodLine, castleFoodSettings, foodCounts, foodTab, grainTradeLine, landShare as landShareOf } from "./ui/food.ts";
 import { bindFolds, fold } from "./ui/fold.ts";
 import { aimsFoldHtml, chronicleHtml, type ChronicleUi } from "./ui/chronicle.ts";
 import { startGoals, type GoalDef } from "@ph/rules";
@@ -5192,6 +5192,7 @@ function foodParts(pi: number): [string, string] {
       <dt>Harvest</dt><dd>${harvestText(pi)}</dd>
       ${men > 0 && people > 0 ? `<dt>Armies</dt><dd>${fmt(men)} men here eat ${(eaten / people).toFixed(1)} months of this store a month</dd>` : ""}
       ${castleFoodLine(s, pi, (p) => provinces[p]!.name)}
+      ${grainTradeLine(s, pi)}
       ${starved > 0 ? `<dt>Starved</dt><dd>${fmt(starved)} this year</dd>` : ""}`];
 }
 
@@ -9336,6 +9337,13 @@ Object.assign(globalThis, {
     const w = snapshot?.traderWalks.find((x) => x.mine && x.medium === "land" && x.from !== x.to) ?? snapshot?.traderWalks[0];
     const m = w && placeTrader(w, undefined, 1, tileXY, (p) => [provinces[p]!.x!, provinces[p]!.y!]);
     if (m) view.lookAt(m.x, m.y, zoom);
+  },
+  /** The player's province that traders sold the most grain to last month, by id, or null (scripts/grain-shots.mjs). */
+  __phGrainProvince: () => {
+    if (!snapshot) return null;
+    let best = -1;
+    for (let p = 0; p < provinces.length; p++) if (snapshot.provinceOwner[p] === snapshot.playerNation && snapshot.provinceGrain[p * 2]! > (best < 0 ? 0 : snapshot.provinceGrain[best * 2]!)) best = p;
+    return best >= 0 ? provinces[best]!.id : null;
   },
   /** Centres the map on a province by id, at a zoom. */
   __phLookAt: (id: string, zoom: number) => {

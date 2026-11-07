@@ -13,6 +13,7 @@ import { moodIndex } from "./moods.ts";
 import { knows, withoutOf } from "./research.ts";
 import { realmAssessment } from "./realmStrengths.ts";
 import { planTilePath } from "./march.ts";
+import { closeGrainMonth, grainHold, grainWay, raiderAt, tradeGrainAt } from "./tradeGrain.ts";
 
 /**
  * Trade in the game (TRADE-129 to TRADE-146, D-TRADE-20): every province's
@@ -68,6 +69,15 @@ export interface GameTrader {
   srcLast: number[];
   fees: number;
   feesLast: number;
+  /** Grain in its hold, in thousands of people fed for a month (TRADE-162). */
+  grain: number;
+  /** Grain it sold and bought on this trip there and back and on the last whole one: province and food, in pairs; only the player's (TRADE-166). */
+  grainSold: number[];
+  grainSoldLast: number[];
+  grainBought: number[];
+  grainBoughtLast: number[];
+  /** The province where an enemy army last seized its purse and grain, or -1 (TRADE-165). */
+  raided: number;
 }
 
 /** A trader's collection or deposit, for the map to show as it happens (TRADE-152). */
@@ -103,6 +113,11 @@ export interface TradeState {
   tradeDraft: { trader: number; stops: number[] } | null;
   /** The player's traders' collections and deposits since the map last looked; never saved. */
   tradeFeed: TradeFeedItem[];
+  /** Grain traders sold to and bought from each province this month and last month, 2 per province (TRADE-166). */
+  provinceGrain: Float32Array;
+  provinceGrainLast: Float32Array;
+  /** Grain gold this month by realm, + in and − out, joining the Grain line when the month turns (TRADE-164). */
+  nationGrainTradeNow: Float64Array;
 }
 
 export function createTradeState(P: number, N: number): TradeState {
@@ -122,6 +137,9 @@ export function createTradeState(P: number, N: number): TradeState {
     nationTradeNow: new Float64Array(N * 2),
     tradeDraft: null,
     tradeFeed: [],
+    provinceGrain: new Float32Array(P * 2),
+    provinceGrainLast: new Float32Array(P * 2),
+    nationGrainTradeNow: new Float64Array(N),
   };
 }
 
@@ -520,7 +538,7 @@ function depositsAt(world: World, t: GameTrader, q: number): boolean {
  * A trader's days on the road, walked a day at a time as armies march: it enters province after province,
  * collecting, paying fees and depositing (TRADE-033, TRADE-043 to TRADE-048, TRADE-060, TRADE-132).
  */
-function walk(world: World, t: GameTrader, collect: boolean, days: number): void {
+function walk(world: World, t: GameTrader, collect: boolean, days: number, news?: News[], daily = false): void {
   const path = pathOf(world, t);
   const row = kindRow(world, t.kind);
   const ship = isShip(t.kind);
@@ -541,9 +559,26 @@ function walk(world: World, t: GameTrader, collect: boolean, days: number): void
       // A ship a blockade stops loses its purse to the blockading realm (NAVY-157).
       if (ship && world.provinceWater[q] && cost !== Infinity) {
         if (collect) seizePurse(world, q, t.purse);
+        if (collect && (t.purse > 0 || t.grain > 0) && isHuman(world, t.owner)) news?.push({ kind: "trade", text: `A blockade took the purse${t.grain > 0 ? " and grain" : ""} of the ${KIND_NAME[t.kind].toLowerCase()} of ${world.rules.provinces[t.home]!.name}.`, nations: [t.owner], province: t.home });
         t.purse = 0;
+        t.grain = 0;
       }
       // The way is shut: plan the loop again next month.
+      t.path = [];
+      t.blocked = q;
+      t.days = 0;
+      return;
+    }
+    // An army at war with its realm on the land ahead seizes its purse and grain, and the way is shut (TRADE-165).
+    const raider = ship || !daily ? -1 : raiderAt(world, t.owner, q);
+    if (raider >= 0) {
+      if (t.purse > 0 || t.grain > 0) {
+        world.nationTreasury[raider] = world.nationTreasury[raider]! + t.purse;
+        if (isHuman(world, t.owner)) news?.push({ kind: "trade", text: `An enemy army at ${world.rules.provinces[q]!.name} seized the purse${t.grain > 0 ? " and grain" : ""} of the ${KIND_NAME[t.kind].toLowerCase()} of ${world.rules.provinces[t.home]!.name}.`, nations: [t.owner], province: q });
+      }
+      t.purse = 0;
+      t.grain = 0;
+      t.raided = q;
       t.path = [];
       t.blocked = q;
       t.days = 0;
@@ -552,12 +587,17 @@ function walk(world: World, t: GameTrader, collect: boolean, days: number): void
     if (budget < cost) break;
     budget -= cost;
     t.at = next;
+    t.raided = -1;
     // Back where it set out: a whole trip there and back is done, and where its gold came from starts afresh.
     if (next === 0 && collect) {
       t.srcLast = t.src;
       t.feesLast = t.fees;
       t.src = [];
       t.fees = 0;
+      t.grainSoldLast = t.grainSold;
+      t.grainBoughtLast = t.grainBought;
+      t.grainSold = [];
+      t.grainBought = [];
     }
     if (world.provinceWater[q]) {
       for (const port of lanePorts(world, q)) mark(port, config.ratio.sea_lane_trader_weight);
@@ -565,6 +605,9 @@ function walk(world: World, t: GameTrader, collect: boolean, days: number): void
     }
     mark(q, 1);
     world.provinceVisits[q] = world.provinceVisits[q]! + 1;
+    // Grain is sold where stores run low and bought where they have plenty (TRADE-163).
+    // Only on the day loop: the warm-up before the first turn moves no grain.
+    if (daily) tradeGrainAt(world, t, q, grainHold(row.hold));
     if (collect && t.purse < row.purse) {
       const value = tradeValueAt(world, q, ship);
       const crowd = Math.min(1, served(world, q) / world.provinceVisits[q]!);
@@ -640,8 +683,8 @@ function updateRatios(world: World): void {
 }
 
 /** Every trader walks one day on, as the armies march (TRADE-132). */
-export function tradeDay(world: World): void {
-  for (const t of world.traders) walk(world, t, true, 1);
+export function tradeDay(world: World, news?: News[]): void {
+  for (const t of world.traders) walk(world, t, true, 1, news, true);
 }
 
 /**
@@ -677,6 +720,8 @@ export function tradeMonth(world: World, collect: boolean): void {
 export function monthlyTrade(world: World, news: News[]): void {
   legCache.delete(world);
   closeMonth(world);
+  // Grain gold joins the Grain line, after the castles' month has counted its own (TRADE-164).
+  closeGrainMonth(world, true);
   const lost: GameTrader[] = [];
   for (const t of world.traders) {
     const up = kindRow(world, t.kind).upkeep;
@@ -919,8 +964,11 @@ export function homedAt(world: World, city: number): number {
   return k;
 }
 
+/** A new trader's grain: an empty hold and nothing sold or bought. */
+const emptyHold = () => ({ grain: 0, grainSold: [] as number[], grainSoldLast: [] as number[], grainBought: [] as number[], grainBoughtLast: [] as number[], raided: -1 });
+
 function addTrader(world: World, n: number, home: number, kind: GameTraderKind, stops: number[]): GameTrader {
-  const t: GameTrader = { id: ++world.traderSeq, kind, owner: n, home, stops, purse: 0, at: 0, days: 0, lastMonth: 0, thisMonth: 0, lastDeposit: 0, lastDepositCity: -1, unpaid: 0, blocked: -1, chosen: false, path: [], marked: [], src: [], srcLast: [], fees: 0, feesLast: 0 };
+  const t: GameTrader = { id: ++world.traderSeq, kind, owner: n, home, stops, purse: 0, at: 0, days: 0, lastMonth: 0, thisMonth: 0, lastDeposit: 0, lastDepositCity: -1, unpaid: 0, blocked: -1, chosen: false, path: [], marked: [], src: [], srcLast: [], fees: 0, feesLast: 0, ...emptyHold() };
   world.traders.push(t);
   return t;
 }
@@ -1149,6 +1197,14 @@ export interface TraderView {
   fees: number;
   /** Better routes, best first (TRADE-148). */
   better: RouteSuggestion[];
+  /** Grain in its hold and the most it holds; what it sold and bought on its last whole trip (this one's so far until then), most first; where an enemy army last seized its load, or -1 (TRADE-162 to TRADE-166). */
+  grain: number;
+  grainMax: number;
+  grainSold: { province: number; food: number }[];
+  grainBought: { province: number; food: number }[];
+  raided: number;
+  /** Provinces on its way that would sell grain now and those that would buy it (TRADE-167). */
+  grainWay: { sell: number[]; buy: number[] };
 }
 
 export interface FoundOption {
@@ -1171,7 +1227,7 @@ export interface TradeView {
   /** The realm's busiest trade cities: value, ratio and traders passing. */
   centres: { province: number; value: number; ratio: number; passing: number }[];
   /** The route being drawn: its stops, whether it can be set, and its preview; with where it starts chosen, the cities it could go to and what each brings (TRADE-149). */
-  draft: ({ trader: number; stops: number[]; why: string | null; path: number[]; options: { city: number; expected: number; loopDays: number }[] } & RouteEstimate) | null;
+  draft: ({ trader: number; stops: number[]; why: string | null; path: number[]; options: { city: number; expected: number; loopDays: number }[]; grainWay: { sell: number[]; buy: number[] } } & RouteEstimate) | null;
   /** This month so far: gold deposited and market fees taken; gold carried in the traders' purses (TRADE-150). */
   depositsNow: number;
   feesNow: number;
@@ -1188,6 +1244,9 @@ const pairs = (src: readonly number[]) => {
   for (let i = 0; i < src.length; i += 2) out.push({ province: src[i]!, gold: src[i + 1]! });
   return out.sort((a, b) => b.gold - a.gold);
 };
+
+/** Province-and-food pairs as a list, most first. */
+const foodPairs = (src: readonly number[]) => pairs(src).map((x) => ({ province: x.province, food: x.gold }));
 
 /** Days a trader has left to walk to path index `to` from where it stands. */
 function daysTo(world: World, t: GameTrader, path: readonly number[], to: number): number {
@@ -1236,7 +1295,7 @@ export function tradeView(world: World, n: number): TradeView {
         id: t.id, kind: t.kind, name: row.name, home: t.home, stops: t.stops.slice(), purse: t.purse, purseMax: row.purse,
         at: path[at] ?? t.home, path: path.slice(), pathAt: at, expected: est.expected, upkeep: row.upkeep, loopDays: est.loopDays,
         lastMonth: t.lastMonth, lastDeposit: t.lastDeposit, lastDepositCity: t.lastDepositCity,
-        problem: t.blocked >= 0 ? `the way to ${world.rules.provinces[t.blocked]!.name} is closed` : (t.stops.length < 2 ? "no route: it waits at home" : est.deposits === 0 ? "no city of yours on its route to deposit in" : null),
+        problem: t.raided >= 0 ? `raided at ${world.rules.provinces[t.raided]!.name}: an enemy army took its purse and grain` : t.blocked >= 0 ? `the way to ${world.rules.provinces[t.blocked]!.name} is closed` : (t.stops.length < 2 ? "no route: it waits at home" : est.deposits === 0 ? "no city of yours on its route to deposit in" : null),
         heading: path.length > 1 ? path[toward]! : t.home,
         headingDays: path.length > 1 ? daysTo(world, t, path, toward) : 0,
         next: path.length > 1 ? path[(at + 1) % path.length]! : t.home,
@@ -1244,6 +1303,10 @@ export function tradeView(world: World, n: number): TradeView {
         sources, sourcesTrip: last ? "last" : "this", fees,
         // A trader with no route or a shut way is offered any route that pays.
         better: suggestRoutes(world, t, t.stops.length < 2 || t.blocked >= 0 ? 0 : est.expected),
+        grain: t.grain, grainMax: grainHold(row.hold),
+        grainSold: foodPairs(t.grainSoldLast.length || t.grainBoughtLast.length ? t.grainSoldLast : t.grainSold),
+        grainBought: foodPairs(t.grainSoldLast.length || t.grainBoughtLast.length ? t.grainBoughtLast : t.grainBought),
+        raided: t.raided, grainWay: grainWay(world, path),
       };
     })
     .sort((a, b) => b.expected - a.expected);
@@ -1265,7 +1328,7 @@ export function tradeView(world: World, n: number): TradeView {
     const path = !why && d.stops.length >= 2 ? loopPath(world, n, dt.kind, d.stops, false) : null;
     const est = path ? estimateLoop(world, n, dt.kind, path, 0, peekPath(world, dt)) : { loopDays: 0, collectIn: 0, best: [], expected: 0, fees: 0, deposits: 0 };
     const options = d.stops.length >= 1 && isTradeStop(world, d.stops[0]!, dt.kind) ? draftOptions(world, dt, d.stops[0]!) : [];
-    draft = { trader: d.trader, stops: d.stops.slice(), why: why ?? (d.stops.length >= 2 && !path ? "no way between those cities" : null), path: path ?? [], options, ...est };
+    draft = { trader: d.trader, stops: d.stops.slice(), why: why ?? (d.stops.length >= 2 && !path ? "no way between those cities" : null), path: path ?? [], options, grainWay: grainWay(world, path ?? []), ...est };
   }
   const sources = [...realmSrc].map(([province, gold]) => ({ province, gold })).sort((a, b) => b.gold - a.gold);
   return {
@@ -1356,25 +1419,37 @@ export function traderWalks(world: World, n: number, max: number, seen: Uint8Arr
 // ---------------------------------------------------------------- saves
 
 /** A trader as saved: its kind by number, so no build text reaches the save. */
-export type SavedTrader = Omit<GameTrader, "kind" | "marked" | "src" | "srcLast" | "fees" | "feesLast"> & { kind: number; marked?: number[]; src?: number[]; srcLast?: number[]; fees?: number; feesLast?: number };
+export type SavedTrader = Omit<GameTrader, "kind" | "marked" | "src" | "srcLast" | "fees" | "feesLast" | GrainKey> & { kind: number; marked?: number[]; src?: number[]; srcLast?: number[]; fees?: number; feesLast?: number } & Partial<Pick<GameTrader, GrainKey>>;
+/** A trader's grain fields: absent in saves from before traders carried grain. */
+type GrainKey = "grain" | "grainSold" | "grainSoldLast" | "grainBought" | "grainBoughtLast" | "raided";
 
 export interface SavedTrade {
   traders: SavedTrader[];
   traderSeq: number;
   /** This month's deposits and fees so far, by realm (2 per realm); absent in saves from before traders walked daily. */
   now?: number[];
+  /** This month's grain gold so far, by realm; absent in saves from before traders carried grain. */
+  grainNow?: number[];
 }
 
 /** By province: trade ratio, goods value a year, weight and trade stop as counted last January, and this month's traders passing and visits so far. */
 export function tradeProvinceArrays(world: World): Record<string, Float32Array | Uint8Array | Int16Array | Int32Array> {
-  return { tradeRatio: world.provinceTradeRatio, tradeGoods: world.provinceGoodsValue, tradeWeight: world.provinceWeight, tradeCity: world.provinceTradeCity, tradePassing: world.provincePassing, tradeVisits: Int16Array.from(world.provinceVisits, (v) => Math.min(32767, v)), tradeVisitsLast: Uint8Array.from(world.provinceVisitsLast, (v) => Math.min(255, v)) };
+  return { tradeRatio: world.provinceTradeRatio, tradeGoods: world.provinceGoodsValue, tradeWeight: world.provinceWeight, tradeCity: world.provinceTradeCity, tradePassing: world.provincePassing, tradeVisits: Int16Array.from(world.provinceVisits, (v) => Math.min(32767, v)), tradeVisitsLast: Uint8Array.from(world.provinceVisitsLast, (v) => Math.min(255, v)), ...grainArrays(world) };
+}
+
+/** Grain sold to and bought from each province by traders, this month and last (TRADE-166), one array each by province. */
+function grainArrays(world: World): Record<string, Float32Array> {
+  const P = world.provinceCount;
+  const pick = (a: Float32Array, k: number) => Float32Array.from({ length: P }, (_, p) => a[p * 2 + k]!);
+  return { tradeGrainIn: pick(world.provinceGrain, 0), tradeGrainOut: pick(world.provinceGrain, 1), tradeGrainInLast: pick(world.provinceGrainLast, 0), tradeGrainOutLast: pick(world.provinceGrainLast, 1) };
 }
 
 export function saveTrade(world: World): SavedTrade {
   return {
-    traders: world.traders.map((t) => ({ ...t, kind: TRADER_KINDS.indexOf(t.kind), stops: t.stops.slice(), path: t.path.slice(), marked: t.marked.slice(), src: t.src.slice(), srcLast: t.srcLast.slice() })),
+    traders: world.traders.map((t) => ({ ...t, kind: TRADER_KINDS.indexOf(t.kind), stops: t.stops.slice(), path: t.path.slice(), marked: t.marked.slice(), src: t.src.slice(), srcLast: t.srcLast.slice(), grainSold: t.grainSold.slice(), grainSoldLast: t.grainSoldLast.slice(), grainBought: t.grainBought.slice(), grainBoughtLast: t.grainBoughtLast.slice() })),
     traderSeq: world.traderSeq,
     now: Array.from(world.nationTradeNow),
+    grainNow: Array.from(world.nationGrainTradeNow),
   };
 }
 
@@ -1387,7 +1462,9 @@ export function restoreTrade(world: World, s: SavedTrade, prov: Partial<Record<s
   world.provinceGoods = new Array(world.provinceCount);
   world.provinceTradeRatio.fill(0);
   const filled = new Uint8Array(world.provinceCount);
-  const { tradeRatio: ratio, tradeGoods: goods, tradeWeight: weight, tradeCity: city, tradePassing: passing, tradeVisits: visits, tradeVisitsLast: visitsLast } = prov;
+  const { tradeRatio: ratio, tradeGoods: goods, tradeWeight: weight, tradeCity: city, tradePassing: passing, tradeVisits: visits, tradeVisitsLast: visitsLast, tradeGrainIn: grainIn, tradeGrainOut: grainOut, tradeGrainInLast: grainInLast, tradeGrainOutLast: grainOutLast } = prov;
+  world.provinceGrain.fill(0);
+  world.provinceGrainLast.fill(0);
   world.provincePassing.fill(0);
   world.provinceVisits.fill(0);
   world.provinceVisitsLast.fill(0);
@@ -1402,6 +1479,8 @@ export function restoreTrade(world: World, s: SavedTrade, prov: Partial<Record<s
     if (passing) world.provincePassing[p] = passing[old]!;
     if (visits) world.provinceVisits[p] = visits[old]!;
     if (visitsLast) world.provinceVisitsLast[p] = visitsLast[old]!;
+    if (grainIn && grainOut) world.provinceGrain.set([grainIn[old]!, grainOut[old]!], p * 2);
+    if (grainInLast && grainOutLast) world.provinceGrainLast.set([grainInLast[old]!, grainOutLast[old]!], p * 2);
     filled[p] = 1;
   }
   // A province the save did not know is counted now.
@@ -1416,6 +1495,11 @@ export function restoreTrade(world: World, s: SavedTrade, prov: Partial<Record<s
     const n = mapN(old);
     if (n >= 0) for (let k = 0; k < 2; k++) world.nationTradeNow[n * 2 + k] = s.now[old * 2 + k]!;
   }
+  world.nationGrainTradeNow.fill(0);
+  s.grainNow?.forEach((gold, old) => {
+    const n = mapN(old);
+    if (n >= 0) world.nationGrainTradeNow[n] = gold;
+  });
   world.traders = [];
   for (const t of s.traders) {
     const owner = mapN(t.owner);
@@ -1426,7 +1510,7 @@ export function restoreTrade(world: World, s: SavedTrade, prov: Partial<Record<s
     const ok = stops.every((x) => x >= 0) && path.every((x) => x >= 0);
     const kind = TRADER_KINDS[t.kind];
     if (!kind) continue;
-    world.traders.push({ ...t, kind, blocked: t.blocked >= 0 ? mapP(t.blocked) : -1, owner, home, stops: ok ? stops : [], path: ok ? path : [], at: ok ? t.at : 0, marked: (t.marked ?? []).map(mapP).filter((q) => q >= 0), src: srcOf(t.src, mapP), srcLast: srcOf(t.srcLast, mapP), fees: t.fees ?? 0, feesLast: t.feesLast ?? 0, lastDepositCity: t.lastDepositCity >= 0 ? mapP(t.lastDepositCity) : -1 });
+    world.traders.push({ ...t, kind, blocked: t.blocked >= 0 ? mapP(t.blocked) : -1, owner, home, stops: ok ? stops : [], path: ok ? path : [], at: ok ? t.at : 0, marked: (t.marked ?? []).map(mapP).filter((q) => q >= 0), src: srcOf(t.src, mapP), srcLast: srcOf(t.srcLast, mapP), fees: t.fees ?? 0, feesLast: t.feesLast ?? 0, lastDepositCity: t.lastDepositCity >= 0 ? mapP(t.lastDepositCity) : -1, grain: t.grain ?? 0, grainSold: srcOf(t.grainSold, mapP), grainSoldLast: srcOf(t.grainSoldLast, mapP), grainBought: srcOf(t.grainBought, mapP), grainBoughtLast: srcOf(t.grainBoughtLast, mapP), raided: (t.raided ?? -1) >= 0 ? mapP(t.raided!) : -1 });
   }
   world.traderSeq = s.traderSeq;
 }
@@ -1443,5 +1527,5 @@ function srcOf(src: readonly number[] | undefined, mapP: (old: number) => number
 
 /** Numbers for the world's hash: ratios and every trader. */
 export function tradeHashData(world: World): Float64Array {
-  return new Float64Array(world.traders.flatMap((t) => [t.id, TRADER_KINDS.indexOf(t.kind), t.owner, t.home, t.at, t.days, t.purse, ...t.stops]));
+  return new Float64Array(world.traders.flatMap((t) => [t.id, TRADER_KINDS.indexOf(t.kind), t.owner, t.home, t.at, t.days, t.purse, t.grain, ...t.stops]));
 }

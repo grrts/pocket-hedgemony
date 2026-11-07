@@ -47,11 +47,11 @@ Feature: Other effects of trade
     Then "Venice" counts "Ottoman" as a trade partner for research spread
 
   @TRADE-092
-  Scenario: Traders carry no food
+  Scenario: Traders carry grain
     Given the city "Paris" is hungry
     When the trade rules are applied
-    Then no trader carries grain to "Paris"
-    And it is fed by the castle and food system
+    Then a trader passing "Paris" with grain in its hold sells it there
+    And it is fed by traders as well as by the castle and food system
 
   @TRADE-127 @placeholder
   Scenario Outline: Materials cost more where no trade route touches

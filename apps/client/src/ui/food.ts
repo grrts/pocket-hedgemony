@@ -12,6 +12,11 @@ import { fold } from "./fold.ts";
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const fmt = (n: number) => Math.round(n).toLocaleString("en");
+/** People a store feeds for a month, from food counted in thousands. */
+const peopleFed = (food: number) => fmt(food * 1000);
+/** Grain traders sold to and bought from province p last month (TRADE-166). */
+const grainIn = (s: Snapshot, p: number) => s.provinceGrain?.[p * 2] ?? 0;
+const grainOut = (s: Snapshot, p: number) => s.provinceGrain?.[p * 2 + 1] ?? 0;
 const monthsText = (m: number) => `${m} month${m === 1 ? "" : "s"}`;
 
 /** Labels the player reads for the realm data's choices. */
@@ -92,6 +97,7 @@ export function foodTab(s: Snapshot, name: (p: number) => string, thumb: (p: num
       <div class="${short ? "warn" : ""}"><b>${short}</b><small>short of food</small></div>
       <div><b>${fed}<small>/${held.length}</small></b><small>fed by castles</small></div>
     </div>
+    <p>${tradeGrainLine(s, held)}</p>
     <p>This year ${f.soldThisYear > 0.5 ? `you sold food for <b>${f.goldThisYear.toFixed(1)} gold</b>` : "you sold no food"}${spoiled ? ` and food that would feed <b>${fmt((f.spoiledThisYear / 12) * 1000)} people for a year spoiled</b>` : ""}.${spoiled && f.realm.surplus === "Keep" ? " Sell the surplus to turn it into gold." : ""}</p>`;
 
   const presets = Object.keys(f.presets)
@@ -159,14 +165,14 @@ export function foodTab(s: Snapshot, name: (p: number) => string, thumb: (p: num
         <button class="place" data-open-land="${p}" title="Open ${esc(name(p))} on its Land tab">
           <img class="thumb" src="${thumb(p)}" alt="" width="48" height="48">
           <span class="place-name"><b>${esc(name(p))}</b><small>${bad ? "Shrinks each year" : "A poor harvest brings famine"} · ${esc(fix(p))}</small></span>
-          <span class="place-stats"><small>Land feeds ${Math.round(share * 100)} %</small><small>${s.provinceFoodMonths[p]!.toFixed(1)} months stored</small></span>
+          <span class="place-stats"><small>Land feeds ${Math.round(share * 100)} %</small><small>${s.provinceFoodMonths[p]!.toFixed(1)} months stored</small>${grainIn(s, p) > 0.0005 ? `<small class="up">Traders bring grain for ${peopleFed(grainIn(s, p))} a month</small>` : `<small class="down">No trader brings grain</small>`}</span>
         </button>
       </div>`;
     })
     .join("");
   const shortList = tight.length
     ? `<h3 class="sub">Short of food</h3>
-      <p class="hint">Their land doesn't feed their people in a normal year, and people keep having children. Build a farm or clear land on the Land tab, or feed them from a castle.</p>
+      <p class="hint">Their land doesn't feed their people in a normal year, and people keep having children. Build a farm or clear land on the Land tab, feed them from a castle, or send a trader to them from a land with grain to spare: traders sell grain where stores run low.</p>
       <div class="province-list">${shortRows}</div>${tight.length > 12 ? `<p class="hint">and ${tight.length - 12} more on Provinces, Short of food</p>` : ""}`
     : "";
 
@@ -209,6 +215,23 @@ export function foodCounts(s: Snapshot, held: number[]): { hungry: number; low: 
     low: held.filter((p) => s.provinceFoodMonths[p]! >= 1 && s.provinceFoodMonths[p]! < 3).length,
     short: held.filter((p) => s.provinceLord[p]! < 0 && landShare(s, p) < FOOD_BALANCE.short).length,
   };
+}
+
+/** What traders did with the realm's grain last month: brought in, took out and the gold for it (TRADE-169). */
+export function tradeGrainLine(s: Snapshot, held: number[]): string {
+  let inn = 0, out = 0;
+  for (const p of held) (inn += grainIn(s, p)), (out += grainOut(s, p));
+  const gold = s.ledger.find((l) => l.line === "grain")?.gold ?? 0;
+  if (inn < 0.0005 && out < 0.0005) return "Last month traders carried no grain in or out of your land.";
+  return `Last month traders brought grain for <b>${peopleFed(inn)}</b> into your land and took grain for <b>${peopleFed(out)}</b> out${Math.abs(gold) >= 0.05 ? ` (Grain line ${gold > 0 ? "+" : ""}${gold.toFixed(1)} gold)` : ""}.`;
+}
+
+/** The province Overview's Grain by trade line, when traders sold or bought there last month (TRADE-169). */
+export function grainTradeLine(s: Snapshot, p: number): string {
+  const inn = grainIn(s, p), out = grainOut(s, p);
+  if (inn < 0.0005 && out < 0.0005) return "";
+  const parts = [inn >= 0.0005 ? `brought ${peopleFed(inn)}` : "", out >= 0.0005 ? `bought ${peopleFed(out)}` : ""].filter(Boolean).join(" · ");
+  return `<dt>Grain by trade</dt><dd>Last month traders ${parts} <small>people fed a month</small></dd>`;
 }
 
 /** The castle line of a province's overview: its castle store, or the castle that feeds it, or none in reach. */

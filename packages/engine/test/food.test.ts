@@ -149,8 +149,9 @@ describe("a living realm: food", () => {
     const home = capitalOf(w, "castile");
     const raider = spawnArmy(w, me, enemyLand, 2000);
     const homeArmy = spawnArmy(w, me, home, 20000);
-    // The home province holds less than its reserve: its locals give nothing.
+    // The home province holds less than its reserve: its locals give nothing; and no trader sells grain into it this week (TRADE-163).
     w.provinceStore[home] = w.provincePopulation[home]! * 1;
+    w.traders.length = 0;
     w.armies.food[raider] = 0;
     w.armies.food[homeArmy] = 30000;
     const enemyStore = w.provinceStore[enemyLand]!;
