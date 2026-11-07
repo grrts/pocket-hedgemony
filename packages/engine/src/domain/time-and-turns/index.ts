@@ -406,6 +406,8 @@ export function orderShape(order: Order): string {
       return "a subject's choice toward its overlord";
     case "court":
       return "court a foreign lord or subject";
+    case "forgeClaim":
+      return "forge a claim on a province";
     case "moveBuild":
       return "move a work in the province's queue";
     case "setFood":

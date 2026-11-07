@@ -4846,6 +4846,7 @@ button.link {
   flex-direction: column;
   align-items: stretch;
   gap: 2px;
+  justify-content: flex-start;
   min-height: 44px;
   padding: 4px 8px;
   text-align: left;
@@ -7390,6 +7391,51 @@ details.pow-line > .hint {
 }
 .declare-terms .censure-warn {
   margin-top: 8px;
+}
+/* The aim of the war, ticked among those held (DIPL-261, DIPL-264): one 44-point row each, a tick and "Chosen" besides colour. */
+.aim-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 6px 0 2px;
+}
+.aim-choice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 4px 8px;
+  text-align: left;
+  background: var(--paper-light);
+  color: var(--ink);
+  border: 2px solid rgb(36 21 12 / 0.35);
+}
+.aim-choice .tick {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--outline);
+  font-weight: 700;
+}
+.aim-choice .what {
+  font-weight: 600;
+}
+.aim-choice small {
+  flex: 1 1 100%;
+  margin-left: 28px;
+  color: var(--ink-soft);
+}
+.aim-choice.chosen {
+  border-color: var(--outline);
+  box-shadow: inset 0 0 0 2px var(--brass);
+}
+.aimless-warn .choices {
+  margin-top: 4px;
 }
 .declare-terms .name-abroad-link {
   margin: 8px 0 4px;

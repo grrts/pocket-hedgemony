@@ -213,7 +213,7 @@ A war aim is held from things in the world:
 
 | War aim | Held when | Lasts |
 |---|---|---|
-| Take land (named provinces) | you held them in the last 50 years; a pretender of yours claims them; they are a homeland of your culture; a lord's Want names them; they refused your demand for them; a lord defected from you with them | while the reason holds; a refused demand gives 5 years |
+| Take land (named provinces) | you hold a **claim** on them (one you forged); you held them in the last 50 years; a pretender of yours claims them; they are a homeland of your culture; a lord's Want names them; they refused your demand for them; a lord defected from you with them | while the reason holds; a refused demand gives 5 years |
 | Seat a pretender | a pretender to their throne is at your court, including an émigré court | while the pretender lives |
 | Tribute | you border them and they refused a tribute demand; or you border them and have 3 times their soldiers | 5 years / while true |
 | Free a people | their land holds a homeland of a culture with no country, yours or accepted by you | while true |
@@ -224,6 +224,14 @@ A war aim is held from things in the world:
 | No aim | nothing | always |
 
 Events and national strengths can grant other aims for a stated time. What each aim wins at the peace is set by [Warfare](Warfare).
+
+### Claims
+
+A **claim** is your right to one province of another realm. While it stands you hold *Take land* on that province, so a war over it is a war the world understands, with none of the cost of a war with no aim. The realm that owns it holds *Holds a claim on our land or throne* (−20) toward you while the claim stands. A claim lasts 20 years from the day it is made and follows the province: if a third realm takes it, your claim is now on them. It ends when you take the province or it lapses.
+
+**Forging a claim.** An envoy can forge a claim on a province of a neighbour that borders your land. It costs 25 gold, paid when he is sent, and his seat for 12 months while he works at their court. Each season there is 1 in 10 that they find him out: they hold *Forged a claim on us* (−20, fading over 10 years), but his work goes on and the claim still comes. You can't forge while at war with them or with a subject tie between you, on a province you already hold *Take land* on, or with no free seat. If the two of you go to war, the province changes hands or the seat is lost, he comes home with nothing made. You can call him home at any time; the gold is spent.
+
+**The other realms** forge claims too: once a season a realm with a free seat forges on the most populous border province of a neighbour it holds as Rival or Hostile and has no aim on. You hear of it when it is your land: *Savoy now holds a claim on Nice*. The numbers are in `diplomacy.claims`.
 
 ### Declaring war
 
@@ -242,7 +250,7 @@ You may always declare war with no aim, but it costs you dearly from the day you
 - **Your allies stay out.** No ally owes you a war with no aim; they refuse the call without breaking the alliance.
 - **Your neighbours are alarmed** (*Threatened us*), and when you take land your lords who aren't Warlike waver again.
 
-The AI never declares a war with no aim unless its ruler is Warlike or it seeks hegemony. A subject rising for its freedom pays none of this. The way out is a demand: if they refuse it, you hold an aim. The declare sheet heads its *Price of war* with this whole cost in a red frame, and *Confirm* reads *Declare war with no aim*. The numbers are in `diplomacy.war_aims.no_aim_penalty`.
+The AI never declares a war with no aim unless its ruler is Warlike or it seeks hegemony. A subject rising for its freedom pays none of this. The way out is a claim or a demand: forge a claim on a province of theirs, or demand one and let them refuse; either gives you an aim. The declare sheet heads its *Price of war* with this whole cost in a red frame, and *Confirm* reads *Declare war with no aim*. The numbers are in `diplomacy.war_aims.no_aim_penalty`.
 
 **Hungary prepares to declare war on the Ottomans.** Hungary holds the aim Take land for Nikopol from the Want of its lord John Hunyadi. The declaration sheet shows the aim "Take land: Nikopol" and its source, Wallachia and the Papal States as called on Hungary's side, Serbia as an Ottoman tributary that does not join, and how many of Hungary's voices lean to peace. It does not show how the called countries will answer. It offers *Send a demand first* and *Declare*.
 
@@ -322,7 +330,7 @@ Answer letters from last month are delivered; envoys arriving this month have th
 - **The country diplomacy card**: their standing toward you and your stance, ties and wrongs, relations, your war aims on them, the last answer with a *Why?* button for the full reasons, and action buttons that show no prediction. In landscape it sits to the right of the map.
 - **The envoy picker**: which official goes, the days on the road, and which province loses its official meanwhile.
 - **The envoys strip**: each seat as free, on the road (destination and days) or resident (court).
-- **The declare sheet**: the *Price of war* (who is called against you and how, the neighbours alarmed, the lords who will waver, a truce broken, your pay at war, the most one peace can take), and the aim the war is declared with (the best fitting aim you hold, or *No aim* in red), above *Confirm*; see [Warfare](Warfare#the-price-of-war).
+- **The declare sheet**: the *Price of war* (who is called against you and how, the neighbours alarmed, the lords who will waver, a truce broken, your pay at war, the most one peace can take), and the aim the war is declared with, above *Confirm*; see [Warfare](Warfare#the-price-of-war). When you hold more than one aim, you tick the one to declare with from a list (the best is ticked first), and *Confirm* names it. With no aim it reads *No aim* in red, and its *Forge a claim* button takes you back to their Claims section.
 - **Your name abroad**: your own Diplomacy tab opens with it. Any league against you comes first, with each member and its soldiers; then your **notoriety** as a word (*Trusted* under 25, *Watched* from 25, *Feared* from 50, *Hated* from 75), and your **Lands taken** in the last 20 years as a bar against the era's league threshold ("6 of 8 before a league"). Notoriety is 5 for each land taken plus notorious deeds, fading over 30 years; courts trust you less for it (less willing to ally, marry or pledge) and are readier to join a league against you. Land taken also leaves the wrong *Grabbed land near us* with the realms that border it. Every row opens its reason on a tap.
 - **The war card** for each war you fight, with both sides' peace voices; see [Warfare](Warfare#the-price-of-war).
 - **Answer letters**, and the country card line "Envoys n of m abroad" and "Leagues against you".
@@ -343,6 +351,12 @@ The first part of statecraft is in the playable build: envoys, alliances, marria
 - **Courting a lord**: tap a province of another realm, open its lord from *Governed by* (*Lord*), and if he is Wavering or Disloyal, *Court him*. One of your envoys stays at his court: each season he loses a step unless his ruler wins him back, and once Disloyal for a year with land next to yours he comes over with it (his old ruler remembers *Took our land*). Each season there is 1 in 4 they find out: *Courted our lord* (−25, fading over 10 years) and your envoy comes home. Your courting envoys are listed with your envoys abroad, and *Recall your envoy* frees the seat. Realms court the lords and subjects of neighbours they hold as rivals or hostile.
 - **The other realms** send envoys too: once a year each court picks the neighbour that thinks best of it and weighs an alliance and a marriage there, and sends the best ask its count says yes to, or a gift first when it is close. You see the alliances and marriages they make in the News.
 - **For now** an envoy is not a named official, so no province loses its official while he is away; every realm counts two unmarried children; and the royal marriages already made on the start day count from the start. Envoys, letters and alliances are kept in your save.
+
+### Claims in the game today
+
+- **Where**: another realm's **Diplomacy** tab has a *Claims* section under *Make a demand*. *Your claims on them* lists each province you hold *Take land* on and why (*our claim, until May 1466*, *held within 50 years*, *refused hand over province*), or says you hold none. Under it, *Forge a claim* has one button for each of their provinces on your border (the most populous first, up to 8, their capital marked), or says why none can be forged. While your envoy forges there, it says on which province and when the claim is made, with *Recall your envoy*.
+- **Your overview**: your own Diplomacy tab lists *Your claims*: each realm you hold claims on, with the provinces and the first to lapse, and every envoy forging a claim with the month he is done. On the map, the Diplomacy lens's crossed sword marks every realm you hold an aim on.
+- **On a phone**: the buttons are 44-point tiles that sit side by side when the card is wide; the aims on the declare sheet are 44-point rows with a tick and the word *Chosen*.
 
 ### Demands in the game today
 

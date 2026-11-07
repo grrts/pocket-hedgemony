@@ -930,6 +930,11 @@
     "weight_per_province": -5,
     "fade_years": 20,
     "name": "Grabbed land near us"
+   },
+   "forged_a_claim_on_us": {
+    "weight": -20,
+    "fade_years": 10,
+    "name": "Forged a claim on us"
    }
   },
   "standing_words": [
@@ -1475,5 +1480,16 @@
    "gamble_ratio_factor": 0.8,
    "min_ratio": 1.2
   }
+ },
+ "claims": {
+  "$comment": "F-30 (Leroy): a claim is a realm's right to one province of another realm, the fact territorial_claim naming the province; it gives Take land on it for `years` and follows the province. An envoy forges one on a province on the realm's border: `forge.gold` paid when sent, `forge.months` at that court holding a seat, found out at `forge.discovery_chance_per_season` each season (the wrong forged_a_claim_on_us, and the work goes on). `ai_forges`: an AI forges on neighbours it holds as Rival or Hostile once a season (DIPL-256 to DIPL-260, D-DIPL-40). Provisional.",
+  "years": 20,
+  "forge": {
+   "gold": 25,
+   "months": 12,
+   "discovery_chance_per_season": 0.1
+  },
+  "ai_forges": true,
+  "provisional": true
  }
 }

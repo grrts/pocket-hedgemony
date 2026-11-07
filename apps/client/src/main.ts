@@ -43,7 +43,7 @@ import {
   THRONE,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
-import { askCard, courtLordHtml, myHouse, mySubjects, myStatecraft, overlordCard, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
+import { askCard, courtLordHtml, myClaims, myHouse, mySubjects, myStatecraft, overlordCard, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
 import { rebelsUi, risingCard, risingsOverview, verdictCard, type Attacker } from "./ui/rebels.ts";
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
 import { fitDraft, offerLine, peaceTable, startDraft, stepGold, togglePick, type PeaceDraft } from "./ui/peace.ts";
@@ -407,6 +407,8 @@ type RealmTab = "general" | "government" | "peoples" | "heritage" | "treasury" |
 let realmTab: RealmTab = "general";
 /** The realm whose declare sheet is open (WAR-229), -1 for none. */
 let declareFor = -1;
+/** The aim ticked on the declare sheet, among the fitting aims held (DIPL-261). */
+let declareAim = 0;
 /** What the player left open in the Research tab (tree or Schools, the zoom, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
@@ -6264,6 +6266,8 @@ function renderDeclareSheet(r: number): void {
       nameAbroad: s.statecraft?.nameAbroad ?? null,
       me,
       censure: censureWarningHtml(s.faithHeads?.censure[r]),
+      aims: s.statecraft?.realms[r]?.aims ?? [],
+      picked: declareAim,
     })}`;
   panel.classList.add("declaring");
   bindClose();
@@ -6273,11 +6277,29 @@ function renderDeclareSheet(r: number): void {
     realmTab = "diplomacy";
     renderPanel();
   });
-  panel.querySelector<HTMLButtonElement>("[data-declare-confirm]")?.addEventListener("click", (e) => {
-    const breakTruce = !!(e.currentTarget as HTMLButtonElement).dataset.breakTruce;
+  // Tick the aim the war is declared with (DIPL-261).
+  panel.querySelectorAll<HTMLButtonElement>("[data-declare-aim]").forEach((b) =>
+    b.addEventListener("click", () => {
+      declareAim = Number(b.dataset.declareAim);
+      const keep = [panel.scrollTop, panel.querySelector(".declare-cols")?.scrollTop ?? 0] as const;
+      renderPanel();
+      panel.scrollTop = keep[0];
+      const cols = panel.querySelector(".declare-cols");
+      if (cols) cols.scrollTop = keep[1];
+    }),
+  );
+  // With no aim, the way out: back to the Diplomacy tab's Claims section (DIPL-262).
+  panel.querySelector<HTMLButtonElement>("[data-forge-goto]")?.addEventListener("click", () => {
     declareFor = -1;
     realmTab = "diplomacy";
-    void act({ type: "declareWar", target: r, ...(breakTruce ? { breakTruce: true } : {}) });
+    renderPanel();
+    panel.querySelector("#claims")?.scrollIntoView({ block: "start" });
+  });
+  panel.querySelector<HTMLButtonElement>("[data-declare-confirm]")?.addEventListener("click", (e) => {
+    const d = (e.currentTarget as HTMLButtonElement).dataset;
+    declareFor = -1;
+    realmTab = "diplomacy";
+    void act({ type: "declareWar", target: r, ...(d.breakTruce ? { breakTruce: true } : {}), ...(d.aim ? { aim: d.aim } : {}), ...(d.province !== undefined ? { province: Number(d.province) } : {}) });
   });
 }
 
@@ -6378,6 +6400,7 @@ function myDiplomacySection(): string {
     <p class="hint">Open a realm to send it an envoy, declare war on it or offer it peace.</p>
     ${mySubjects(s.statecraft, (n) => realmButton(n, "diplomacy"))}
     ${myHouse(s.statecraft, (n) => realmButton(n, "diplomacy"))}
+    ${myClaims(s.statecraft, (n) => realmButton(n, "diplomacy"))}
     ${myStatecraft(s.statecraft, (n) => realmButton(n, "diplomacy"))}
     ${ties.length ? `<h3 class="sub">Ties</h3>${ties
       .map((x) => `<p>${realmButton(x.nation, "diplomacy")} <small>${STATE[x.state]}${x.until ? ` until ${monthText(x.until)}` : ""}</small></p>`)
@@ -6859,6 +6882,7 @@ function renderRealm(r: number): void {
   // Declaring opens the declare sheet with the price of war first (WAR-229).
   panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => {
     declareFor = r;
+    declareAim = 0;
     renderPanel();
   });
   panel.querySelectorAll<HTMLButtonElement>("[data-envoy]").forEach((b) => b.addEventListener("click", () => void act({ type: "sendEnvoy", target: r, action: b.dataset.envoy! })));
@@ -6870,6 +6894,9 @@ function renderRealm(r: number): void {
     b.addEventListener("click", () => void act({ type: "subjectAction", subject: r, action: b.dataset.subjectAct as "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "hostage" | "send_heir_home" | "tighten" | "fold_in" | "merge", ...(b.dataset.level ? { level: b.dataset.level } : {}) })),
   );
   panel.querySelector<HTMLButtonElement>("[data-break-alliance]")?.addEventListener("click", () => void act({ type: "breakAlliance", target: r }));
+  // Forge a claim, or call the forging envoy home (DIPL-257, DIPL-262).
+  panel.querySelectorAll<HTMLButtonElement>("[data-forge]").forEach((b) => b.addEventListener("click", () => void act({ type: "forgeClaim", province: Number(b.dataset.forge) })));
+  panel.querySelector<HTMLButtonElement>("[data-forge-recall]")?.addEventListener("click", () => void act({ type: "forgeClaim", target: r, recall: true }));
   panel.querySelectorAll<HTMLButtonElement>("[data-demand]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "makeDemand", target: r, kind: b.dataset.demand!, ...(b.dataset.province ? { province: Number(b.dataset.province) } : {}) })),
   );
@@ -9298,6 +9325,16 @@ Object.assign(globalThis, {
   },
   /** Sends one of the player's envoys to a realm by id, on a mission (ENVOY_ACTIONS). */
   __phEnvoy: (id: string, action = "courtesy_visit") => act({ type: "sendEnvoy", target: nationIndex.get(id)!, action }),
+  /** Puts claims and aims on a realm in the snapshot by province ids and redraws, to check the Claims section and the declare sheet's aim choices (claims-shots.mjs). */
+  __phClaims: (id: string, list: [string, string, string?][], aims: [string, string?, string?][] = []) => {
+    const r = nationIndex.get(id)!;
+    const v = snapshot?.statecraft;
+    if (!v?.claims || !v.realms[r]) return;
+    v.claims.claims[r] = list.map(([p, why, until]) => ({ province: provinceIndex.get(p)!, name: provinces[provinceIndex.get(p)!]!.name, why, ...(until ? { until } : {}) }));
+    v.realms[r]!.aims = aims.map(([aim, p, source]) => ({ aim, ...(p ? { province: provinceIndex.get(p)! } : {}), ...(source ? { source } : {}) }));
+    if (v.realms[r]!.price && aims.length) v.realms[r]!.price = { ...v.realms[r]!.price!, noAim: false, aimless: null, aim: v.realms[r]!.aims[0]! };
+    renderPanel();
+  },
   /** Redraws the open Your name abroad card from a given view by realm ids, to check how a league looks (price-of-war-shots.mjs). */
   __phNameAbroad: (v: { notoriety: number; landsTaken: number; threshold: number; leagues: { members: [string, number][] }[]; fearful?: [string, "wary" | "threatened", number][] }) => {
     const el = panel.querySelector("#name-abroad");

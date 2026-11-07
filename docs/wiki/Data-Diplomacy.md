@@ -301,6 +301,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | notorious\_deed |  | 30 | Notorious deed |  |  |  |  |  | -10 |
 | stirred\_revolt\_in\_our\_land |  | 20 | Stirred revolt in our land | -50 |  |  |  |  |  |
 | grabbed\_land\_near\_us (provisional) | -5 | 20 | Grabbed land near us |  |  |  |  |  |  |
+| forged\_a\_claim\_on\_us |  | 10 | Forged a claim on us | -20 |  |  |  |  |  |
 
 ### Standing words
 
@@ -794,3 +795,21 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | defences (provisional) |  |  |  |  |  |  |  |  |  | castle step: (calm: 0; wary: 1; threatened: 2); reserve share: (calm: 1; wary: 1; threatened: 0.5) |
 | technology (provisional) |  |  |  |  |  |  |  |  |  | warfare prefix: W; cost weight: (calm: 1; wary: 0.8; threatened: 0.6) |
 | opportunity (provisional) |  |  |  |  |  |  |  |  |  | at war ratio factor: 0.75; at war chance factor: 2; at war target weight: 3; gamble chance: 0.1; gamble ratio factor: 0.8; min ratio: 1.2 |
+
+## Claims
+
+> F-30 (Leroy): a claim is a realm's right to one province of another realm, the fact territorial\_claim naming the province; it gives Take land on it for \`years\` and follows the province. An envoy forges one on a province on the realm's border: \`forge.gold\` paid when sent, \`forge.months\` at that court holding a seat, found out at \`forge.discovery\_chance\_per\_season\` each season (the wrong forged\_a\_claim\_on\_us, and the work goes on). \`ai\_forges\`: an AI forges on neighbours it holds as Rival or Hostile once a season (DIPL-256 to DIPL-260, D-DIPL-40). Provisional.
+
+| Key | Value |
+|---|---|
+| `years` | 20 |
+| `ai_forges` | yes |
+| `provisional` | yes |
+
+### Forge
+
+| Key | Value |
+|---|---|
+| `gold` | 25 |
+| `months` | 12 |
+| `discovery_chance_per_season` | 0.1 |

@@ -1288,6 +1288,16 @@
      "id": "arms-and-fear",
      "text": "Arms and fear",
      "level": 2
+    },
+    {
+     "id": "claims",
+     "text": "Claims",
+     "level": 2
+    },
+    {
+     "id": "forge",
+     "text": "Forge",
+     "level": 3
     }
    ]
   },
@@ -7207,6 +7217,11 @@
      "level": 3
     },
     {
+     "id": "claims",
+     "text": "Claims",
+     "level": 3
+    },
+    {
      "id": "declaring-war",
      "text": "Declaring war",
      "level": 3
@@ -7259,6 +7274,11 @@
     {
      "id": "envoys-in-the-game-today",
      "text": "Envoys in the game today",
+     "level": 3
+    },
+    {
+     "id": "claims-in-the-game-today",
+     "text": "Claims in the game today",
      "level": 3
     },
     {

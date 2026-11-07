@@ -13,6 +13,7 @@ import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft,
 import { monthlyConquest } from "./conquest.ts";
 import { backersOf, bondOf, riseUp, subjectAction, subjectChoice } from "./subjects.ts";
 import { court, recallCourting } from "./courting.ts";
+import { forgeClaim, recallForging } from "./claims.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { monthlyThrone } from "./throne.ts";
@@ -174,6 +175,8 @@ export type Order =
   | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "hostage" | "send_heir_home" | "tighten" | "fold_in" | "merge"; level?: string }
   /** Send an envoy to court lord `lord` of realm `target`, or subject `target` without a lord; `recall` calls him home (DIPL-215). */
   | { type: "court"; target: number; lord?: number; recall?: boolean }
+  /** Send an envoy to forge a claim on province `province` (DIPL-257); `recall` with `target` calls home the envoy forging at that realm's court. */
+  | { type: "forgeClaim"; province?: number; target?: number; recall?: boolean }
   /** A Disloyal subject rises against its overlord (SUBJ-076, SUBJ-077). */
   | { type: "riseUp" }
   /** A subject's own choices toward its overlord: stop paying, pay again, ask politely to loosen (SUBJ-131). */
@@ -570,6 +573,9 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       if (!reason) runLedger(world, false);
       return reason;
     }
+    case "forgeClaim":
+      if (order.recall) return order.target === undefined ? "no such realm" : recallForging(world, actingNation, order.target);
+      return order.province === undefined ? "no such province" : forgeClaim(world, actingNation, order.province);
     case "court":
       return order.recall ? recallCourting(world, actingNation, order.target, order.lord) : court(world, actingNation, order.target, order.lord);
     case "subjectAction": {
