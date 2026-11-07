@@ -1,4 +1,4 @@
-import type { NameAbroadView, PeaceVoices, PriceOfWar, PriceOfWarCall, Snapshot, Titles } from "@ph/engine";
+import type { AimChoice, NameAbroadView, PeaceVoices, PriceOfWar, PriceOfWarCall, Snapshot, Titles } from "@ph/engine";
 import { icon } from "../art/ui.ts";
 
 /**
@@ -81,6 +81,10 @@ export interface DeclareSheetInput {
   me: number;
   /** The faith head's censure warning, already built (faithHeads.ts), shown above Confirm; "" for none. */
   censure: string;
+  /** Every fitting aim the player holds against the target, best first (DIPL-261); empty or missing when none. */
+  aims?: AimChoice[];
+  /** The aim ticked among `aims` (0, the best, by default). */
+  picked?: number;
 }
 
 /**
@@ -144,7 +148,8 @@ export function aimlessWarHtml(p: PriceOfWar, o: Pick<DeclareSheetInput, "name" 
   return `<div class="aimless-warn framed-soft">
     <p class="warn">${HURT}A war with no aim: you hold no reason to fight ${esc(o.name(p.target))}.</p>
     ${rows.join("")}
-    <p class="hint">Make a demand first: if they refuse, you hold an aim and none of this applies.</p>
+    <p class="hint">Forge a claim or make a demand first: a claim, or their refusal, gives you an aim and none of this applies.</p>
+    <div class="choices"><button class="paper" data-forge-goto="${p.target}">${icon("scroll", 1)}Forge a claim</button></div>
   </div>`;
 }
 
@@ -222,19 +227,34 @@ export function declareSheetHtml(o: DeclareSheetInput): string {
   const p = o.price;
   const them = esc(o.name(o.target));
   const noAim = p?.noAim ?? true;
-  const aim = p && !noAim ? `${aimName(p.aim.aim)}${p.aim.province !== undefined ? `: ${esc(o.provinceName(p.aim.province))}` : ""}` : "No aim";
-  // Why the aim is held, in words: "held within 50 years", "refused hand over province".
-  const source = p?.aim.source ? ` You hold it because: ${esc(p.aim.source.replace(/_/g, " "))}.` : "";
+  // The aim Confirm declares with: the one ticked among those held (DIPL-261), else the price's own.
+  const aims = noAim ? [] : (o.aims ?? []);
+  const picked = aims[Math.min(Math.max(0, o.picked ?? 0), aims.length - 1)] ?? (p && !noAim ? p.aim : undefined);
+  const aimText = (a: { aim: string; province?: number }) => `${aimName(a.aim)}${a.province !== undefined ? `: ${esc(o.provinceName(a.province))}` : ""}`;
+  const aim = picked ? aimText(picked) : "No aim";
+  // Why the aim is held, in words: "held within 50 years", "our claim".
+  const why = (src?: string) => (src ? esc(src.replace(/_/g, " ")) : "");
+  const source = picked?.source ? ` You hold it because: ${why(picked.source)}.` : "";
+  const choices =
+    aims.length > 1
+      ? `<div class="aim-choices" role="radiogroup" aria-label="Aim of the war">${aims
+          .map((a, k) => {
+            const on = a === picked;
+            return `<button class="aim-choice${on ? " chosen" : ""}" role="radio" aria-checked="${on}" data-declare-aim="${k}"><span class="tick" aria-hidden="true">${on ? "✓" : ""}</span><span class="what">${aimText(a)}</span><small>${why(a.source)}${on ? " · <b>Chosen</b>" : ""}</small></button>`;
+          })
+          .join("")}</div><p class="hint">You hold ${aims.length} aims against ${them}: tap one to declare the war with it. Any of them makes it a war the world understands.</p>`
+      : "";
   const terms = `<section class="declare-terms">
       <h3 class="sub">Terms</h3>
       ${reasonRow(
         "Aim",
         aim,
         noAim
-          ? `You hold no aim against ${them}. A war with no aim costs you dearly the day you declare it (see the price): your lords turn, your name abroad darkens, your people call it unjust. A war aim (from a demand they refused, land you held, a pretender) makes it a war they understand.`
-          : `The best aim you hold against ${them}, and the one this war is declared with: a war they understand, so your neighbours are not alarmed and your lords don't waver when you take land.${source}`,
+          ? `You hold no aim against ${them}. A war with no aim costs you dearly the day you declare it (see the price): your lords turn, your name abroad darkens, your people call it unjust. A war aim (a claim you forged, a demand they refused, land you held, a pretender) makes it a war they understand.`
+          : `The aim this war is declared with: a war they understand, so your neighbours are not alarmed and your lords don't waver when you take land.${source}`,
         noAim,
       )}
+      ${choices}
       ${o.censure}
       ${o.nameAbroad ? `<button class="paper name-abroad-link" data-realm="${o.me}" data-realm-open="diplomacy">${icon("crown", 1)}Your name abroad: <b>${o.nameAbroad.word}</b></button>` : ""}
       <p class="hint">Calls to arms go out at once and are answered within a month. Peace is offered from ${them}'s Diplomacy tab.</p>
@@ -245,7 +265,7 @@ export function declareSheetHtml(o: DeclareSheetInput): string {
     <div class="declare-cols">${price}${terms}</div>
     <div class="declare-confirm">
       <button class="paper" data-declare-back>Back</button>
-      <button class="wax" data-declare-confirm="${o.target}"${truce ? ` data-break-truce="1"` : ""}>${icon("swords", 1)}${truce ? "Break the truce and declare war" : noAim ? `Declare war with no aim` : `Declare war on ${them}`}</button>
+      <button class="wax" data-declare-confirm="${o.target}"${truce ? ` data-break-truce="1"` : ""}${picked && !noAim ? ` data-aim="${esc(picked.aim)}"${picked.province !== undefined ? ` data-province="${picked.province}"` : ""}` : ""}>${icon("swords", 1)}${truce ? "Break the truce and declare war" : noAim ? `Declare war with no aim` : aims.length > 1 ? `Declare war: ${aim}` : `Declare war on ${them}`}</button>
     </div>
   </div>`;
 }

@@ -178,6 +178,8 @@ export interface DiplomacyConfig {
   lands_taken_years: number;
   /** AI arms and fear (DIPL-231 to DIPL-237): standing armies, mobilising at war, borrowing for war, fear of a much stronger neighbour. */
   arms_and_fear: ArmsAndFearRule;
+  /** Claims and forging them (DIPL-256 to DIPL-260, F-30). */
+  claims: { years: number; forge: { gold: number; months: number; discovery_chance_per_season: number }; ai_forges: boolean };
 }
 
 /** A value for each fear level. */

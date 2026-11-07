@@ -1,6 +1,6 @@
 import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
-import { cedeProvince, relationState, type News } from "./war.ts";
+import { cedeProvince, fittingAimsHeld, relationState, type News } from "./war.ts";
 import { grabbedLand, nameAbroadView, type NameAbroadView } from "./conquest.ts";
 import { priceContext, priceOfWar, type PriceOfWar } from "./priceOfWar.ts";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -10,6 +10,7 @@ import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { houseView, yearlyCrowns, type HouseView } from "./crowns.ts";
 import { yearlyPeople } from "./people.ts";
 import { aiCourting, courtingView, monthlyCourting, type CourtingView } from "./courting.ts";
+import { aiForging, claimsView, monthlyClaims, type ClaimsView } from "./claims.ts";
 import { bondOf, aiMayTakeSubject, aiOverlordEnvoys, aiOverlords, aiRisings, monthlySubjectEnvoys, makeSubject, seasonalSubjects, subjectByAgreement, subjectsView, type SubjectsView } from "./subjects.ts";
 
 /**
@@ -335,6 +336,9 @@ export function monthlyStatecraft(world: World, news: News[]): void {
   yearlyCrowns(world, news);
   monthlyCourting(world, news);
   aiCourting(world, (s) => bondOf(world, s)?.loyalty ?? null);
+  // Claims follow their provinces; forging envoys finish, or are found out; the AI forges on its rivals (DIPL-256 to DIPL-260).
+  monthlyClaims(world, news);
+  aiForging(world);
   aiEnvoys(world);
   // An AI envoy to a near court arrives this month: the player hears of the ask at once.
   libraryEvents(world, news);
@@ -561,7 +565,7 @@ export interface StatecraftView {
    * (null when it can) and, for one the reasons decide that can be sent, how likely a yes is (DIPL-229), in ENVOY_ACTIONS order;
    * and whom it fears (DIPL-235).
    */
-  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; hints: (dip.AskHint | null)[]; married: boolean; demands: DemandView; notoriety: number; price: PriceOfWar | null; fears: FearView[] }>;
+  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; hints: (dip.AskHint | null)[]; married: boolean; demands: DemandView; notoriety: number; price: PriceOfWar | null; fears: FearView[]; aims: AimChoice[] }>;
   /** The player's own name abroad: notoriety, Lands taken against the league threshold and the leagues against them (DIPL-225). */
   nameAbroad: NameAbroadView;
   /** The player's subjects and its own overlord (SUBJ-091, SUBJ-102). */
@@ -570,8 +574,17 @@ export interface StatecraftView {
   house: HouseView | null;
   /** The player's courting envoys, and why each foreign lord or subject can't be courted (DIPL-220). */
   courting: CourtingView | null;
+  /** The player's claims, its envoys forging claims, and the provinces it could forge a claim on (DIPL-262, DIPL-263). */
+  claims: ClaimsView | null;
   /** Envoys waiting at the player's court for an answer, oldest first (DIPL-211): what they ask, and the month it stands until. */
   asks: AskView[];
+}
+
+/** A fitting aim the player may declare a war with, picked on the declare sheet (DIPL-261): the aim, the province a Take land names, and why it is held. */
+export interface AimChoice {
+  aim: string;
+  province?: number;
+  source?: string;
 }
 
 /** A neighbour a realm is Wary or Threatened of this month (DIPL-231, DIPL-235): who, how much, and its strength over the realm's side's. */
@@ -655,6 +668,7 @@ export function statecraftView(world: World, player: number): StatecraftView | n
       notoriety: dip.notoriety(d, world.nationIds[n]!),
       price: mayPrice(world, player, n, ctx.counts) ? priceOfWar(world, player, n, ctx) : null,
       fears: fearsOf(world, n),
+      aims: mayPrice(world, player, n, ctx.counts) ? aimChoices(world, player, n) : [],
     };
   }
   const subjects = subjectsView(world, player, (n) => world.nationLedger[n * LEDGER_LINES + LEDGER.indexOf("tribute")]!);
@@ -671,7 +685,15 @@ export function statecraftView(world: World, player: number): StatecraftView | n
         until: p.until,
       };
     });
-  return { me: player, seats, free, giftGold: giftGold(world), envoys, letters, realms, subjects, house: houseView(world, player), courting: courtingView(world, player), asks, nameAbroad: nameAbroadView(world, player) };
+  return { me: player, seats, free, giftGold: giftGold(world), envoys, letters, realms, subjects, house: houseView(world, player), courting: courtingView(world, player), claims: claimsView(world, player), asks, nameAbroad: nameAbroadView(world, player) };
+}
+
+/** The fitting aims the player could declare a war on n with, best first (DIPL-261). */
+function aimChoices(world: World, player: number, n: number): AimChoice[] {
+  return fittingAimsHeld(world, player, n).map((h) => {
+    const p = h.province === undefined ? undefined : world.provinceIndex.get(h.province);
+    return { aim: h.aim, ...(p !== undefined ? { province: p } : {}), ...(h.source ? { source: h.source } : {}) };
+  });
 }
 
 /** A realm the player could declare war on: no war, alliance or subject tie between them (a truce may be broken). */

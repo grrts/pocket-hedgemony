@@ -302,6 +302,7 @@
 <tr><td>notorious_deed</td><td></td><td>30</td><td>Notorious deed</td><td></td><td></td><td></td><td></td><td></td><td>-10</td></tr>
 <tr><td>stirred_revolt_in_our_land</td><td></td><td>20</td><td>Stirred revolt in our land</td><td>-50</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>grabbed_land_near_us (provisional)</td><td>-5</td><td>20</td><td>Grabbed land near us</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>forged_a_claim_on_us</td><td></td><td>10</td><td>Forged a claim on us</td><td>-20</td><td></td><td></td><td></td><td></td><td></td></tr>
 </tbody></table></div>
 <h3 id="standing-words"><a class="anchor" href="#standing-words" aria-label="Link to this section">#</a>Standing words</h3>
 <div class="table-scroll"><table>
@@ -797,4 +798,23 @@
 <tr><td>defences (provisional)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>castle step: (calm: 0; wary: 1; threatened: 2); reserve share: (calm: 1; wary: 1; threatened: 0.5)</td></tr>
 <tr><td>technology (provisional)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>warfare prefix: W; cost weight: (calm: 1; wary: 0.8; threatened: 0.6)</td></tr>
 <tr><td>opportunity (provisional)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>at war ratio factor: 0.75; at war chance factor: 2; at war target weight: 3; gamble chance: 0.1; gamble ratio factor: 0.8; min ratio: 1.2</td></tr>
+</tbody></table></div>
+<h2 id="claims"><a class="anchor" href="#claims" aria-label="Link to this section">#</a>Claims</h2>
+<blockquote>
+<p>F-30 (Leroy): a claim is a realm&#39;s right to one province of another realm, the fact territorial_claim naming the province; it gives Take land on it for `years` and follows the province. An envoy forges one on a province on the realm&#39;s border: `forge.gold` paid when sent, `forge.months` at that court holding a seat, found out at `forge.discovery_chance_per_season` each season (the wrong forged_a_claim_on_us, and the work goes on). `ai_forges`: an AI forges on neighbours it holds as Rival or Hostile once a season (DIPL-256 to DIPL-260, D-DIPL-40). Provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>years</code></td><td>20</td></tr>
+<tr><td><code>ai_forges</code></td><td>yes</td></tr>
+<tr><td><code>provisional</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="forge"><a class="anchor" href="#forge" aria-label="Link to this section">#</a>Forge</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>gold</code></td><td>25</td></tr>
+<tr><td><code>months</code></td><td>12</td></tr>
+<tr><td><code>discovery_chance_per_season</code></td><td>0.1</td></tr>
 </tbody></table></div>

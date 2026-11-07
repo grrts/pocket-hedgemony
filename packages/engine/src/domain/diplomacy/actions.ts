@@ -475,6 +475,10 @@ export function warAimsOf(d: Diplomacy, holder: string, target: string): WarAim[
   const out: WarAim[] = d.aims.filter((a) => a.holder === holder && a.target === target && (!a.until || now < a.until));
   const h = country(d, holder);
   const add = (aim: string, source: string, prov?: string) => out.push(prov ? { holder, target, aim, source, province: prov } : { holder, target, aim, source });
+  // Claims (DIPL-256): a claim names a province; its fact's target is the realm that owns the province now.
+  for (const f of d.graph.facts) {
+    if (f.fact === "territorial_claim" && f.source === holder && f.target === target && typeof f.province === "string" && (typeof f.until !== "string" || now < f.until)) add("take_land", "our claim", f.province);
+  }
   for (const p of Object.values(d.provinces).filter((x) => x.owner === target)) {
     if (p.history.some((x) => x.owner === holder && monthsBetween(x.until, now) <= C.war_aims.held_province_years * 12)) add("take_land", "held within 50 years", p.id);
     if (d.pretenders.some((x) => x.court === holder && x.claims.includes(p.id))) add("take_land", "a pretender's claim", p.id);

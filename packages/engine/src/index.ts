@@ -38,7 +38,8 @@ export { TRADER_KINDS, traderKindName, type FoundOption, type GameTraderKind, ty
 export { tradeSeen, traderWalks } from "./trade.ts";
 export { FAITH_FAMILY, FAITH_IDS, FAITH_POLICIES, faithLine, faithName, NO_FAITH, NO_TONGUE, peoplesDataOf, peoplesView, SLOTS, TONGUE_FAMILY, TONGUE_IDS, TONGUE_POLICIES, tongueLine, tongueName, type FaithRow, type PeoplesSnapshot, type PeoplesView, type TongueLine, type TongueRow } from "./peoples.ts";
 export { censurePreview, faithBadge, faithHeadsView, headCard, type FaithHeadsView, type HeadCard } from "./faithHeads.ts";
-export { ENVOY_ACTIONS, type EnvoyAction, type FearView, type StatecraftView } from "./statecraft.ts";
+export { ENVOY_ACTIONS, type AimChoice, type EnvoyAction, type FearView, type StatecraftView } from "./statecraft.ts";
+export { type ClaimsView } from "./claims.ts";
 export { type RebelsView, type RisingView } from "./rebels.ts";
 export { type RegimeView, type RevolutionView, type Sign as RevolutionSign, type StanceView } from "./revolutions.ts";
 export { admit, answerRuling, callTheDiet, courtAims, passReform, defenceCalls, dietForecast, dissolveEmpire, empireDues, empireOrder, empireTax, empireView, headOfFaith, institutionsLens, monthlyInstitutions, realmsOf, seekVote, takeToCourt, whyNotDissolveTerm, type EmpireOrder, type EmpireView, type MemberView, type ReformsView, type SeatView } from "./institutions.ts";

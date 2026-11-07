@@ -250,6 +250,29 @@ export function declaringAim(world: World, a: number, b: number): { aim: string;
   return held;
 }
 
+/**
+ * Every fitting aim a holds against b that a declaration may name (DIPL-261):
+ * each Take land province and every other aim once, best first (AIM_ORDER),
+ * leaving out what a regency may not use. The declare sheet lists them.
+ */
+export function fittingAimsHeld(world: World, a: number, b: number): { aim: string; province?: string; source?: string }[] {
+  const held = dip.warAimsOf(world.diplomacy, world.nationIds[a]!, world.nationIds[b]!);
+  const regency = dip.country(world.diplomacy, world.nationIds[a]!).regency;
+  const out: { aim: string; province?: string; source?: string }[] = [];
+  const seen = new Set<string>();
+  for (const k of AIM_ORDER) {
+    if (regency && !dip.config.war_aims.regency_allows.includes(k)) continue;
+    for (const h of held) {
+      if (h.aim !== k) continue;
+      const key = `${h.aim}:${h.province ?? ""}`;
+      if (seen.has(key) || (h.aim !== "take_land" && out.some((x) => x.aim === k))) continue;
+      seen.add(key);
+      out.push({ aim: h.aim, ...(h.province ? { province: h.province } : {}), source: h.source });
+    }
+  }
+  return out;
+}
+
 /** A regency may fight only some wars: an aim it may not use falls back to no aim. */
 function declareWithAim(d: dip.Diplomacy, x: string, y: string, aim: string): dip.War {
   try {

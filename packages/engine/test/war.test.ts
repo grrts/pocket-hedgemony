@@ -5,6 +5,7 @@ import { advance, applyNow, createWorld, marchMap, processTurn, relationState, s
 import { blockingCastle, routeBars } from "../src/turn.ts";
 import { runOccupation, wallsOf, type News } from "../src/war.ts";
 import { planRoute } from "../src/march.ts";
+import { disbandArmy } from "../src/recruit.ts";
 
 const rules = loadDefaultRuleset();
 const tiles = loadMapTiles(rules);
@@ -36,7 +37,14 @@ describe("war and conquest", () => {
     const target = Array.from({ length: w.provinceCount }, (_, p) => p).find((p) => w.provinceOwner[p] === foe && p !== capital && borders(p))!;
     const news = [];
     let peace = false;
+    // Portugal's field armies are sent home once the siege is laid, so one siege runs its course: a relief army lifting
+    // the siege is not what this checks, and how often the AI sends one swings with every change to its other choices.
+    const sendHome = () => {
+      if (!w.sieges.has(target)) return;
+      for (let i = 0; i < w.armies.count; i++) if (w.armies.alive[i] && w.armies.owner[i] === foe) disbandArmy(w, foe, i);
+    };
     for (let t = 0; t < 120 && !peace; t++) {
+      sendHome();
       const orders = w.armies.location[army] !== target && !w.armies.route[army]!.length ? [{ type: "move" as const, army, to: target }] : [];
       news.push(...processTurn(w, orders, me).news);
       if (w.provinceOccupier[target] === me) {

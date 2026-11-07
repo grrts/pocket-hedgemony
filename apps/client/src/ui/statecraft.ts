@@ -69,7 +69,7 @@ export function realmStatecraft(v: StatecraftView | null, r: number, allied: boo
         ? tile(`<button class="wax" data-envoy="${m.action}">${icon("scroll", 1)}${m.label}</button>`, `${odds(realm.hints?.[k])}${esc(m.does(v))}`)
         : tile(`<button class="paper" disabled>${m.label}</button>`, why(not));
     }).join("")}${allied ? tile(`<button class="paper" data-break-alliance="${r}">End the alliance</button>`, "An oath broken: they will remember it (−40, fading over 20 years), and other courts trust you less.") : ""}</div>`;
-  return `${standing}${away}${last}${missions}${atWar ? "" : courtSubjectHtml(v, r)}${atWar ? "" : demandsHtml(realm.demands)}`;
+  return `${standing}${away}${last}${missions}${atWar ? "" : courtSubjectHtml(v, r)}${atWar ? "" : demandsHtml(realm.demands)}${atWar ? "" : claimsHtml(v, r)}`;
 }
 
 /** Whom a realm fears this month (DIPL-235): you first, as a line with its reason, then the neighbours it fears besides you. */
@@ -142,6 +142,68 @@ function demandsHtml(d: StatecraftView["realms"][number]["demands"]): string {
         .join("")}</div>`
     : "";
   return `${head}<div class="missions">${tribute}</div>${provinces}`;
+}
+
+/** Why a claim is held, in the player's words (DIPL-262): "our claim", "held within 50 years", "refused hand over province". */
+const claimWhy = (why: string) => why.replace(/_/g, " ");
+
+/** Odds of being found out, as "1 in 10". */
+const oneIn = (p: number) => (p > 0 ? `1 in ${Math.round(1 / p)}` : "no chance");
+
+/**
+ * The Claims section on another realm's Diplomacy tab (DIPL-262): your claims
+ * on them with why, an envoy forging one, and a button for each province on
+ * your border to forge a claim on, or why none can be.
+ */
+export function claimsHtml(v: StatecraftView | null, r: number): string {
+  const c = v?.claims;
+  if (!c) return "";
+  const held = c.claims[r] ?? [];
+  const forge = c.forge[r];
+  const mine = c.forging.find((f) => f.target === r);
+  if (!held.length && !forge && !mine) return "";
+  const rows = held.length
+    ? `<dl class="facts">${held.map((x) => `<dt>${icon("swords", 1)} ${esc(x.name)}</dt><dd>${esc(claimWhy(x.why))}${x.until ? `, until ${monthText(x.until)}` : ""}</dd>`).join("")}</dl>
+    <p class="hint">Each is a reason for war: <i>Take land</i> on it. A war over it is a war the world understands, with none of the cost of a war with no aim.</p>`
+    : `<p class="hint">You hold no claim on their land. A war on them now would have no aim, which costs you dearly the day you declare it.</p>`;
+  const working = mine
+    ? `<p>${icon("scroll", 1)} Your envoy forges a claim on <b>${esc(mine.name)}</b>, since ${monthText(mine.since)}; the claim is made in ${monthText(mine.done)}.</p>
+    <div class="missions">${tile(`<button class="paper" data-forge-recall="${r}">Recall your envoy</button>`, "He comes home with nothing made; the gold is spent.")}</div>`
+    : "";
+  const buttons = !forge
+    ? ""
+    : forge.why
+      ? `<p class="hint">${why(forge.why)}</p>`
+      : forge.provinces.length
+        ? `<div class="missions">${forge.provinces
+            .map((p) => (p.why === null ? tile(`<button class="wax" data-forge="${p.province}">${icon("scroll", 1)}Forge a claim on ${esc(p.name)}${p.capital ? " (their capital)" : ""}</button>`, `${c.gold} gold`) : tile(`<button class="paper" disabled>Forge a claim on ${esc(p.name)}</button>`, why(p.why))))
+            .join("")}</div>`
+        : `<p class="hint">You hold a claim on every province of theirs on your border.</p>`;
+  return `<section class="claims" id="claims">
+    <h3 class="sub">Claims</h3>
+    <p><b>Your claims on them</b></p>
+    ${rows}
+    ${working}
+    ${forge && !mine ? `<p><b>Forge a claim</b></p><p class="hint">An envoy works a year at their court to forge your right to a province on your border: ${c.gold} gold, and his seat for ${c.months} months. Each season there is ${oneIn(c.discovery)} that they find out and hold it against you (−20, fading over 10 years); his work goes on. The claim lasts 20 years.</p>${buttons}` : ""}
+  </section>`;
+}
+
+/** Your claims (DIPL-263): one row a realm you hold claims on, with how many provinces and the nearest to lapse; each opens its Diplomacy tab. */
+export function myClaims(v: StatecraftView | null, realmButton: (n: number) => string): string {
+  const c = v?.claims;
+  if (!c) return "";
+  const realms = Object.entries(c.claims).map(([r, list]) => ({ r: Number(r), list }));
+  const lapse = (list: { until?: string }[]) => list.map((x) => x.until).filter((x): x is string => !!x).sort()[0];
+  return `<h3 class="sub">Your claims</h3>
+    ${realms.length
+      ? realms
+          .map(({ r, list }) => {
+            const first = lapse(list);
+            return `<div class="house-row">${realmButton(r)} <small>${list.length} province${list.length === 1 ? "" : "s"}: ${list.slice(0, 3).map((x) => esc(x.name)).join(", ")}${list.length > 3 ? "…" : ""}${first ? ` · first lapses ${monthText(first)}` : ""}</small></div>`;
+          })
+          .join("")
+      : `<p class="hint">You hold no claim on another realm's land. Open a neighbour's Diplomacy tab to forge one: a claim is a reason for war.</p>`}
+    ${c.forging.map((f) => `<p>${icon("scroll", 1)} ${realmButton(f.target)} <small>forging a claim on ${esc(f.name)}, done ${monthText(f.done)}</small></p>`).join("")}`;
 }
 
 /** Your own statecraft: envoys abroad and the answers of the last two years. */
