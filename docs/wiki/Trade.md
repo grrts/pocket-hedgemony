@@ -205,7 +205,8 @@ collected = trade value × trade ratio × hold × visit share (0.2) × crowding
 - **Crafts appearing**: craft buildings appear by themselves only where the trade ratio is 30 % or more.
 - **Inputs**: a building's input ware is supplied if it is made in the province, within reach (one ring, more with roads and rivers), or anywhere on a trader's route that passes through; otherwise the building works at half.
 - **Research**: when your traders deposit or collect in another country's cities, that country counts as your trade partner for invention spread (see [Research](Research)).
-- **Food is never carried** by traders; hungry cities are fed by castles (see [Your Realm](Your-Realm)).
+- **Grain**: traders and trade ships carry grain like any other ware. Each has a grain hold beside its purse (a pack caravan feeds 5,000 people for a month, a cog 10,000). Entering a province its owner holds, a trader first sells grain if the store there is under 4 months, then buys if it is over 9. Across a border the buyer pays the seller the fixed grain price, which joins the Grain line; between your own provinces no gold moves. So a land short of fields can live on bought grain, and a war brings hunger to it: an enemy army on the road ahead seizes a caravan's purse and grain, and a blockade takes a ship's. Castles still share food inside your realm (see [Your Realm](Your-Realm)).
+- **Where you see it**: the trader card's Grain part (its hold, where it fed and bought), the route bar's "Grain: from … to …" line, the Food tab's line on grain traded last month and its Short of food rows ("Traders bring grain" or "No trader brings grain"), and a province's Grain by trade line.
 
 ### Inventions
 
