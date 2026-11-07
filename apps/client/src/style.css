@@ -4071,12 +4071,15 @@ button.land-tile.on {
 /* How the realm is fed, at a glance: three counts side by side. */
 .food-glance {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   margin: 6px 0;
 }
 .food-glance > div {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: center;
   gap: 6px;

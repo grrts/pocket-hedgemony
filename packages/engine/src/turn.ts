@@ -359,7 +359,7 @@ function endDay(world: World, news: News[]): void {
   dailyExploration(world);
   runOccupation(world, world.date.day === 1, news);
   // Traders walk a day on, as the armies march (TRADE-132).
-  tradeDay(world);
+  tradeDay(world, news);
   dailyRebels(world, news);
   world.date = addDays(world.date, 1);
   world.day++;

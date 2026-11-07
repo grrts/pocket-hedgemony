@@ -310,6 +310,8 @@ export interface Snapshot {
   /** Every province's trade value (gold a month), trade ratio (0 to 100), traders passing last month, and whether it is a trade stop (bit 1 city, bit 2 port). */
   provinceTradeValue: Float32Array;
   provinceTradeRatio: Uint8Array;
+  /** Grain traders sold to and bought from each province last month, 2 per province, in thousands of people fed for a month (TRADE-166). */
+  provinceGrain: Float32Array;
   provinceTradePassing: Uint8Array;
   provinceTradeCity: Uint8Array;
   /** Provinces whose trade the player sees: its own and those on its traders' loops (D-TRADE-13). */
@@ -626,6 +628,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       tradeFeed: w.tradeFeed.splice(0),
       provinceTradeValue: Float32Array.from({ length: w.provinceCount }, (_, p) => tradeValueAt(w, p)),
       provinceTradeRatio: Uint8Array.from(w.provinceTradeRatio, (r) => Math.round(r)),
+      provinceGrain: w.provinceGrainLast.slice(),
       provinceTradePassing: Uint8Array.from(w.provincePassed, (x) => Math.min(255, Math.round(x))),
       provinceTradeCity: w.provinceTradeCity.slice(),
       ...(() => {
@@ -755,6 +758,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceWorks,
       snap.provinceTradeValue,
       snap.provinceTradeRatio,
+      snap.provinceGrain,
       snap.provinceTradePassing,
       snap.provinceTradeCity,
       snap.provinceTradeSeen,

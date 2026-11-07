@@ -657,6 +657,13 @@
       "min_gain": 0.2,
       "draft_options": 12
     },
-    "feed_max": 256
+    "feed_max": 256,
+    "grain": {
+      "$comment": "D-TRADE-24, traders carry grain (feedback 85, provisional): a trader's grain hold is its kind's hold times hold_per_hold, in thousands of people fed for a month; entering a province it sells grain where the store is under unload_below_months of eating, up to that, then buys where the store is over load_above_months, as much of the excess as fits.",
+      "hold_per_hold": 5,
+      "unload_below_months": 4,
+      "load_above_months": 9,
+      "provisional": true
+    }
   }
 }

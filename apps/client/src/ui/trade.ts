@@ -151,16 +151,44 @@ export function routeBar(r: Routing, v: TradeView | null, name: (p: number) => s
       d.best.length ? ` <small class="best">· best ${d.best.map((b) => `${esc(name(b.province))} ${gold(b.gold)}`).join(", ")}</small>` : ""
     }`;
   else if (!d) preview = `<span class="soft">Working it out…</span>`;
+  // Grain along the way: where it would buy and where it would sell, so the player can send a trader from plenty to want (TRADE-168).
+  const grain = d && r.stops.length >= 2 && !d.why ? `<p class="route-grain">${grainWayText(d.grainWay, name)}</p>` : "";
   const why = r.note ?? d?.why ?? null;
   const ok = r.stops.length >= 2 && !!d && !d.why;
   return `<p class="route-what"><b>${t ? esc(t.name) : "Trader"}${t ? ` of ${esc(name(t.home))}` : ""}</b> · Tap where it starts, then where it goes; it finds the way through the busiest land</p>
     <div class="route-stops">${chips}<span class="route-preview">${preview}</span></div>
+    ${grain}
     ${why ? `<p class="route-why">${esc(cap1(why))}.</p>` : ""}
     <div class="route-buttons">
       <button class="paper" data-route-undo${r.stops.length ? "" : " disabled"}>Undo</button>
       <button class="paper" data-route-cancel>Cancel</button>
       <button class="wax" data-route-confirm${ok ? "" : " disabled"}>Confirm</button>
     </div>`;
+}
+
+/** People a store of grain feeds for a month (food is counted in thousands). */
+const peopleFed = (food: number) => Math.round(food * 1000).toLocaleString("en");
+const nameList = (ps: readonly number[], name: (p: number) => string) => ps.map((p) => esc(name(p))).join(", ");
+
+/** "Grain: from Paris, Troyes to Lyon", or why it carries none on this way (TRADE-167, TRADE-168). */
+export function grainWayText(w: { sell: number[]; buy: number[] }, name: (p: number) => string): string {
+  if (w.sell.length && w.buy.length) return `Grain: from ${nameList(w.sell, name)} to <b>${nameList(w.buy, name)}</b>`;
+  if (w.buy.length) return `${nameList(w.buy, name)} would buy grain, but nothing on the way has grain to spare`;
+  if (w.sell.length) return `Grain to spare in ${nameList(w.sell, name)}, but no one on the way runs short`;
+  return `No grain to carry on this way`;
+}
+
+/** The trader card's Grain part: its hold, where it fed and bought on its last trip, and what its way offers now (TRADE-168). */
+export function traderGrainHtml(t: TraderView, name: (p: number) => string): string {
+  const full = t.grainMax > 0 ? Math.min(100, (t.grain / t.grainMax) * 100) : 0;
+  const place = (x: { province: number; food: number }) => `<button class="link" data-show-province="${x.province}">${esc(name(x.province))}</button> ${peopleFed(x.food)}`;
+  const fed = t.grainSold.length ? `<p><small>Fed</small> ${t.grainSold.slice(0, 4).map(place).join(" · ")}</p>` : "";
+  const bought = t.grainBought.length ? `<p><small>Bought in</small> ${t.grainBought.slice(0, 4).map(place).join(" · ")}</p>` : "";
+  return `<h3 class="sub">Grain</h3>
+    <p>${t.grain > 0.0005 ? `Carries grain for <b>${peopleFed(t.grain)}</b> people for a month` : "Hold empty"} <small>of ${peopleFed(t.grainMax)}</small></p>
+    <span class="progress grain-bar" role="img" aria-label="Grain ${peopleFed(t.grain)} of ${peopleFed(t.grainMax)}"><i style="width:${full.toFixed(1)}%"></i></span>
+    ${fed}${bought}
+    <p class="hint">${grainWayText(t.grainWay, name)}. It sells where stores run low and buys where they have plenty.</p>`;
 }
 
 /** What a trader is doing now, in a few words: "Walking to Lyon, 3 days" or "Waiting in Paris" (TRADE-153). */
@@ -219,6 +247,7 @@ export function traderCardHtml(t: TraderView, name: (p: number) => string, forei
     <span class="progress purse-bar" role="img" aria-label="Purse ${gold(t.purse)} of ${gold(t.purseMax)} gold"><i style="width:${full.toFixed(1)}%"></i></span>
     <p><small>Carrying ${gold(t.purse)} of ${gold(t.purseMax)} gold; it banks it in your next city on its way.</small></p>
     ${t.problem ? `<p class="trader-why">${esc(cap1(t.problem))}.</p>` : ""}
+    ${traderGrainHtml(t, name)}
     <h3 class="sub">Route</h3>
     ${route}
     <h3 class="sub">${t.better.length ? "Better routes" : "Its best route"}</h3>

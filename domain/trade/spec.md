@@ -259,7 +259,7 @@ its ratio in about seven months.
 - TRADE-089 The trade context shall let craft buildings appear by themselves only where the trade ratio is 30 % or more. [trade §9]
 - TRADE-090 The trade context shall supply a building's input ware if it is made in the province, within reach (one ring, more with roads and rivers), or in any province on a trader's route passing through this one; otherwise the building works at half. [trade §9]
 - TRADE-091 When a country's traders deposit or collect in another country's cities, the trade context shall count that country as its trade partner for research spread. [trade §9]
-- TRADE-092 The trade context shall never carry food by traders; hungry cities are fed by the castle and food system. [trade §9]
+- TRADE-092 The trade context shall let traders carry grain like any other ware, buying where a store has plenty and selling where it runs low (TRADE-162 to TRADE-170); hungry cities are fed by traders as well as by the castle and food system. [trade §9; D-TRADE-24, feedback 85]
 
 ### 5.11 Screens and controls
 - TRADE-093 The game shall show trade by zoom: a trade-ratio-coloured Trade lens and busiest roads and sea lanes at world; thicker roads with more traders, trader icons with a purse bar and a coin on market cities at region; caravans, barges and ships moving at local. [trade §10.1]
@@ -403,6 +403,52 @@ route loses money.
   and says how many traders each market step homes; a full city's kinds are greyed out with the reason. The trader
   card's Route line already gives what it brings after upkeep, so a losing route reads in red there and in the Traders
   rows. [F-162, X-19, TRADE-153, TRADE-156]
+
+### 5.18 Traders carry grain (feedback 85, 7 November)
+Leroy's feedback 85 reverses the old TRADE-092: traders and trade ships carry food like any other ware, so land short of
+fields can import grain, and blockades and raided roads bring hunger. Built on the walking traders (TRADE-132, F-129)
+and the castle food network (REALM-206 to REALM-213), which still moves food inside a realm; traders move it along
+their way, across borders and over the sea. (D-TRADE-24)
+
+- TRADE-162 Each trader shall have a grain hold as well as its purse: its kind's hold times
+  `trade.game.grain.hold_per_hold`, in thousands of people fed for a month (a pack caravan 5, a cog 10). Grain in the hold
+  is kept in the save. [feedback 85]
+- TRADE-163 When a trader enters a land province (a port for a trade ship) whose owner holds it, the trade context shall
+  first sell it grain if its store is under `grain.unload_below_months` of its people's eating, as much as brings it up to
+  that or empties the hold, and then buy grain if the store is over `grain.load_above_months`, as much of the excess as
+  fits in the hold. It neither buys nor sells in unclaimed or occupied land, nor while the warm-up runs. [feedback 85,
+  TRADE-043, REALM-022]
+- TRADE-164 Grain shall change hands at the realm's one grain price (REALM-026, `grain_price_gold_per_food` ×
+  `castleFood.grainGoldScale`): bought in a foreign province, the trader's realm pays its owner; sold in a foreign
+  province, its owner pays the trader's realm; between a realm's own provinces no gold moves. The month's grain gold
+  joins each realm's Grain line of the ledger (REALM-179). [feedback 85, REALM-026, REALM-209]
+- TRADE-165 When a trader would enter a land province where an army at war with its realm stands, the army shall seize
+  its purse for its realm and the grain in its hold, and the trader shall not go in: its way is shut until it is planned
+  again (TRADE-078, TRADE-136). When a blockade stops a trade ship, it loses its grain with its purse (NAVY-157). The
+  player hears of it in the News when the trader carried anything. [feedback 85, TRADE-078, NAVY-157]
+- TRADE-166 The game shall keep, for every province, the grain traders sold to it and bought from it this month and last
+  month (kept in the save), and for each of the player's traders the grain it sold and bought on its last whole trip
+  there and back, or on this trip so far, by province (TRADE-146). [feedback 85, TRADE-146]
+- TRADE-167 While a route is chosen, and on a trader's card, the game shall name the provinces on the way that would sell
+  grain now and those that would buy it now. [feedback 85, TRADE-054]
+
+#### How the player uses it
+- TRADE-168 Where: the **trader card** (TRADE-153) gains a **Grain** line under Now: "Carries grain for 4,000 people"
+  with a bar against its hold, or "Hold empty"; then where it sold grain on its last trip ("Fed Lyon 6,000 · Rouen
+  2,000") and where it bought it, each name opening the province; and, in red, "Raided at Dijon: lost its purse and
+  grain". The route bar's preview (TRADE-142) adds one line, "Grain: from Paris, Troyes to Lyon", or "No grain to carry
+  on this way", so the player sends a trader from plenty to want by choosing where it starts and where it goes; nothing
+  new to tap. [feedback 85, X-19, TRADE-153, TRADE-142]
+- TRADE-169 Grouping and overview: grain is food, so its overview is the **Food tab** (REALM-212). Under the counts one
+  line says what traders did last month: "Traders brought grain for 12,000 into your land and took 30,000 out (+0.1
+  gold)", or that they carried none. Each row of **Short of food** says under its months stored either "Traders bring
+  grain for 3,000 a month" or, in red, "No trader brings grain", and the hint names the fix: farms, a castle, or a
+  trader from a land with grain to spare. A province's Overview shows a **Grain by trade** line beside its castle line
+  when traders sold or bought there last month. A raided or seized trader reaches the News (TRADE-165). [feedback 85,
+  X-19, REALM-212, REALM-213]
+- TRADE-170 Phone: the new lines are text lines of the panel cards already there, wrapping on a narrow panel in the Wide
+  and Tall layouts; province names in them are buttons at least 44 points high; nothing needs hover and nothing scrolls
+  sideways. [X-19, SHELL-108, SHELL-109, SHELL-114]
 
 ## 6. Commands
 
@@ -577,6 +623,8 @@ Changes the design asks of other files (§14), recorded here; not edited:
 - **D-TRADE-22** Honest estimates (trade rework, 19 October): the playtest found the screens' "about x a month" 30 % to 300 % above what traders brought, since it ignored crowding and let the purse overfill on long loops. The estimate now walks the loop with its purse and last month's crowding (TRADE-147), and better routes are offered only on that estimate (TRADE-148). Without an honest number, suggestions and the AI's reroute mislead.
 - **D-TRADE-23** Home slots (trade rework, 19 October, Leroy chose A of three): the playtest saw France found 121 caravans for +114 gold a month, as upkeep (0.1) was a twentieth of a poor route. Rather than stronger crowding (B, spam still pays) or leaving the numbers (C), each city homes 1 trader per market step (a fair 2, a trading house 4) and a port 1 more, upkeep is four times and founding three times what it was. A poor long route then loses money, so better routes and Dismiss matter. The AI's keep bar went from 4 to 1 times upkeep so the same routes are kept.
 
+- **D-TRADE-24** Traders carry grain (feedback 85, 7 November): the old TRADE-092 kept food off the roads so castles alone fed the hungry. Leroy's feedback 85 reverses it: food is a ware like any other, so a land short of fields can live on bought grain and a war that cuts its roads or ports brings hunger. The simplest rule that does this: a trader sells to a store running low and buys from a store with plenty wherever it walks, at the one fixed grain price (REALM-026), with no market or price to steer and nothing new to tap; the player feeds a place by sending a trader from plenty to it. Thresholds and hold sizes are provisional (`trade.game.grain`).
+
 ## 14. Traceability
 
 | Requirement | Feature file | Scenario |
@@ -609,3 +657,5 @@ Changes the design asks of other files (§14), recorded here; not edited:
 | TRADE-146 … TRADE-152 | — | Engine: packages/engine/test/trade.test.ts (following and steering a trader: where it walks and its sources, the honest estimate, better routes, options while choosing, the realm's sums, the map feed, saves) |
 | TRADE-153 … TRADE-158 | — | Presentation: apps/client/src/ui/trade.ts, the trader card, its way on the map, the Trade tab overview, banking on the map |
 | TRADE-159 … TRADE-161 | — | Engine: packages/engine/test/trade.test.ts (founding: home slots, upkeep and founding gold); presentation: apps/client/src/ui/trade.ts, Found a trader |
+| TRADE-162 … TRADE-167 | — | Engine: packages/engine/test/tradeGrain.test.ts (the grain hold, buying and selling, the grain price, raids and blockades, the counts, saves) |
+| TRADE-168 … TRADE-170 | — | Presentation: apps/client/src/ui/trade.ts (trader card, route bar) and apps/client/src/ui/food.ts (Food tab, province Overview) |
