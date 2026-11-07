@@ -16,3 +16,4 @@ export * from "./desk.ts";
 export { classifyShape, layoutFor, mapHud, checkTouchRules, cornerOf, oppositeCorners, portraitNotice, type Shape, type Window } from "../map-presentation/index.ts";
 export * from "./autoTurns.ts";
 export * from "./overview.ts";
+export * from "./comingUp.ts";

@@ -88,3 +88,37 @@ Feature: Auto turns
     When the week has played and its saves are written
     Then Auto turns are off
     And no new week starts
+
+  @SHELL-190 @placeholder
+  Scenario: Quiet weeks on Auto play faster
+    # autoTurns.quiet_speed 3
+    Given a single-player campaign with Auto turns on
+    And Turn playback speed gives a day 300 ms
+    And nothing is near the realm
+    When a day of the week plays
+    Then the day takes 100 ms on screen
+    And the Auto button reads "Auto ×3"
+
+  @SHELL-190
+  Scenario Outline: Something near slows the days
+    Given a single-player campaign with Auto turns on
+    And Turn playback speed gives a day 300 ms
+    And <what>
+    When a day of the week plays
+    Then the day takes 300 ms on screen
+    And the Auto button reads "Auto"
+
+    Examples:
+      | what                                                |
+      | a battle of the player's is under way               |
+      | an enemy army stands beside the player's land       |
+      | a truce on Coming up ends this month                  |
+
+  @SHELL-190
+  Scenario: Without Auto the days keep their speed
+    Given a single-player campaign with Auto turns off
+    And Turn playback speed gives a day 300 ms
+    And nothing is near the realm
+    When a day of the week plays
+    Then the day takes 300 ms on screen
+    And the Auto button reads "Auto"

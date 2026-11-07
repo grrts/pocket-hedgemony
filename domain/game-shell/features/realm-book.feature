@@ -93,6 +93,68 @@ Feature: Realm book
       | study       | none  | Research  | Choose what to study          | Research        |
       | beliefLow   | 1     | Research  | Faith or language low         | Peoples         |
 
+  @SHELL-188 @placeholder
+  Scenario: Coming up lists what is near, soonest first
+    # comingUp.horizon_months 6, comingUp.order, comingUp.of_age 16
+    Given what is coming for the realm:
+      | kind     | what              | months |
+      | study    | Plough            | 2      |
+      | truce    | Aragon            | 3      |
+      | work     | Farm, Toledo      | 1      |
+      | lord     | Álvaro de Luna    |        |
+      | heir     | Juan, 15          |        |
+    When the player opens the Realm book's Overview
+    Then Coming up reads:
+      | Álvaro de Luna may rise against you |
+      | Farm in Toledo done next month      |
+      | Plough learned in 2 months          |
+      | Truce with Aragon ends in 3 months  |
+
+  @SHELL-188 @placeholder
+  Scenario: Coming up leaves out what is far
+    Given what is coming for the realm:
+      | kind  | what     | months |
+      | truce | Portugal | 9      |
+      | heir  | Juan, 12 |        |
+      | lord  | Pedro    | Wavering |
+    When the player opens the Realm book's Overview
+    Then Coming up is left out
+
+  @SHELL-188 @placeholder
+  Scenario: Coming up keeps the four soonest
+    # comingUp.max 4
+    Given what is coming for the realm:
+      | kind     | what           | months |
+      | ambition | Unite Iberia   |        |
+      | truce    | Aragon         | 0      |
+      | work     | Farm, Toledo   | 5      |
+      | work     | Market, Burgos | 4      |
+      | study    | Plough         | 6      |
+    When the player opens the Realm book's Overview
+    Then Coming up reads:
+      | Truce with Aragon ends this month |
+      | Market in Burgos done in 4 months |
+      | Farm in Toledo done in 5 months   |
+      | Plough learned in 6 months        |
+
+  @SHELL-189
+  Scenario Outline: A Coming up item opens what it names
+    Given what is coming for the realm:
+      | kind   | what   | months   |
+      | <kind> | <what> | <months> |
+    When the player opens the Realm book's Overview
+    Then the Coming up item "<item>" opens <opens>
+
+    Examples:
+      | kind     | what           | months | item                                | opens                         |
+      | lord     | Álvaro de Luna |        | Álvaro de Luna may rise against you | the lord's screen             |
+      | truce    | Aragon         | 2      | Truce with Aragon ends in 2 months  | the realm's card on Diplomacy |
+      | work     | Farm, Toledo   | 1      | Farm in Toledo done next month      | the province card on Build    |
+      | study    | Plough         | 3      | Plough learned in 3 months          | the page "Research"           |
+      | ambition | Unite Iberia   |        | Ambition within reach: Unite Iberia | the page "Heritage"           |
+      | heir     | Juan, 15       |        | Juan comes of age within a year     | the page "Government"         |
+      | regency  | 15             |        | The ruler comes of age within a year | the page "Government"        |
+
   @SHELL-062
   Scenario: Show on map and back to the same place
     Given the Realm book is open on the tab "Military" scrolled to the army "Armée de Dunois"

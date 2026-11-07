@@ -127,7 +127,7 @@ import { formName } from "@ph/engine/domain/government";
 import { campaignOptionsOf, DEFAULT_CHOICES, PICKER_REGIONS, pickerRegions, startTrade, waysToGrow, type NewGameChoices } from "@ph/engine/domain/scenario-setup";
 import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
 import { loadLastChoices, newGameOptionsHtml, rulesLine, saveLastChoices, setRule, type RuleKey } from "./ui/newGame.ts";
-import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, firstLaunchQuestion, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
+import { autoDayMs, autoLabel, BATTLE_STEP_MS, bannerAt, comingUp, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, firstLaunchQuestion, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type ComingItem, type Nearness, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, gate, longDate, newCampaign, newManualSave, saveStart, savesConfig, sharedFromLine, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { mpStore } from "./multiplayer/store.ts";
 import { activeIn, cleanCode, storeTable, timeLeft, weekDue, type MyGame, type OnlineGame, type Seat, type Table, type TurnDoc } from "./multiplayer/lobby.ts";
@@ -4314,7 +4314,7 @@ function renderActions(): void {
   autoButton.classList.toggle("stopping", auto.state === "stopping");
   autoButton.setAttribute("aria-pressed", String(auto.state === "on"));
   const stopping = endTurnLabel(auto);
-  autoButton.querySelector("span")!.textContent = stopping ?? "Auto";
+  autoButton.querySelector("span")!.textContent = stopping ?? autoLabel(auto, playing && snapshot ? nearness() : null);
   autoButton.title = stopping ? `${stopping}: tap to keep Auto turns on (Shift+Space)` : auto.state === "on" ? "Auto turns on: tap to stop at the end of this week (Shift+Space)" : "Auto turns: play week after week (Shift+Space)";
   fab.classList.toggle("playing", playing);
   fab.classList.toggle("paused", paused);
@@ -6709,6 +6709,7 @@ function realmOverviewHtml(r: number, own: number[], people: number, armies: num
     `<button class="paper tile${t.needs ? " needs" : ""}" data-realm-open-tab="${PAGE_KEYS[t.page]}"${t.needs ? ` aria-label="${t.section}: ${esc(t.needs)}"` : ""}>${icon(SECTION_ICONS[t.section]!, 1)}<b>${t.section}</b><span>${esc(t.line)}</span>${t.needs ? `<em>${esc(t.needs)}</em>` : t.note ? `<small>${esc(t.note)}</small>` : ""}</button>`;
   return `
     <p class="overview-head"><b>Your realm</b> · ${own.length} province${own.length === 1 ? "" : "s"} ${empireBadgeHtml(s.empire, r) + shogunBadgeHtml(s.shogunate, r)} · Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
+    ${comingUpHtml(r, own)}
     <div class="overview-tiles">${tiles.map(tile).join("")}</div>
     <dl class="facts">
       ${s.rulers[r] ? rulerLines(s.rulers[r]!) : ""}
@@ -6716,6 +6717,44 @@ function realmOverviewHtml(r: number, own: number[], people: number, armies: num
     </dl>
     ${s.stability ? stabilitySection(s.stability, titlesOf(r)) : ""}
     ${s.revolution ? revolutionSection(s.revolution) : ""}`;
+}
+
+/** Whole months from the snapshot's date to an ISO day ("1450-03-01"), never below 0. */
+function monthsUntil(iso: string): number {
+  const [y, m] = iso.split("-").map(Number);
+  const d = snapshot!.date;
+  return Math.max(0, (y! - d.year) * 12 + (m! - d.month));
+}
+
+/** What Coming up reads from the snapshot for a realm (SHELL-188). */
+function comingFor(r: number, own: number[]): ComingItem[] {
+  const s = snapshot!;
+  const ownSet = new Set(own);
+  const ruler = s.rulers[r];
+  return comingUp({
+    truces: s.relations.filter((x) => x.state === "truce" && x.until).map((x) => ({ realm: nations[x.nation]!.name, nation: x.nation, months: monthsUntil(x.until!) })),
+    works: s.sites.filter((x) => ownSet.has(x.province)).map((x) => ({ work: cap(s.workSteps[x.work]![Math.max(0, x.step - 1)]!.name), province: provinces[x.province]!.name, provinceIndex: x.province, months: x.monthsLeft })),
+    study: s.research?.study ? { name: studyNow(s.research)!.name, months: s.research.study.months } : null,
+    heir: ruler?.heir ? { name: ruler.heir.name, age: ruler.heir.age } : null,
+    ruler: ruler ? { age: ruler.age, regent: !!ruler.regent } : null,
+    ambitions: (s.heritage[r]?.ambitions ?? []).filter((a) => a.state === "open").map((a) => ({ name: a.name, near: !!a.near })),
+    lords: s.lords.flatMap((l, k) => (l.nation === r && !l.gone && l.loyalty !== "Loyal" ? [{ name: l.name, lord: k, loyalty: l.loyalty }] : [])),
+  });
+}
+
+/** Realm's Overview: Coming up, what will happen soon without the player acting, soonest first (SHELL-188, SHELL-189). */
+function comingUpHtml(r: number, own: number[]): string {
+  const items = comingFor(r, own);
+  if (!items.length) return "";
+  const open = (c: ComingItem) =>
+    "lord" in c.open ? `data-lord-open="${c.open.lord}"`
+    : "realm" in c.open ? `data-realm="${c.open.realm}" data-realm-open="diplomacy"`
+    : "build" in c.open ? `data-open-build="${c.open.build}"`
+    : `data-realm-open-tab="${PAGE_KEYS[c.open.page]}"`;
+  const glyph = (c: ComingItem): IconName => (c.kind === "lord" ? "swords" : c.kind === "truce" ? "scroll" : c.kind === "work" ? "hammer" : c.kind === "ambition" || c.kind === "heir" || c.kind === "regency" ? "crown" : "hourglass");
+  return `<section class="coming-up" aria-label="Coming up"><h3 class="sub">${icon("hourglass", 1)}Coming up</h3><div class="coming">${items
+    .map((c) => `<button class="paper coming-item${c.kind === "lord" ? " risk" : ""}" ${open(c)}>${icon(glyph(c), 1)}<span>${esc(c.text)}</span></button>`)
+    .join("")}</div></section>`;
 }
 
 function realmBookNav(r: number, answerWaits: boolean): string {
@@ -7957,6 +7996,31 @@ async function endTurn(force = false): Promise<void> {
   return playWeek();
 }
 
+/**
+ * What is near the player's realm today (SHELL-190): a battle or siege of
+ * theirs, an enemy army in or beside their land, or a truce, site or study of
+ * Coming up due this month. A Disloyal lord is on Coming up for as long as he
+ * stays so, and does not hold every week back.
+ */
+function nearness(): Nearness {
+  const s = snapshot!;
+  const me = s.playerNation;
+  const owner = s.provinceOwner;
+  const fighting = s.battles.some((b) => b.player) || s.sieges.some((x) => x.by === me || owner[x.province] === me);
+  const foes = new Set(s.relations.filter((x) => x.state === "war").map((x) => x.nation));
+  let enemyNear = false;
+  if (foes.size)
+    for (let i = 0; i < s.armies.id.length && !enemyNear; i++) {
+      if (!foes.has(s.armies.owner[i]!)) continue;
+      const p = s.armies.location[i]!;
+      enemyNear = owner[p] === me || (neighborIdx[p] ?? []).some((j) => owner[j] === me);
+    }
+  const own: number[] = [];
+  for (let i = 0; i < owner.length; i++) if (owner[i] === me) own.push(i);
+  const dueThisMonth = comingFor(me, own).some((c) => c.months === 0 && c.kind !== "lord");
+  return { fighting, enemyNear, dueThisMonth };
+}
+
 /** Plays the week out, a day or a 4-hour step at a time (TIME-076). */
 async function playWeek(): Promise<void> {
   if (!snapshot) return;
@@ -7981,7 +8045,7 @@ async function playWeek(): Promise<void> {
     // The contact day and the nights pass no slower than a day does; the bells play at battle speed.
     const fighting = snapshot.battles.some((b) => b.player && b.phase === "fighting");
     const stepMs = watching && !watching.result ? (WATCH_STEP_MS * battleStepMs()) / BATTLE_STEP_MS : battleStepMs();
-    const ms = battle ? (fighting ? stepMs : Math.min(stepMs, dayMs())) : dayMs();
+    const ms = battle ? (fighting ? stepMs : Math.min(stepMs, dayMs())) : autoDayMs(auto, dayMs(), nearness());
     const t0 = performance.now();
     // Armies of the player's on the march, to tell when one arrives while Auto turns run (SHELL-161).
     const marching = auto.state === "on" ? marchingArmies() : null;

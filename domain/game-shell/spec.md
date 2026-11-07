@@ -401,6 +401,13 @@ Leroy asked for an auto turn mode for single player that can be paused, and deci
 
   How the player uses it: the Auto button sits right beside End turn in the corner the player's hand is on, the only place that controls time, with a 44-point tap target, the double play mark and the word Auto. Lit, it shows Auto turns are on, and the hourglass turns on End turn as every week plays; while it stops at the end of the week it blinks and says so. The End turn corner is the overview: off, on or stopping is readable there at a glance, and an alert under the top bar says why Auto turns stopped. On a phone in landscape the two buttons stand together above the safe area in the Wide and Tall layouts and keep clear of the alerts and the battle strip; nothing needs hover, and a long press is not needed.
 
+### Quiet weeks play faster (Leroy, 19 October 2026; F-156)
+Long stretches of peace on Auto still played every day at the speed chosen for watching a war (play hook, `research/play-hook.md`).
+
+- SHELL-190: While Auto turns are on, a day in which nothing is near shall play `autoTurns.quiet_speed` (3) times as fast as Turn playback speed (SET-131) asks, and a day in which something is near plays at that speed. Something is near while one of the player's battles or sieges is under way, while an army of a realm at war with the player stands in the player's land or in a province beside it, or while a truce, building site or study on Coming up (SHELL-188) ends this month; a Disloyal lord stays on Coming up as long as he is Disloyal and does not slow the days. The Auto button reads "Auto ×3" while the days play fast and "Auto" otherwise. Only how long a day takes on screen changes, never what the day does (X-15). [Leroy 19 Oct; F-156]
+
+  How the player uses it: nothing new to find or tap; the player turns Auto on beside End turn as before, and the weeks of a quiet peace go by three times as fast while the map stays live. As an enemy column crosses the border, a siege begins or a truce runs out this month, the days slow to the chosen speed by themselves, so the player sees it coming and can stop Auto in time; the stops of SHELL-161 are unchanged. The Auto button, already the overview of time in the End turn corner, says which pace is on ("Auto ×3"), inside its 44-point target on a phone held sideways or a tablet held upright. Nothing needs hover.
+
 ### 5.16 Campaign end and score in play (18 October)
 The first playable slice of SHELL-094 to SHELL-100, SHELL-129 and SHELL-130, and of the score line on the country card (REALM-156). The wrap-up events, the closing sequence over the borders by era, Look back, achievements and Credits wait for their own slices; the card below stands for the game over card and the final result until then.
 
@@ -428,6 +435,14 @@ The General tab had grown into a wall of 4.5 phone screens that repeated a line 
 - SHELL-171: When something in a section waits on the player, its Overview tile shall be marked and name it (hungry provinces, provinces whose normal year's food falls short of what they eat (D-PROV-36), or a month that loses gold; new lands to fill, beaten risings to judge, uprisings or settlers waiting; an answer waiting; nothing studied, or faith or language low), and a tap on a tile shall open the page that holds it (Food for food, Officials for new lands, Provinces for risings, Hunting grounds for settlers, Peoples for belief), or else the section's first page. [Leroy 18 Oct; ui-review; SHELL-141]
 
   How the player uses it: the player opens the Realm book on Realm and reads the whole realm in one screen on a phone held sideways: the ruler, Stability's four pillars and five tiles, two to a row, each at least 44 points tall. A red edge and one line say what waits ("2 provinces hungry", "An answer waits"); tapping the tile goes straight to it. What used to be repeated here (government form, faiths and languages, lands by ground, heritage, the fallen, neighbours) stays on its own page in its section, one tap away, so nothing is explained twice. Nothing needs hover.
+
+### Coming up (Leroy, 19 October 2026; F-154)
+The tiles say what waits on the player now; nothing said what is about to happen, so a truce ran out or a lord rose during a week on Auto without warning (play hook, `research/play-hook.md`).
+
+- SHELL-188: The Realm book's Overview shall show a Coming up strip between the capital line and the tiles: what will happen to the realm without the player acting, at most `comingUp.max` items (4), soonest first, kinds due the same month in the order of `comingUp.order`. It holds a Disloyal lord ("Álvaro de Luna may rise against you", any day), a truce ending, a building site finishing and the study being learned within `comingUp.horizon_months` (6) months ("Truce with Aragon ends in 3 months", "Farm in Toledo done next month", "Plough learned this month"), the open ambitions within reach as one item ("Ambition within reach: Unite Iberia", "3 ambitions within reach"), and a ruler under a regent or an heir one year short of `comingUp.of_age` (16) ("Juan comes of age within a year"). With nothing coming the strip is left out. [Leroy 19 Oct; F-154]
+- SHELL-189: Tapping an item of Coming up shall open what it names: a lord's screen, the realm's card on Diplomacy for a truce, the province card on Build for a site, Research for the study, Heritage for an ambition and Government for a ruler or heir coming of age. [Leroy 19 Oct; F-154]
+
+  How the player uses it: the player opens the Realm book (banner or a plaque) and Realm's Overview shows Coming up as one row of chips over the tiles, each 44 points tall with an hourglass and one short line, read left to right from the soonest. It sits on the Overview because that is the overview of the whole realm, and next to the tiles because a tile says what waits now and the strip says what comes next; nothing else repeats it. One tap goes to the thing itself, and Back returns to the Overview. On a phone held sideways the chips wrap to two lines inside the 45 % side sheet rather than scroll sideways (SHELL-167 lets no row scroll), and on a tablet held upright they sit in the bottom sheet the same way. Nothing needs hover.
 
 ### Less to read on each page (Leroy, 18 October 2026)
 The Economy pages were the longest in the book: Food 8.9 phone screens, with a paragraph under each of its settings, and Trade 6.9 (ui-review). Settings and long lists the player opens now and then move behind a tap.
@@ -861,6 +876,7 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-159 | auto-turns.feature | Auto turns play week after week; Auto turns are off after loading |
 | SHELL-160 | auto-turns.feature | Pausing finishes the current week; Tapping Auto again keeps it on; End turn pauses as before with Auto turns off |
 | SHELL-161 | auto-turns.feature | Auto turns stop by themselves; A blocked End turn stops Auto turns |
+| SHELL-190 | auto-turns.feature | Quiet weeks on Auto play faster; Something near slows the days; Without Auto the days keep their speed |
 | SHELL-149 | start-screen.feature | The start screen opens with its menu shown |
 | SHELL-150 | start-screen.feature | The map pans behind the start screen at region zoom |
 | SHELL-151 | start-screen.feature | Battery saver keeps the map moving |
@@ -878,6 +894,7 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-168 | map-and-cards.feature | Tool column |
 | SHELL-170 | realm-book.feature | The overview has a tile per section |
 | SHELL-171 | realm-book.feature | A tile names what waits and opens it |
+| SHELL-188, 189 | realm-book.feature | Coming up lists what is near, soonest first; Coming up leaves out what is far; Coming up keeps the four soonest; A Coming up item opens what it names |
 | SHELL-172 | — | Presentation only: the client's folds (`apps/client/src/ui/fold.ts`), checked on screenshots |
 | SHELL-185, 187 | — | Presentation only: the Army page, province card and its page rows in `apps/client/src/main.ts`, checked on screenshots (`apps/client/scripts/screens-shots.mjs`) |
 | SHELL-186 | map-and-cards.feature | The country card's tabs |

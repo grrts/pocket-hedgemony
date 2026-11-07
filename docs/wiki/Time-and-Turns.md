@@ -45,6 +45,8 @@ In a single-player campaign you can let the weeks play one after another. Tap **
 
 **Auto turns stop by themselves** at the end of a week in which something needs you, and the alert over the map says what: an event, one of your battles or sieges, a war of your realm, a call to arms, a peace offer or an envoy waiting, beaten rebels waiting for your verdict, scholars with nothing to study, or one of your armies reaching the end of its march. An event, a revolution or one of your battles still makes the week wait at once, as it always does. Auto turns are off every time you load a campaign.
 
+**Quiet weeks play faster.** On Auto, a day in which nothing is near plays three times as fast as your Turn playback speed, and the Auto button reads **Auto ×3**. As soon as something is near, the days slow to your speed again so you see it coming: one of your battles or sieges, an enemy army in or beside your land, or a truce, building site or study on the Overview's Coming up ending this month. Only how fast the days pass on screen changes, never what happens in them.
+
 ### The order of a turn
 
 Every turn runs the same steps in the same order:
