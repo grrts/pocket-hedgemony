@@ -352,3 +352,14 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `min_gain_share` | 0.2 |
 | `min_gain` | 0.2 |
 | `draft_options` | 12 |
+
+### Grain
+
+> D-TRADE-24, traders carry grain (feedback 85, provisional): a trader's grain hold is its kind's hold times hold\_per\_hold, in thousands of people fed for a month; entering a province it sells grain where the store is under unload\_below\_months of eating, up to that, then buys where the store is over load\_above\_months, as much of the excess as fits.
+
+| Key | Value |
+|---|---|
+| `hold_per_hold` | 5 |
+| `unload_below_months` | 4 |
+| `load_above_months` | 9 |
+| `provisional` | yes |
